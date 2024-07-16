@@ -7,8 +7,7 @@ module.exports = {
       {
         email: 'admin@example.com',
         password: '$2a$10$GyqMakjEG34Jjn76BKQk8eFVwiW1aECKdq4TfVcTZMl6Ph6J0mJEq', // hashed password: 'password123'
-        firstName: 'Admin',
-        lastName: 'User',
+        username: 'Admin',
         avatar: '',
         status: 'active',
         createdAt: new Date(),
@@ -17,8 +16,7 @@ module.exports = {
       {
         email: 'moderator@example.com',
         password: '$2a$10$GyqMakjEG34Jjn76BKQk8eFVwiW1aECKdq4TfVcTZMl6Ph6J0mJEq', // hashed password: 'password123'
-        firstName: 'Moderator',
-        lastName: 'User',
+        username: 'Moderator',
         avatar: '',
         status: 'active',
         createdAt: new Date(),
@@ -27,8 +25,7 @@ module.exports = {
       {
         email: 'user1@example.com',
         password: '$2a$10$GyqMakjEG34Jjn76BKQk8eFVwiW1aECKdq4TfVcTZMl6Ph6J0mJEq', // hashed password: 'password123'
-        firstName: 'John',
-        lastName: 'Doe',
+        username: 'John',
         avatar: '',
         status: 'active',
         createdAt: new Date(),
@@ -37,8 +34,7 @@ module.exports = {
       {
         email: 'user2@example.com',
         password: '$2a$10$GyqMakjEG34Jjn76BKQk8eFVwiW1aECKdq4TfVcTZMl6Ph6J0mJEq', // hashed password: 'password123'
-        firstName: 'Jane',
-        lastName: 'Doe',
+        username: 'Jane',
         avatar: '',
         status: 'pending',
         createdAt: new Date(),
@@ -47,8 +43,7 @@ module.exports = {
       {
         email: 'guest@example.com',
         password: '$2a$10$GyqMakjEG34Jjn76BKQk8eFVwiW1aECKdq4TfVcTZMl6Ph6J0mJEq', // hashed password: 'password123'
-        firstName: 'Guest',
-        lastName: 'User',
+        username: 'Guest',
         avatar: '',
         status: 'block',
         createdAt: new Date(),
@@ -59,36 +54,36 @@ module.exports = {
     await queryInterface.bulkInsert('Tokens', [
       {
         userId: 1,
-        accessToken: 'a',
-        refreshToken: 'a',
+        accessToken: '',
+        refreshToken: '',
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
         userId: 2,
-        accessToken: 'a',
-        refreshToken: 'a',
+        accessToken: '',
+        refreshToken: '',
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
         userId: 3,
-        accessToken: 'a',
-        refreshToken: 'a',
+        accessToken: '',
+        refreshToken: '',
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
         userId: 4,
-        accessToken: 'a',
-        refreshToken: 'a',
+        accessToken: '',
+        refreshToken: '',
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
         userId: 5,
-        accessToken: 'a',
-        refreshToken: 'a',
+        accessToken: '',
+        refreshToken: '',
         createdAt: new Date(),
         updatedAt: new Date()
       }

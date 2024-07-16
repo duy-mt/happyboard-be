@@ -6,11 +6,13 @@ const compression = require('compression')
 const { default: helmet } = require('helmet')
 const morgan = require('morgan')
 const cookieParser = require('cookie-parser')
+const cors = require('cors')
 const { NotFound } = require('./api/v1/core/error.response')
 
 const app = express()
 
 app.use(morgan('dev'))
+app.use(cors())
 app.use(helmet())
 app.use(compression())
 app.use(express.json())
@@ -22,7 +24,7 @@ app.use(cookieParser())
 // INIT DB
 // require('./api/v1/dbs/mysql.init')
 require('./api/v1/dbs/postgres.init')
-const es = require('./api/v1/dbs/es.init')
+require('./api/v1/dbs/es.init')
 
 // INIT ROUTES
 app.use('', require('./api/v1/routes/index'))

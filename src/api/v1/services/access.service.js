@@ -9,11 +9,11 @@ const {
     createRefreshToken, 
     createHash,
     compareHash,
-     
+    verifyJWT,
 } = require("../utils")
 
 class AccessService {
-    static login = async ({ email, password, refreshToken = null }) => {
+    static login = async ({ email, password }) => {
         // 1.Check email
         if(!email || !password) throw new BadRequest('Email and password are required')
         const foundUser = await findUserByEmail(email)
@@ -51,14 +51,14 @@ class AccessService {
     }
 
     static signUp = async ({
-        email, password, firstName, lastName
+        email, password, username
     }) => {
         const holderUser = await findUserByEmail(email)
         if(holderUser) throw new Conflict('Account already exists')
 
         const hashPW = await createHash(password)
         const newUser = await createUser({
-            email, password: hashPW, firstName, lastName
+            email, password: hashPW, username
         })
 
         if(newUser) {
@@ -78,8 +78,7 @@ class AccessService {
                 accessToken,
                 refreshToken 
             })
-            console.log(`user`,newUser);
-            console.log(`access`,accessToken);
+
             return {
                 user: newUser,
                 tokens: {
@@ -96,8 +95,40 @@ class AccessService {
         return delToken
     }
 
-    static handleRefreshToken = async ( refreshToken ) => {
+    static handleRefreshToken = async ({userId, refreshToken}) => {
+        // 1. Check refreshToken exists in db
         const holderToken = await findTokenByRefreshToken(refreshToken)
+        if(!holderToken) throw new BadRequest('Token not found in db. Relogin please')
+
+        // 2. Decode
+        const {
+            userId: id, email
+        } = await verifyJWT({
+            token: refreshToken,
+            secretKey: createSecretKey()
+        })
+
+
+        if(id != userId) throw new BadRequest('Relogin please')
+        const payload = {
+            userId, 
+            email,
+        }
+
+        const accessToken = await createAccessToken({
+            payload, secretKey: createSecretKey()
+        })
+
+        const token = await updatePairToken({
+            userId,
+            accessToken,
+            refreshToken
+        })
+
+        if(!token) throw new BadRequest('Relogin please')
+        return {
+            accessToken: token.accessToken
+        }
     }
 }
 

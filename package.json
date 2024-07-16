@@ -6,8 +6,8 @@
 		"dev": "node --watch server.js",
 		"nodemon": "nodemon server.js",
 		"migrate": "npx sequelize db:migrate",
-		"seeder": "npx sequelize db:seed:all",
-		"undo": "npx sequelize db:migrate:undo:all"
+		"undo": "npx sequelize db:migrate:undo:all",
+		"seed": "npx sequelize db:seed:all"
 	},
 	"keywords": [],
 	"author": "",
@@ -17,6 +17,7 @@
 		"@elastic/elasticsearch": "^8.14.0",
 		"bcryptjs": "^2.4.3",
 		"cookie-parser": "^1.4.6",
+		"cors": "^2.8.5",
 		"dotenv": "^16.4.5",
 		"express": "^4.19.2",
 		"jsonwebtoken": "^9.0.2",
@@ -24,6 +25,7 @@
 		"mysql2": "^3.10.2",
 		"pg": "^8.12.0",
 		"pg-hstore": "^2.3.4",
+		"redis": "^4.6.15",
 		"sequelize": "^6.37.3"
 	},
 	"devDependencies": {

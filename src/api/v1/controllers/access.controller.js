@@ -5,45 +5,59 @@ const AccessService = require("../services/access.service")
 
 class AccessController {
     login = async (req, res, next) => {
-        const metadata = await AccessService.login(req.body)
+        const data = await AccessService.login(req.body)
 
-        res.cookie('access-token', metadata.tokens.accessToken, {
-            httpOnly: true,
-            maxAge: 10 * 24 * 60 * 60 * 1000
-        }).cookie('refresh-token', metadata.tokens.refreshToken, {
-            httpOnly: true,
-            maxAge: 10 * 24 * 60 * 60 * 1000
+        res.cookie('access-token', data.tokens.accessToken, {
+            maxAge: 10 * 24 * 60 * 60 * 1000,
+        }).cookie('refresh-token', data.tokens.refreshToken, {
+            maxAge: 10 * 24 * 60 * 60 * 1000,
+        }).cookie('userId', data.user.id, {
+            maxAge: 10 * 24 * 60 * 60 * 1000,
         })
 
         new OK({
             message: 'Login successfully',
-            metadata
+            data
         }).send(res)
     }
 
     signUp = async (req, res, next) => {
-        const metadata = await AccessService.signUp(req.body)
+        const data = await AccessService.signUp(req.body)
 
-        res.cookie('access-token', metadata.tokens.accessToken, {
-            httpOnly: true,
+        res.cookie('access-token', data.tokens.accessToken, {
             maxAge: 10 * 24 * 60 * 60 * 1000
-        }).cookie('refresh-token', metadata.tokens.refreshToken, {
-            httpOnly: true,
+        }).cookie('refresh-token', data.tokens.refreshToken, {
+            maxAge: 10 * 24 * 60 * 60 * 1000
+        }).cookie('userId', data.user.id, {
             maxAge: 10 * 24 * 60 * 60 * 1000
         })
 
         new Created({
             message: 'Register successfully',
-            metadata
+            data
         }).send(res)
     }
 
     logout = async (req, res, next) => {
         res.clearCookie('access-token')
         res.clearCookie('refresh-token')
+        res.clearCookie('userId')
         new OK({
             message: 'Logout successfully',
-            metadata: await AccessService.logout(req.token)
+            data: await AccessService.logout(req.token)
+        }).send(res)
+    }
+
+    refreshToken = async (req, res, next) => {
+        const data = await AccessService.handleRefreshToken(req.body)
+
+        res.cookie('access-token', data.accessToken, {
+            maxAge: 10 * 24 * 60 * 60 * 1000
+        })
+
+        new OK({
+            message: 'Logout successfully',
+            data
         }).send(res)
     }
 }

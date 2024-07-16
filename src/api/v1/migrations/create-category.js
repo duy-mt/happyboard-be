@@ -17,9 +17,9 @@ module.exports = {
             type: Sequelize.TEXT,
             defaultValue: ''
         },
-        color: {
-            type: Sequelize.STRING(20),
-            defaultValue: 'blue'
+        icon: {
+            type: Sequelize.STRING,
+            defaultValue: ''
         },
         createdAt: {
             allowNull: false,

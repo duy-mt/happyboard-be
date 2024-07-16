@@ -15,11 +15,11 @@ module.exports = {
         },
         refreshToken: {
             type: Sequelize.STRING,
-            allowNull: false
+            defaultValue: ''
         },
         accessToken: {
             type: Sequelize.STRING,
-            allowNull: false
+            defaultValue: ''
         },
         createdAt: {
             allowNull: false,

@@ -3,22 +3,33 @@
 const { Category } = require('../index')
 
 const createCategory = async ({
-    title, description, color
+    title, description, icon
 }) => {
     const category = Category.create({
         title,
         description,
-        color
+        icon
     })
 
     return category
 }
 
 // FIND
-const getAllCategories = async () => await Category.findAll()
+const getAllCategories = async (options = {}) => {
+    const { count: total, rows: categories } = await Category.findAndCountAll({
+        ...options
+    })
+    
+    return {
+        categories, total
+    }
+}
 
-const getCategoryById = async (id) => await Category.findOne({
-    where: {id}
+const getCategoryById = async ({
+    id, options = {}
+}) => await Category.findOne({
+    where: {id},
+    ...options
 })
 
 module.exports = {

@@ -1,23 +1,34 @@
 'use strict'
 
-const { BadRequest } = require("../core/error.response")
 const { createCategory, getAllCategories, getCategoryById } = require("../models/repo/category.repo")
 
 class CategoryService {
     static createCategory = async ({
-        title, description, color
+        title, description, icon
     }) => {
         return await createCategory({
-            title, description, color
+            title, description, icon
         })
     }
 
     static getAllCategories = async () => {
-        return await getAllCategories()
-    }
+        const options = {
+            attributes: ['id', 'icon']
+        }
+        const { categories, total } = await getAllCategories(options)
+
+        return {
+            total,
+            categories
+        }
+    }    
 
     static getCategoryById = async (id) => {
-        return await getCategoryById(id)
+        const options = {
+            attributes: ['id', 'icon']
+        }
+        const category = await getCategoryById({id, options})
+        return category
     }   
 }
 

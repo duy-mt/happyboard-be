@@ -2,12 +2,13 @@
 
 const { OK, Created } = require('../core/success.response')
 const IdeaService = require('../services/idea.service')
+const CommentService = require('../services/comment.service')
 
 class IdeaController {
     getIdea = async (req, res, next) => {
         new OK({
             message: 'Get idea successfully',
-            metadata: await IdeaService.getIdea(req.params.ideaId)
+            data: await IdeaService.getIdea(req.params.ideaId)
         }).send(res)
     }
 
@@ -15,44 +16,59 @@ class IdeaController {
         const {q} = req.query
         if(!q) {
             new OK({
-                message: 'Get all ideas successfully',
-                metadata: await IdeaService.getAllIdeas(req.query)
+                message: 'Get ideas successfully',
+                data: await IdeaService.getAllIdeas(req.query)
             }).send(res)
         } else {
             new OK({
-                message: 'Get all ideas successfully',
-                metadata: await IdeaService.searchIdea(req.query)
+                message: 'Get ideas successfully',
+                data: await IdeaService.searchIdea(req.query)
             }).send(res)
         }
-    }
-
-    getAllIdeasByUserId = async (req, res, next) => {
-        new OK({
-            message: 'Get all ideas for user successfully',
-            metadata: await IdeaService.getAllIdeasByUserId(req.params.userId)
-        }).send(res)
     }
 
     createIdea = async (req, res, next) => {
         new Created({
             message: 'Created idea successfully!',
-            metadata: await IdeaService.createIdea(req.body)
+            data: await IdeaService.createIdea(req.body)
         }).send(res)
     }
 
     upVoteCount = async (req, res, next) => {
+        console.log('VOTE IDEA');
         new OK({
             message: 'Up voteCount successfully',
-            metadata: await IdeaService.upVoteCount(req.body)
+            data: await IdeaService.upVoteCount({
+                ideaId: req.params.ideaId,
+                userId: req.body.userId
+            })
         }).send(res)
     }
 
-    // searchIdea = async (req, res, next) => {
-    //     new OK({
-    //         message: 'Find data successfully',
-    //         metadata: await IdeaService.searchIdea(req.query)
-    //     })
-    // }
+    downVoteCount = async (req, res, next) => {
+        new OK({
+            message: 'Down voteCount successfully',
+            data: await IdeaService.downVoteCount({
+                ideaId: req.params.ideaId,
+                userId: req.body.userId
+            })
+        }).send(res)
+    }
+
+    createComment = async (req, res, next) => {
+        req.body.ideaId = req.params.ideaId
+        new Created({
+            message: 'Comment successfully',
+            data: await CommentService.createComment(req.body)
+        }).send(res)
+    }
+
+    getCommentByIdeaId = async (req, res, next) => {
+        new OK({
+            message: 'Comment successfully',
+            data: await CommentService.getCommentByIdeaId(req.params.ideaId)
+        }).send(res)
+    }
 }
 
 module.exports = new IdeaController()

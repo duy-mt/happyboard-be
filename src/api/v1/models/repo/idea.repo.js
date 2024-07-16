@@ -1,6 +1,8 @@
 'use strict'
-const { Idea, Comment, sequelize } = require('../index')
-const { createVote } = require('./vote.repo')
+const { QueryTypes, Op } = require('sequelize')
+const { Idea, Comment, User, Category, sequelize } = require('../index')
+const { createVote, deleteVote, findVote } = require('./vote.repo')
+const { processReturnedData } = require('../../utils')
 
 const createIdea = async ({
     title, content, categoryId, userId
@@ -16,18 +18,18 @@ const createIdea = async ({
 }
 
 // FIND
-const findIdea = async (id) => {
-    const idea = await Idea.findOne(id)
-    return idea
+const findIdea = async ({ id, options = {} }) => {    
+    const idea = await Idea.findByPk(id, options)
+    return processReturnedData(idea)
 }
 
 const findAllIdeas = async () => {
     const ideas = await Idea.findAll()
-    return ideas
+    return processReturnedData(ideas)
 }
 
 const findAllIdeasByUsedId = async (userId) => {
-    return await Idea.findAll({
+    const ideas = await Idea.findAll({
         where: {
             userId
         },
@@ -36,24 +38,37 @@ const findAllIdeasByUsedId = async (userId) => {
             as: 'comments'
         }]
     })
+    return processReturnedData(ideas)
 }
 
-const findIdeaPage = async ({ limit, start, options }) => {
-    const offset = start * limit
-    
+const findIdeaPage = async ({ limit, page, options }) => {
+    const offset = (page - 1) * limit
+
     const { count, rows: ideas } = await Idea.findAndCountAll({
         offset,
         limit,
-        ...options
+        order: [
+            ['createdAt', 'DESC'],
+            ['id', 'DESC']
+        ],
+        include: [
+            {
+                model: User,
+                attributes: ['username']
+            },
+            {
+                model: Category,
+                attributes: ['title']
+            }
+        ]
     })
-
-    const totalPages = Math.ceil(count / limit)
-
+    
     return {
-        ideas,
-        totalPages
+        ideas: processReturnedData(ideas),
+        totalIdea: count
     }
 }
+
 
 const increaseVoteCount = async ({
     ideaId, userId
@@ -69,17 +84,58 @@ const increaseVoteCount = async ({
             })
         }
     })
-    return idea
+    return {
+        voteCount: idea.voteCount
+    }
 }
 
 
-const decrementVoteCount = async (ideaId) => {
-    const idea = await findIdea(ideaId)
-    idea.decrement('voteCount', {
-        by: 1
+const decrementVoteCount = async ({ userId, ideaId }) => {
+    const [idea, vote] = await Promise.all([
+        Idea.findByPk(ideaId),
+        findVote({ userId, ideaId })
+    ])
+    
+    if(vote) {
+        await sequelize.transaction(async (t) => {
+            await deleteVote({userId, ideaId})
+    
+            if (idea.voteCount > 0) {
+                await idea.decrement('voteCount', {
+                    by: 1,
+                    transaction: t
+                })
+            }
+        })
+    }
+
+    return {
+        voteCount: idea.voteCount
+    }
+}
+
+const searchIdea = async ({q, page = 1, limit = 5}) => {    
+    const offset = (page - 1) * limit;
+
+    const { count, rows } = await Idea.findAndCountAll({
+        offset,
+        limit,
+        order: [
+            ['createdAt', 'DESC'],
+            ['id', 'DESC']
+        ],
+        where: {
+            title: {
+                [Op.like]: `%${q}%`
+            }
+        }
     })
 
-    return idea
+    const totalPages = Math.ceil(count / limit);
+    return {
+        ideas: processReturnedData(rows),
+        totalPages
+    };
 }
 
 
@@ -91,5 +147,6 @@ module.exports = {
     findIdeaPage,
     findIdea,
     increaseVoteCount,
-    decrementVoteCount
+    decrementVoteCount,
+    searchIdea
 }

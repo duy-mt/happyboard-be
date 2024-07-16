@@ -4,8 +4,8 @@ const { BadRequest } = require("../core/error.response")
 const { createComment, getCommentsByIdeaId } = require("../models/repo/comment.repo")
 
 class CommentService {
-    static createIdea = async ({
-        content, userId, ideaId, parentId
+    static createComment = async ({
+        content, userId, ideaId, parentId = null
     }) => {
         const comment = await createComment({
             content, userId, ideaId, parentId

@@ -1,14 +1,8 @@
 'use strict'
 
-// const mysql = require('mysql2/promise')
-// const {host, user, password, database} = require('../../../config/mysql.config')
-
-// const db = mysql.createPool({
-//     host, user, password, database
-// })
 const { Sequelize } = require('sequelize')
-const config = require('../../../config/mysql.config')
-const sequelize = new Sequelize(config)
+const { mysql } = require('../../../config')
+const sequelize = new Sequelize(mysql)
 
 async function testConnection() {   
     try {     
@@ -18,6 +12,6 @@ async function testConnection() {
         console.error('Unable to connect to the database:', error);
     }
 }
-testConnection();
+testConnection()
 
 module.exports = sequelize

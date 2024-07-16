@@ -7,10 +7,10 @@ const categoryController = require('../../controllers/category.controller')
 
 const router = express.Router()
 
-router.get('', asyncHandler(categoryController.getAllCategories))
-router.get('/:id', asyncHandler(categoryController.getCategoryById))
-
 router.use(asyncHandler(authentication))
-router.post('/create', asyncHandler(categoryController.createCategory))
+
+router.get('', asyncHandler(categoryController.getAllCategories))
+router.get('/:categoryId', asyncHandler(categoryController.getCategoryById))
+router.post('', asyncHandler(categoryController.createCategory))
 
 module.exports = router

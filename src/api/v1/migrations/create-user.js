@@ -18,13 +18,9 @@ module.exports = {
             type: Sequelize.STRING(60),
             allowNull: false
         },
-        firstName: {
+        username: {
             type: Sequelize.STRING(50),
-            defaultValue: ''
-        },
-        lastName: {
-            type: Sequelize.STRING(50),
-            defaultValue: ''
+            defaultValue: 'user'
         },
         avatar: {
             type: Sequelize.STRING,

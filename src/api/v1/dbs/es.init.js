@@ -1,20 +1,20 @@
 'use strict'
 
 const { Client } = require('@elastic/elasticsearch')
-const esConfig = require('../../../config/es.config')
+const { elastic } = require('../../../config')
 
 const client = new Client({
     cloud: {
-        id: esConfig.cloudID
+        id: elastic.cloudID
     },
     auth: {
-        username: esConfig.username,
-        password: esConfig.password
+        username: elastic.username,
+        password: elastic.password
     }
 })
 
 client.info()
     .then(res => console.log(`Connect Elastic Cloud succefully`))
-    .catch(err => console.log(`ES Connect Error :`, err))
+    .catch(err => console.log(`Elastic Cloud Connect Error :`, err))
 
 module.exports = client

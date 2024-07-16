@@ -29,6 +29,14 @@ module.exports = {
             type: Sequelize.INTEGER,
             defaultValue: 0
         }, 
+        voteCount: {
+            type: Sequelize.INTEGER,
+            defaultValue: 0
+        }, 
+        commentCount: {
+            type: Sequelize.INTEGER,
+            defaultValue: 0
+        }, 
         createdAt: {
             allowNull: false,
             type: Sequelize.DATE

@@ -14,6 +14,14 @@ module.exports = (sequelize, DataTypes) => {
                 foreignKey: 'ideaId',
                 as: 'comments'
             })
+
+            this.belongsTo(models.User, {
+                foreignKey: 'userId'
+            })
+
+            this.belongsTo(models.Category, {
+                foreignKey: 'categoryId'
+            })
         }
     }
     Idea.init({
@@ -21,7 +29,8 @@ module.exports = (sequelize, DataTypes) => {
         content: DataTypes.TEXT,
         userId: DataTypes.INTEGER,
         categoryId: DataTypes.INTEGER,
-        voteCount: DataTypes.INTEGER
+        voteCount: DataTypes.INTEGER,
+        commentCount: DataTypes.INTEGER,
     }, {
         sequelize,
         modelName: 'Idea',
