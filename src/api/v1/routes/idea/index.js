@@ -10,14 +10,17 @@ const router = express.Router()
 router.use(asyncHandler(authentication))
 ////////////////////////////////////////
 router.get('', asyncHandler(ideaController.getAllIdeas))
-router.get('/:ideaId', asyncHandler(ideaController.getIdea))
 router.post('', asyncHandler(ideaController.createIdea))
 
 // Publish
+router.get('/published', asyncHandler(ideaController.getAllPublisedIdeas))
+// router.get('/draft/all', asyncHandler(ideaController.getAllDraftIdeas))
+
+router.get('/:ideaId', asyncHandler(ideaController.getIdea))
 // router.post('/:ideaId/publish', asyncHandler(ideaController.publishIdea))
 // router.post('/:ideaId/unpublish', asyncHandler(ideaController.unPublishIdea))
-// router.get('/published/all', asyncHandler(ideaController.getAllPublisedIdeas))
-// router.get('/draft/all', asyncHandler(ideaController.getAllDraftIdeas))
+
+router.get('/:ideaId', asyncHandler(ideaController.getIdea))
 
 // Comment
 router.get('/:ideaId/comments', asyncHandler(ideaController.getCommentByIdeaId))

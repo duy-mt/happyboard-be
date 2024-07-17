@@ -1,8 +1,32 @@
 'use strict'
-const { QueryTypes, Op } = require('sequelize')
+const { QueryTypes, Op, where } = require('sequelize')
 const { Idea, Comment, User, Category, sequelize } = require('../index')
 const { createVote, deleteVote, findVote } = require('./vote.repo')
 const { processReturnedData } = require('../../utils')
+
+// DEFIND OPTIONS
+const optIdea = {
+    include: [{
+        model: Comment,
+        as: 'comments',
+        include: [
+            {
+                model: User,
+                attributes: ['username', 'email']
+            }
+        ]
+        }, {
+            model: Category,
+            attributes: ['title', 'icon']
+        }, 
+        {
+            model: User,
+            attributes: ['username', 'email']
+        },
+    ],
+    attributes: ['id', 'title', 'content', 'voteCount', 'commentCount', 'createdAt', 'updatedAt']
+}
+
 
 const createIdea = async ({
     title, content, categoryId, userId
@@ -18,8 +42,8 @@ const createIdea = async ({
 }
 
 // FIND
-const findIdea = async ({ id, options = {} }) => {    
-    const idea = await Idea.findByPk(id, options)
+const findIdea = async ({ id }) => {    
+    const idea = await Idea.findByPk(id, optIdea)
     return processReturnedData(idea)
 }
 
@@ -28,20 +52,18 @@ const findAllIdeas = async () => {
     return processReturnedData(ideas)
 }
 
-const findAllIdeasByUsedId = async (userId) => {
+const findAllIdeasByUsedId = async ({userId, isPublished = true}) => {
     const ideas = await Idea.findAll({
         where: {
-            userId
+            userId,
+            // isPublished
         },
-        include: [{
-            model: Comment,
-            as: 'comments'
-        }]
+        ...optIdea
     })
     return processReturnedData(ideas)
 }
 
-const findIdeaPage = async ({ limit, page, options }) => {
+const findIdeaPage = async ({ limit, page }) => {
     const offset = (page - 1) * limit
 
     const { count, rows: ideas } = await Idea.findAndCountAll({
@@ -58,11 +80,17 @@ const findIdeaPage = async ({ limit, page, options }) => {
             },
             {
                 model: Category,
-                attributes: ['title']
+                attributes: ['title', 'icon']
             }
-        ]
+        ],
+        where: {
+            isPublished: true
+        },
+        attributes: {
+            exclude: ['isPublished']
+        }
     })
-    
+
     return {
         ideas: processReturnedData(ideas),
         totalIdea: count

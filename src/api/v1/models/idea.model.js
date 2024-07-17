@@ -1,6 +1,6 @@
 'use strict'
 
-const { Model } = require('sequelize')
+const { Model, BOOLEAN } = require('sequelize')
 
 module.exports = (sequelize, DataTypes) => {
     class Idea extends Model {
@@ -29,11 +29,13 @@ module.exports = (sequelize, DataTypes) => {
         content: DataTypes.TEXT,
         userId: DataTypes.INTEGER,
         categoryId: DataTypes.INTEGER,
+        isPublished: DataTypes.BOOLEAN,
         voteCount: DataTypes.INTEGER,
         commentCount: DataTypes.INTEGER,
     }, {
         sequelize,
         modelName: 'Idea',
+        tableName: 'ideas',
         timestamps: true,
     })
     return Idea

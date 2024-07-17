@@ -10,16 +10,17 @@ const {
     createHash,
     compareHash,
     verifyJWT,
+    removeField,
 } = require("../utils")
 
 class AccessService {
     static login = async ({ email, password }) => {
         // 1.Check email
         if(!email || !password) throw new BadRequest('Email and password are required')
-        const foundUser = await findUserByEmail(email)
+        const { password: foundPW, user: foundUser } = await findUserByEmail(email)
         if(!foundUser) throw new Conflict('Account does not exist')
         // 2.Match pw
-        const isPw = await compareHash(password, foundUser.password)
+        const isPw = await compareHash(password, foundPW)
         if(!isPw) throw new BadRequest('Password is incorrect')
 
         // 3. Update access token
@@ -80,7 +81,10 @@ class AccessService {
             })
 
             return {
-                user: newUser,
+                user: removeField({
+                    obj: newUser,
+                    field: ['password', 'createdAt', 'updatedAt']
+                }),
                 tokens: {
                     accessToken,
                     refreshToken
@@ -96,9 +100,11 @@ class AccessService {
     }
 
     static handleRefreshToken = async ({userId, refreshToken}) => {
+        if(!refreshToken) throw new BadRequest('Wrong infomation. Relogin please')
+
         // 1. Check refreshToken exists in db
         const holderToken = await findTokenByRefreshToken(refreshToken)
-        if(!holderToken) throw new BadRequest('Token not found in db. Relogin please')
+        if(!holderToken) throw new BadRequest('Wrong infomation. Relogin please')
 
         // 2. Decode
         const {
@@ -108,8 +114,7 @@ class AccessService {
             secretKey: createSecretKey()
         })
 
-
-        if(id != userId) throw new BadRequest('Relogin please')
+        if(id != userId) throw new BadRequest('Wrong infomation. Relogin please')
         const payload = {
             userId, 
             email,
@@ -125,7 +130,7 @@ class AccessService {
             refreshToken
         })
 
-        if(!token) throw new BadRequest('Relogin please')
+        if(!token) throw new BadRequest('Wrong infomation. Relogin please')
         return {
             accessToken: token.accessToken
         }

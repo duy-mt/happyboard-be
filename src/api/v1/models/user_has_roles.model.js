@@ -14,10 +14,11 @@ module.exports = (sequelize, DataTypes) => {
     }
     User_has_roles.init({
         roleId: DataTypes.INTEGER,
-        permissionId: DataTypes.INTEGER,
+        userId: DataTypes.INTEGER,
     }, {
         sequelize,
         modelName: 'User_has_roles',
+        tableName: 'user_has_roles',
         timestamps: true,
     })
     return User_has_roles

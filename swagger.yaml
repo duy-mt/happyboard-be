@@ -1,0 +1,443 @@
+openapi: 3.0.3
+info:
+  title: Happy Board
+  version: 1.0.0s
+servers:
+  - url: https://localhost:8000/api/v1
+tags:
+  - name: access
+    description: Everything about access web
+  - name: Ideas
+    description: Everything about ideas
+paths:
+  /signup:
+    post:
+      tags:
+        - access
+      summary: Register new account by user
+      operationId: signup
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: admin@example.com
+                password:
+                  type: string
+                  example: password123
+                username:
+                  type: string
+                  example: admin
+        required: true
+      responses:
+        '201':
+          description: Register successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Register successfully
+                  status: 
+                    type: integer
+                    example: 201
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 5
+                          email:
+                            type: string
+                            example: thangvb.dev@gmail.com
+                          username:
+                            type: string
+                            example: thangvb
+                          avatar:
+                            type: string
+                            example: ""
+                          status:
+                            type: string
+                            example: pending
+                      tokens:
+                        type: object
+                        properties:
+                          accessToken:
+                            type: string
+                            example: ...
+                          refreshToken:
+                            type: string
+                            example: ...
+        '409':
+          description: Account already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    example: 409
+                  code:
+                    type: integer
+                    example: 409
+                  message:
+                    type: string
+                    example: Account already exists
+  /signin:
+    post:
+      tags:
+        - access
+      summary: Login web
+      operationId: signin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: admin@example.com
+                password:
+                  type: string
+                  example: password123
+        required: true
+      responses:
+        '200':
+          description: Register successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Register successfully
+                  status: 
+                    type: integer
+                    example: 200
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 5
+                          email:
+                            type: string
+                            example: thangvb.dev@gmail.com
+                          username:
+                            type: string
+                            example: thangvb
+                          avatar:
+                            type: string
+                            example: ""
+                          status:
+                            type: string
+                            example: pending
+                      tokens:
+                        type: object
+                        properties:
+                          accessToken:
+                            type: string
+                            example: ...
+                          refreshToken:
+                            type: string
+                            example: ...
+        '400':
+          description: Account already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    example: 400
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: Password is incorrect
+
+        '409':
+          description: Account already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    example: 409
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: Account does not exist
+  /logout:
+    post:
+      tags:
+        - access
+      summary: Logout Token Web
+      operationId: logout
+      parameters:
+        - in: header
+          name: x-client-id
+          schema:
+            type: integer
+            example: 1
+          required: true
+        - in: header
+          name: authorization
+          schema:
+            type: string
+            example: ...
+          required: true
+      responses:
+        '200':
+          description: Logout successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Logout successfully
+                  status: 
+                    type: integer
+                    example: 200
+                  data:
+                    type: integer
+                    example: 1
+  /refresh:
+    post:
+      tags:
+        - access
+      summary: Refresh Token Web
+      operationId: logout
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example: {
+              "userId": "1",
+              "refreshToken": "..."
+            }
+      responses:
+        '200':
+          description: Logout successfully
+          content:
+            application/json:
+              example: {
+                "message": "Logout successfully",
+                "status": 200,
+                "data": {
+                  "accessToken": "..."
+                }
+              }
+        '400':
+          description: Not fill "userId"
+          content:
+            application/json:
+              example: {
+                "status": 400,
+                "code": 400,
+                "message": "Wrong infomation. Relogin please"
+              }
+
+# IDEAS
+  /ideas:
+    get:
+      tags:
+        - Ideas
+      summary: Get all ideas
+      parameters:
+        - in: header
+          name: x-client-id
+          schema:
+            type: integer
+            example: 1
+          required: true
+        - in: header
+          name: authorization
+          schema:
+            type: string
+            example: ...
+          required: true
+      responses:
+        '200':
+          description: Get ideas successfully
+          content:
+            application/json:
+              example: {
+                "message": "Get ideas successfully",
+                "status": 200,
+                "data": {
+                  "totalPage": 1,
+                  "currentPage": 1,
+                  "pageSize": 5,
+                  "total": 3,
+                  "ideas": [
+                    {
+                      "id": 4,
+                      "title": "Bảo vệ môi trường biển",
+                      "content": "Giảm thiểu rác thải nhựa, bảo vệ đa dạng sinh học biển",
+                      "userId": 3,
+                      "categoryId": 4,
+                      "voteCount": 25,
+                      "commentCount": 12,
+                      "createdAt": "15/7/2024",
+                      "updatedAt": "15/7/2024",
+                      "User": {
+                          "username": "Jane Doe"
+                      },
+                      "Category": {
+                          "title": "Môi trường",
+                          "icon": "icon"
+                      }
+                    },
+                    {
+                      
+                    },
+                    ...
+                  ]
+                }
+              }
+  /ideas/:ideaId:
+    get:
+      tags:
+        - Ideas
+      summary: Get an idea
+      parameters:
+        - in: header
+          name: x-client-id
+          schema:
+            type: integer
+            example: 1
+          required: true
+        - in: header
+          name: authorization
+          schema:
+            type: string
+            example: ...
+          required: true
+        - in: path
+          name: ideaId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the user to get
+          example: 1
+      responses:
+        '200':
+          description: Get an idea successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Get idea successfully
+                  status:
+                    type: integer
+                    example: 200
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      title: 
+                        type: string
+                        example: Phát triển ứng dụng học tiếng Anh
+                      content:
+                        type: string
+                        example: Ứng dụng học tiếng Anh dựa trên trí tuệ nhân tạo
+                      voteCount:
+                        type: integer
+                        example: 1
+                      commentCount: 
+                        type: integer
+                        example: 1
+                      createdAt:
+                        type: string
+                        example: hh:mm:ss dd:MM:yyyy
+                      updatedAt:
+                        type: string
+                        example: hh:mm:ss dd:MM:yyyy
+                      comments:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            content:
+                              type: string
+                              example: Ý tưởng rất hay!
+                            User:
+                              type: object
+                              properties:
+                                username:
+                                  type: string
+                                  example: Admin User
+                                email:
+                                  type: string
+                                  example: admin@example.com
+                            createdAt:
+                              type: string
+                              example: hh:mm:ss dd:MM:yyyy
+                            updatedAt::
+                              type: string
+                              example: hh:mm:ss dd:MM:yyyy
+                      User:
+                        type: object
+                        properties:
+                          username:
+                            type: string
+                            example: Admin User
+                          email:
+                            type: string
+                            example: admin@example.com
+                      Category:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                            example: Công nghệ
+                          icon:
+                            type: string
+                            example: https://localhost:8000/images/1.png
+
+
+
+
+
+
+                        
+                            
+
+                      
+            
+        
+
+
+
+
+
+
+

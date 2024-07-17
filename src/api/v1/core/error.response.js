@@ -40,10 +40,17 @@ class ErrorRedis extends ErrorResponse {
     }
 }
 
+class Forbidden extends ErrorResponse {
+    constructor(message = ReasonPhrases.FORBIDDEN, statusCode = StatusCodes.FORBIDDEN) {
+        super(message, statusCode)
+    }
+}
+
 module.exports = {
     NotFound,
     BadRequest,
     Unauthorized,
     Conflict,
-    ErrorRedis
+    ErrorRedis,
+    Forbidden
 }

@@ -50,13 +50,18 @@ const verifyJWT = async ({token, secretKey}) => {
 
 const convertTime = (originTime) => {
     const date = new Date(originTime)
-    const day = date.getUTCDate();
-    const month = date.getUTCMonth() + 1
+    const day = String(date.getUTCDate()).padStart(2, '0')
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0')
     const year = date.getUTCFullYear()
-    // Format: dd/MM/yyyy
-    const formattedDate = `${day}/${month}/${year}`
+    const hours = String(date.getUTCHours()).padStart(2, '0')
+    const minutes = String(date.getUTCMinutes()).padStart(2, '0')
+    const seconds = String(date.getUTCSeconds()).padStart(2, '0')
+    
+    // Format: hh:mm:ss dd/MM/yyyy
+    const formattedDate = `${hours}:${minutes}:${seconds} ${day}/${month}/${year}`
     return formattedDate
-}
+};
+
 
 const getModel = (modelName) => {
     return sequelize[modelName]
@@ -78,35 +83,28 @@ const removeField = ({
 }
 
 const processReturnedData = (obj) => {
-    // if(Array.isArray(data)) {
-    //     return data.filter(obj => {
-    //         const handleObj = obj?.dataValues
-    //         Object.keys(handleObj).forEach(key => {
-    //             if(obj[key] == null) delete obj[key]
-    //         })
-    //         handleObj.createdAt = convertTime(handleObj.createdAt)
-    //         handleObj.updatedAt = convertTime(handleObj.updatedAt)
-    //         return obj?.dataValues
-    //     })
-    // }
-    // else {
-    //     const 
-    // }
+    obj = obj?.dataValues || obj
+
     if(Array.isArray(obj)) {
-        obj.filter(child => processReturnedData(child))
-    }
-    Object.keys(obj).forEach(key => {
-        if(obj[key] == null) delete obj[key]
-        if(Array.isArray(obj[key])) obj[key] = processReturnedData(obj[key])
-    })
-    const handleObj = obj?.dataValues
-    if(handleObj) {
-        // Convert time
-        if(handleObj?.createdAt) handleObj.createdAt = convertTime(handleObj.createdAt)
-        if(handleObj?.updatedAt) handleObj.updatedAt = convertTime(handleObj.updatedAt)
+        obj = obj.map(child => {
+            return processReturnedData(child?.dataValues || child)
+        })
     }
 
-    return handleObj || obj
+    Object.keys(obj).forEach(key => {
+        if(obj[key] == null) {
+            delete obj[key]
+        }
+        if(Array.isArray(obj[key])) {
+            obj[key] = processReturnedData(obj[key])
+        } 
+    })
+
+    // Convert time
+    if(obj?.createdAt) obj.createdAt = convertTime(obj.createdAt)
+    if(obj?.updatedAt) obj.updatedAt = convertTime(obj.updatedAt)
+
+    return obj
 }
 
 module.exports = {

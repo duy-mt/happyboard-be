@@ -4,7 +4,7 @@ const { BadRequest } = require("../core/error.response")
 const { createIdea, findAllIdeas, findAllIdeasByUsedId, findIdeaPage, findIdea, increaseVoteCount, searchIdea, decrementVoteCount } = require("../models/repo/idea.repo")
 const { insertDataByES, searchDataByES } = require('../elastic/idea.elastic')
 const { findVote } = require('../models/repo/vote.repo')
-const { convertTime, getModel } = require("../utils")
+const { getModel } = require("../utils")
 
 class IdeaService {
     static createIdea = async ({
@@ -25,91 +25,9 @@ class IdeaService {
         return idea
     }
 
-    // static getIdea = async (id) => {
-    //     const {
-    //         Category, User, comments, ...ideaData
-    //     } = await findIdea(id)
-
-    //     const {
-    //         id: ideaId,
-    //         userId,
-    //         title,
-    //         commentCount,
-    //         voteCount,
-    //         content,
-    //         createdAt
-    //     } = ideaData.dataValues
-
-    //     const {
-    //         username
-    //     } = User
-
-    //     const vote = await findVote({
-    //         userId,
-    //         ideaId
-    //     })
-    //     const isVoted = vote ? true : false
-
-    //     const handleComment = comments.map(cmt => {
-    //         const {
-    //             User, ...data
-    //         } = cmt
-    //         const {
-    //             id,
-    //             content,
-    //             createdAt
-    //         } = data.dataValues
-
-    //         return {
-    //             id,
-    //             author: User.username,
-    //             content,
-    //             createAt: convertTime(createdAt)
-    //         }
-    //     })
-
-    //     return {
-    //         id: ideaId,
-    //         author: username,
-    //         title,
-    //         category: {
-    //             title: Category.title,
-    //             icon: Category.icon
-    //         },
-    //         totalComment: commentCount,
-    //         totalVote: voteCount,
-    //         totalView: 100,
-    //         description: content,
-    //         isVoted,
-    //         createAt: convertTime(createdAt),
-    //         comments: handleComment
-    //     }
-    // }
-
     static getIdea = async (id) => {
-        const options = {
-            include: [{
-                model: getModel('Comment'),
-                as: 'comments',
-                include: [
-                    {
-                        model: getModel('User'),
-                        attributes: ['username']
-                    }
-                ]
-                }, {
-                    model: getModel('Category'),
-                    attributes: ['title', 'icon']
-                }, 
-                {
-                    model: getModel('User'),
-                    attributes: ['username', 'email']
-                },
-            ],
-            // attributes: ['id', 'title', 'content', 'voteCount', 'commentCount']
-        }
 
-        const ideas = await findIdea({id, options})
+        const ideas = await findIdea({id})
 
         return ideas
     }
@@ -121,32 +39,7 @@ class IdeaService {
             ideas, totalIdea
         } = await findIdeaPage({ limit, page })
 
-        // const data = await Promise.all(ideas.map(async (idea) => {
-        //     const { User, Category, ...ideaData} = idea.get({ plain: true })
-
-        //     const vote = await findVote({
-        //         ideaId: ideaData.id,
-        //         userId: ideaData.userId
-        //     })
-
-        //     const isVoted = vote ? true : false
-
-        //     return {
-        //         // ...ideaData,
-        //         id: ideaData.id,
-        //         author: User.username,
-        //         title: ideaData.title,
-        //         category: Category.title,
-        //         totalComment: ideaData.commentCount,
-        //         totalVote: ideaData.voteCount,
-        //         totalView: 100,
-        //         description: ideaData.content,
-        //         isVoted,
-        //         createAt: convertTime(ideaData.createdAt)
-        //     }
-        // }))
-
-        const totalPage = Math.ceil(totalIdea / limit);
+        const totalPage = Math.ceil(totalIdea / limit)
 
         return {
             totalPage: totalPage,
@@ -157,8 +50,8 @@ class IdeaService {
         }
     }
 
-    static getAllIdeasByUserId = async (userId) => {
-        const ideas = await findAllIdeasByUsedId(userId) 
+    static getAllPublisedIdeas = async (userId) => {
+        const ideas = await findAllIdeasByUsedId({userId}) 
         return ideas
     }
 

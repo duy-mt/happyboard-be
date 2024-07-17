@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS "ideas" (
   "categoryId" INTEGER NOT NULL,
   "voteCount" INTEGER DEFAULT 0,
   "commentCount" INTEGER DEFAULT 0,
+  "isPublished" BOOLEAN DEFAULT false,
   "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL,
   "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL,
   FOREIGN KEY ("userId") REFERENCES "users" ("id") ON UPDATE CASCADE ON DELETE CASCADE,
@@ -182,20 +183,29 @@ INSERT INTO "roles" ("name", "description", "createdAt", "updatedAt") VALUES
 ('User', 'Normal User', NOW(), NOW()),
 ('Guest', 'Guest User', NOW(), NOW());
 
+-- users
+-- categories
+-- ideas
+-- comments
+-- votes
+-- reaction
+-- tokens
+
 -- Thêm dữ liệu cho bảng permissions
 INSERT INTO "permissions" ("name", "description", "createdAt", "updatedAt") VALUES
-('manage_users', 'Manage users', NOW(), NOW()),
-('create_ideas', 'Create ideas', NOW(), NOW()),
-('vote_ideas', 'Vote ideas', NOW(), NOW()),
-('comment_ideas', 'Comment on ideas', NOW(), NOW());
+('create user', '', NOW(), NOW()),
+('read all users', '', NOW(), NOW()),
+('read user', '', NOW(), NOW()),
+('update user', '', NOW(), NOW()),
+('delete user', '', NOW(), NOW());
 
 -- Thêm dữ liệu cho bảng role_has_permissions
 INSERT INTO "role_has_permissions" ("roleId", "permissionId", "createdAt", "updatedAt") VALUES
 (1, 1, NOW(), NOW()),
 (1, 2, NOW(), NOW()),
 (1, 3, NOW(), NOW()),
-(1, 4, NOW(), NOW()),
-(2, 2, NOW(), NOW()),
+(1, 5, NOW(), NOW()),
+(2, 1, NOW(), NOW()),
 (2, 3, NOW(), NOW()),
 (2, 4, NOW(), NOW());
 
@@ -203,5 +213,5 @@ INSERT INTO "role_has_permissions" ("roleId", "permissionId", "createdAt", "upda
 INSERT INTO "user_has_roles" ("userId", "roleId", "createdAt", "updatedAt") VALUES
 (1, 1, NOW(), NOW()),
 (2, 2, NOW(), NOW()),
-(3, 2, NOW(), NOW());
+(3, 2, NOW(), NOW()),
 (4, 2, NOW(), NOW());

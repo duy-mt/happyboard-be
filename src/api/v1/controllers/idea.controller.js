@@ -27,6 +27,13 @@ class IdeaController {
         }
     }
 
+    getAllPublisedIdeas = async (req, res, next) => {
+        new OK({
+            message: 'Get idea successfully',
+            data: await IdeaService.getAllPublisedIdeas(req.body.userId)
+        }).send(res)
+    }
+
     createIdea = async (req, res, next) => {
         new Created({
             message: 'Created idea successfully!',
