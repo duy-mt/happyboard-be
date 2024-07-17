@@ -15,10 +15,11 @@ module.exports = (sequelize, DataTypes) => {
     Category.init({
         title: DataTypes.STRING(50),
         description: DataTypes.TEXT,
-        color: DataTypes.STRING(20),
+        icon: DataTypes.STRING,
     }, {
         sequelize,
         modelName: 'Category',
+        tableName: 'categories',
         timestamps: true,
     })
     return Category

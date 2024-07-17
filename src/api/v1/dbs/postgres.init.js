@@ -1,19 +1,17 @@
 'use strict'
 
 const { Sequelize } = require('sequelize')
-const config = require('../../../config/postgres.config')
-const sequelize = new Sequelize(config)
+const { postgres } = require('../../../config')
+const sequelize = new Sequelize(postgres)
 
-console.log(config)
-
-async function testConnection() {
-    try {
-        await sequelize.authenticate();
-        console.log('Postgres connected succefully');
+async function testConnection() {   
+    try {     
+        await sequelize.authenticate()
+        console.log('Postgres connected succefully')
     } catch (error) {
-        console.error('Unable to connect to the database:', error);
+        console.error('Unable to connect to the database:', error)
     }
 }
-testConnection();
+testConnection()
 
 module.exports = sequelize

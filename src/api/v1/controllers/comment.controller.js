@@ -7,21 +7,21 @@ class CommentController {
     createComment = async (req, res, next) => {
         new Created({
             message: 'Created comment successfully!',
-            metadata: await CommentService.createComment(req.body)
+            data: await CommentService.createComment(req.body)
         }).send(res)
     }
 
     getCommentsByIdeaId = async (req, res, next) => {
         new OK({
             message: 'Get comment successfully!',
-            metadata: await CommentService.getCommentByIdeaId(req.params.ideaId)
+            data: await CommentService.getCommentByIdeaId(req.params.ideaId)
         }).send(res)
     }
 
     // getCommentsByParentId = async (req, res, next) => {
     //     new OK({
     //         message: 'Get comment successfully!',
-    //         metadata: await CommentService.getCommentByParentId(req.params.parentId)
+    //         data: await CommentService.getCommentByParentId(req.params.parentId)
     //     }).send(res)
     // }
 

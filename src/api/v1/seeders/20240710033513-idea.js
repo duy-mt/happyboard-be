@@ -9,7 +9,8 @@ module.exports = {
         content: 'This is the content of the first idea.',
         userId: 1,
         categoryId: 1,
-        voteCount: 10,
+        voteCount: 0,
+        commentCount: 3,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -18,7 +19,8 @@ module.exports = {
         content: 'This is the content of the second idea.',
         userId: 2,
         categoryId: 2,
-        voteCount: 20,
+        voteCount: 0,
+        commentCount: 1,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -27,7 +29,8 @@ module.exports = {
         content: 'This is the content of the third idea.',
         userId: 3,
         categoryId: 3,
-        voteCount: 5,
+        voteCount: 0,
+        commentCount: 1,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -36,7 +39,8 @@ module.exports = {
         content: 'This is the content of the fourth idea.',
         userId: 4,
         categoryId: 4,
-        voteCount: 15,
+        voteCount: 0,
+        commentCount: 0,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -45,7 +49,8 @@ module.exports = {
         content: 'This is the content of the fifth idea.',
         userId: 5,
         categoryId: 5,
-        voteCount: 8,
+        voteCount: 0,
+        commentCount: 0,
         createdAt: new Date(),
         updatedAt: new Date()
       }

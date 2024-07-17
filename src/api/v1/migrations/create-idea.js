@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
     async up(queryInterface, Sequelize) {
-        await queryInterface.createTable('Ideas', {
+        await queryInterface.createTable('ideas', {
         id: {
             allowNull: false,
             autoIncrement: true,
@@ -29,6 +29,14 @@ module.exports = {
             type: Sequelize.INTEGER,
             defaultValue: 0
         }, 
+        voteCount: {
+            type: Sequelize.INTEGER,
+            defaultValue: 0
+        }, 
+        commentCount: {
+            type: Sequelize.INTEGER,
+            defaultValue: 0
+        }, 
         createdAt: {
             allowNull: false,
             type: Sequelize.DATE
@@ -40,6 +48,6 @@ module.exports = {
         })
     },
     async down(queryInterface, Sequelize) {
-        await queryInterface.dropTable('Ideas');
+        await queryInterface.dropTable('ideas');
     }
 }

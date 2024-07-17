@@ -7,70 +7,70 @@ module.exports = {
             {
                 title: 'Technology',
                 description: 'All about the latest tech trends and innovations.',
-                color: 'blue',
+                icon: 'icon',
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
             {
                 title: 'Health',
                 description: 'Health tips, news, and advice.',
-                color: 'green',
+                icon: 'icon',
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
             {
                 title: 'Travel',
                 description: 'Travel guides, tips, and destination reviews.',
-                color: 'orange',
+                icon: 'icon',
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
             {
                 title: 'Food',
                 description: 'Delicious recipes, restaurant reviews, and cooking tips.',
-                color: 'red',
+                icon: 'icon',
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
             {
                 title: 'Education',
                 description: 'Resources and news about education and learning.',
-                color: 'purple',
+                icon: 'icon',
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
             {
                 title: 'Finance',
                 description: 'Financial advice, news, and tips on saving money.',
-                color: 'yellow',
+                icon: 'icon',
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
             {
                 title: 'Entertainment',
                 description: 'Latest entertainment news and celebrity gossip.',
-                color: 'pink',
+                icon: 'icon',
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
             {
                 title: 'Sports',
                 description: 'Sports news, scores, and analysis.',
-                color: 'cyan',
+                icon: 'icon',
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
             {
                 title: 'Fashion',
                 description: 'Latest trends in fashion and style tips.',
-                color: 'violet',
+                icon: 'icon',
                 createdAt: new Date(),
                 updatedAt: new Date()
             },
             {
                 title: 'Science',
                 description: 'Discoveries and news from the world of science.',
-                color: 'grey',
+                icon: 'icon',
                 createdAt: new Date(),
                 updatedAt: new Date()
             }

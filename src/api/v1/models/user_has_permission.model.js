@@ -3,7 +3,7 @@
 const { Model } = require('sequelize')
 
 module.exports = (sequelize, DataTypes) => {
-    class Role_Feature extends Model {
+    class User_has_permissions extends Model {
         /**
          * Helper method for defining associations.
          * This method is not a part of Sequelize lifecycle.
@@ -12,13 +12,14 @@ module.exports = (sequelize, DataTypes) => {
         static associate(models) {
         }
     }
-    Role_Feature.init({
+    User_has_permissions.init({
         roleId: DataTypes.INTEGER,
-        featureId: DataTypes.INTEGER,
+        userId: DataTypes.INTEGER,
     }, {
         sequelize,
-        modelName: 'Role_Feature',
+        modelName: 'User_has_permissions',
+        tableName: 'user_has_permissions',
         timestamps: true,
     })
-    return Role_Feature
+    return User_has_permissions
 }

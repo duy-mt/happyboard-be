@@ -8,7 +8,8 @@ const { authentication } = require('../../auth')
 const router = express.Router()
 
 router.post('/signup', asyncHandler(accessController.signUp))
-router.post('/login', asyncHandler(accessController.login))
+router.post('/signin', asyncHandler(accessController.login))
+router.post('/refresh', asyncHandler(accessController.refreshToken))
 
 router.use(asyncHandler(authentication))
 

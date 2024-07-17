@@ -19,6 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     }, {
         sequelize,
         modelName: 'Reaction',
+        tableName: 'reactions',
         timestamps: true,
     })
     return Reaction

@@ -1,6 +1,6 @@
 'use strict'
 
-const { Model } = require('sequelize')
+const { Model, BOOLEAN } = require('sequelize')
 
 module.exports = (sequelize, DataTypes) => {
     class Idea extends Model {
@@ -14,6 +14,14 @@ module.exports = (sequelize, DataTypes) => {
                 foreignKey: 'ideaId',
                 as: 'comments'
             })
+
+            this.belongsTo(models.User, {
+                foreignKey: 'userId'
+            })
+
+            this.belongsTo(models.Category, {
+                foreignKey: 'categoryId'
+            })
         }
     }
     Idea.init({
@@ -21,10 +29,13 @@ module.exports = (sequelize, DataTypes) => {
         content: DataTypes.TEXT,
         userId: DataTypes.INTEGER,
         categoryId: DataTypes.INTEGER,
-        voteCount: DataTypes.INTEGER
+        isPublished: DataTypes.BOOLEAN,
+        voteCount: DataTypes.INTEGER,
+        commentCount: DataTypes.INTEGER,
     }, {
         sequelize,
         modelName: 'Idea',
+        tableName: 'ideas',
         timestamps: true,
     })
     return Idea

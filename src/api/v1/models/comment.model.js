@@ -12,7 +12,10 @@ module.exports = (sequelize, DataTypes) => {
         static associate(models) {
             this.belongsTo(models.Idea, {
                 foreignKey: 'ideaId',
-                as: 'idea'
+            });
+
+            this.belongsTo(models.User, {
+                foreignKey: 'ideaId',
             });
         }
     }
@@ -24,6 +27,7 @@ module.exports = (sequelize, DataTypes) => {
     }, {
         sequelize,
         modelName: 'Comment',
+        tableName: 'comments',
         timestamps: true,
     })
     return Comment

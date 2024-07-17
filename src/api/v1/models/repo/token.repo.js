@@ -5,23 +5,34 @@ const { Token } = require('../index')
 const createNewToken = async ({
     userId, accessToken, refreshToken
 }) => {
-    return await Token.create({ 
+    const token = await Token.create({ 
         userId,
         accessToken,
         refreshToken
     })
+
+    return token?.dataValues
 }
 
 const updatePairToken = async ({
     userId, accessToken, refreshToken
 }) => {
-    return await Token.update(
+    const [token, isCreated] = await Token.findOrCreate(
         { 
-            accessToken,
-            refreshToken
-        },
-        { where: { userId } }
+            where: { userId },
+            defaults: {
+                accessToken,
+                refreshToken
+            } 
+        },    
     )
+
+    if(!isCreated) token.update({
+        accessToken,
+        refreshToken
+    })
+
+    return token?.dataValues
 } 
 
 // FIND

@@ -7,12 +7,27 @@ const { authentication } = require('../../auth')
 
 const router = express.Router()
 
-router.get('', asyncHandler(ideaController.getAllIdeas))
-
 router.use(asyncHandler(authentication))
+////////////////////////////////////////
+router.get('', asyncHandler(ideaController.getAllIdeas))
+router.post('', asyncHandler(ideaController.createIdea))
 
-router.get('/:userId', asyncHandler(ideaController.getAllIdeasByUserId))
-router.post('/create', asyncHandler(ideaController.createIdea))
-router.post('/vote', asyncHandler(ideaController.upVoteCount))
+// Publish
+router.get('/published', asyncHandler(ideaController.getAllPublisedIdeas))
+// router.get('/draft/all', asyncHandler(ideaController.getAllDraftIdeas))
+
+router.get('/:ideaId', asyncHandler(ideaController.getIdea))
+// router.post('/:ideaId/publish', asyncHandler(ideaController.publishIdea))
+// router.post('/:ideaId/unpublish', asyncHandler(ideaController.unPublishIdea))
+
+router.get('/:ideaId', asyncHandler(ideaController.getIdea))
+
+// Comment
+router.get('/:ideaId/comments', asyncHandler(ideaController.getCommentByIdeaId))
+router.post('/:ideaId/comments', asyncHandler(ideaController.createComment))
+
+// Vote
+router.post('/:ideaId/vote', asyncHandler(ideaController.upVoteCount))
+router.post('/:ideaId/unvote', asyncHandler(ideaController.downVoteCount))
 
 module.exports = router

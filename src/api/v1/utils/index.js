@@ -2,6 +2,8 @@
 
 const JWT = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
+const _ = require('lodash')
+const sequelize = require('../models')
 
 // BEGIN AUTH
 
@@ -41,15 +43,69 @@ const compareHash = (input1, input2) => {
 }
 
 const verifyJWT = async ({token, secretKey}) => {
-    try {
-        return await JWT.verify(token, secretKey)
-    } catch (err) {
-        return null
-    }
+    return await JWT.verify(token, secretKey)
 }
 
-
 // END AUTH
+
+const convertTime = (originTime) => {
+    const date = new Date(originTime)
+    const day = String(date.getUTCDate()).padStart(2, '0')
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+    const year = date.getUTCFullYear()
+    const hours = String(date.getUTCHours()).padStart(2, '0')
+    const minutes = String(date.getUTCMinutes()).padStart(2, '0')
+    const seconds = String(date.getUTCSeconds()).padStart(2, '0')
+    
+    // Format: hh:mm:ss dd/MM/yyyy
+    const formattedDate = `${hours}:${minutes}:${seconds} ${day}/${month}/${year}`
+    return formattedDate
+};
+
+
+const getModel = (modelName) => {
+    return sequelize[modelName]
+}
+
+const removeUndefinedObject = obj => {
+    console.log(obj)
+} 
+
+const removeField = ({
+    obj, field
+}) => {
+    Object.keys(obj).forEach(key => {
+        if(obj[key] == null) delete obj[key]
+        if(field.includes(key)) delete obj[key]
+    })
+
+    return obj
+}
+
+const processReturnedData = (obj) => {
+    obj = obj?.dataValues || obj
+
+    if(Array.isArray(obj)) {
+        obj = obj.map(child => {
+            return processReturnedData(child?.dataValues || child)
+        })
+    }
+
+    Object.keys(obj).forEach(key => {
+        if(obj[key] == null) {
+            delete obj[key]
+        }
+        if(Array.isArray(obj[key])) {
+            obj[key] = processReturnedData(obj[key])
+        } 
+    })
+
+    // Convert time
+    if(obj?.createdAt) obj.createdAt = convertTime(obj.createdAt)
+    if(obj?.updatedAt) obj.updatedAt = convertTime(obj.updatedAt)
+
+    return obj
+}
 
 module.exports = {
     createAccessToken,
@@ -57,5 +113,10 @@ module.exports = {
     createSecretKey,
     createHash,
     compareHash,
-    verifyJWT
+    verifyJWT,
+    convertTime,
+    getModel,
+    removeUndefinedObject,
+    removeField,
+    processReturnedData
 }

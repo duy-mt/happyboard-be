@@ -9,17 +9,18 @@ const {
     createRefreshToken, 
     createHash,
     compareHash,
-     
+    verifyJWT,
+    removeField,
 } = require("../utils")
 
 class AccessService {
-    static login = async ({ email, password, refreshToken = null }) => {
+    static login = async ({ email, password }) => {
         // 1.Check email
         if(!email || !password) throw new BadRequest('Email and password are required')
-        const foundUser = await findUserByEmail(email)
+        const { password: foundPW, user: foundUser } = await findUserByEmail(email)
         if(!foundUser) throw new Conflict('Account does not exist')
         // 2.Match pw
-        const isPw = await compareHash(password, foundUser.password)
+        const isPw = await compareHash(password, foundPW)
         if(!isPw) throw new BadRequest('Password is incorrect')
 
         // 3. Update access token
@@ -51,14 +52,14 @@ class AccessService {
     }
 
     static signUp = async ({
-        email, password, firstName, lastName
+        email, password, username
     }) => {
         const holderUser = await findUserByEmail(email)
         if(holderUser) throw new Conflict('Account already exists')
 
         const hashPW = await createHash(password)
         const newUser = await createUser({
-            email, password: hashPW, firstName, lastName
+            email, password: hashPW, username
         })
 
         if(newUser) {
@@ -78,10 +79,12 @@ class AccessService {
                 accessToken,
                 refreshToken 
             })
-            console.log(`user`,newUser);
-            console.log(`access`,accessToken);
+
             return {
-                user: newUser,
+                user: removeField({
+                    obj: newUser,
+                    field: ['password', 'createdAt', 'updatedAt']
+                }),
                 tokens: {
                     accessToken,
                     refreshToken
@@ -96,8 +99,41 @@ class AccessService {
         return delToken
     }
 
-    static handleRefreshToken = async ( refreshToken ) => {
+    static handleRefreshToken = async ({userId, refreshToken}) => {
+        if(!refreshToken) throw new BadRequest('Wrong infomation. Relogin please')
+
+        // 1. Check refreshToken exists in db
         const holderToken = await findTokenByRefreshToken(refreshToken)
+        if(!holderToken) throw new BadRequest('Wrong infomation. Relogin please')
+
+        // 2. Decode
+        const {
+            userId: id, email
+        } = await verifyJWT({
+            token: refreshToken,
+            secretKey: createSecretKey()
+        })
+
+        if(id != userId) throw new BadRequest('Wrong infomation. Relogin please')
+        const payload = {
+            userId, 
+            email,
+        }
+
+        const accessToken = await createAccessToken({
+            payload, secretKey: createSecretKey()
+        })
+
+        const token = await updatePairToken({
+            userId,
+            accessToken,
+            refreshToken
+        })
+
+        if(!token) throw new BadRequest('Wrong infomation. Relogin please')
+        return {
+            accessToken: token.accessToken
+        }
     }
 }
 

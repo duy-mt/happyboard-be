@@ -34,9 +34,23 @@ class Conflict extends ErrorResponse {
     }
 }
 
+class ErrorRedis extends ErrorResponse {
+    constructor(message = 'Rediss error', statusCode = -99) {
+        super(message, statusCode)
+    }
+}
+
+class Forbidden extends ErrorResponse {
+    constructor(message = ReasonPhrases.FORBIDDEN, statusCode = StatusCodes.FORBIDDEN) {
+        super(message, statusCode)
+    }
+}
+
 module.exports = {
     NotFound,
     BadRequest,
     Unauthorized,
-    Conflict
+    Conflict,
+    ErrorRedis,
+    Forbidden
 }
