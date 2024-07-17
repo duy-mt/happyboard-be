@@ -3,7 +3,7 @@ name: Deploy Node Server
 on:
   push: 
     branches:
-      - feature/cicd
+      - main
 
 jobs:
   build:
