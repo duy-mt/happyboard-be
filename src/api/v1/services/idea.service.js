@@ -1,25 +1,23 @@
 'use strict'
 
 const { BadRequest } = require("../core/error.response")
-const { createIdea, findAllIdeas, findAllIdeasByUsedId, findIdeaPage, findIdea, increaseVoteCount, searchIdea, decrementVoteCount } = require("../models/repo/idea.repo")
+const { createIdea, findAllIdeasByUsedId, findIdeaPage, findIdea, increaseVoteCount, decrementVoteCount, updateIdea } = require("../models/repo/idea.repo")
 const { insertDataByES, searchDataByES } = require('../elastic/idea.elastic')
-const { findVote } = require('../models/repo/vote.repo')
-const { getModel } = require("../utils")
 
 class IdeaService {
     static createIdea = async ({
-        title, content, categoryId, userId
+        title, content, categoryId, userId, isPublished = true
     }) => {
         if(!content || !title) throw new BadRequest('Title and content are required')
         categoryId = categoryId ? categoryId : 0
 
-        const idea = await createIdea({
-            title, content, categoryId, userId
+        const savedIdea = await createIdea({
+            title, content, categoryId, userId, isPublished
         })
-
+        const idea = await findIdea({id: savedIdea.id})
         // Ingest elastic
         await insertDataByES({
-            obj: idea
+            obj: savedIdea
         })
 
         return idea
@@ -56,15 +54,16 @@ class IdeaService {
     }
 
     static searchIdea = async ({q, limit = 5, page = 1}) => {
-        const {ideas, totalPages} = await searchIdea({
+        const {ideas, totalIdea} = await findIdeaPage({
             q, page, limit
         })
+
+        const totalPage = Math.ceil(totalIdea / limit)
         return {
-            metadata: {
-                currentPage: page,
-                totalPages,
-                limit
-            },
+            totalPage: totalPage,
+            currentPage: page,
+            pageSize: limit,
+            total: totalIdea,
             ideas,
         }
     }
@@ -85,6 +84,28 @@ class IdeaService {
             ideaId,
             userId
         })
+    }
+
+    static publishIdea = async (ideaId) => {
+        const updatedIdea = await updateIdea({
+            id: ideaId,
+            opt: {
+                isPublished: true
+            }
+        })
+
+        return updatedIdea ? 1 : 0
+    }
+
+    static unPublishIdea = async (ideaId) => {
+        const updatedIdea = await updateIdea({
+            id: ideaId,
+            opt: {
+                isPublished: false
+            }
+        })
+
+        return updatedIdea ? 1 : 0
     }
 }
 

@@ -17,8 +17,8 @@ router.get('/published', asyncHandler(ideaController.getAllPublisedIdeas))
 // router.get('/draft/all', asyncHandler(ideaController.getAllDraftIdeas))
 
 router.get('/:ideaId', asyncHandler(ideaController.getIdea))
-// router.post('/:ideaId/publish', asyncHandler(ideaController.publishIdea))
-// router.post('/:ideaId/unpublish', asyncHandler(ideaController.unPublishIdea))
+router.post('/:ideaId/publish', asyncHandler(ideaController.publishIdea))
+router.post('/:ideaId/unpublish', asyncHandler(ideaController.unPublishIdea))
 
 router.get('/:ideaId', asyncHandler(ideaController.getIdea))
 
@@ -27,7 +27,8 @@ router.get('/:ideaId/comments', asyncHandler(ideaController.getCommentByIdeaId))
 router.post('/:ideaId/comments', asyncHandler(ideaController.createComment))
 
 // Vote
-router.post('/:ideaId/vote', asyncHandler(ideaController.upVoteCount))
-router.post('/:ideaId/unvote', asyncHandler(ideaController.downVoteCount))
+router.post('/:ideaId/up', asyncHandler(ideaController.upVoteCount))
+router.post('/:ideaId/down', asyncHandler(ideaController.downVoteCount))
+router.post('/:ideaId/cancel', asyncHandler(ideaController.downVoteCount))
 
 module.exports = router

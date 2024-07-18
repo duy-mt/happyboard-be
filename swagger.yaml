@@ -9,6 +9,8 @@ tags:
     description: Everything about access web
   - name: Ideas
     description: Everything about ideas
+  - name: Categoris
+    description: Everything about categoris
 paths:
   /signup:
     post:
@@ -276,6 +278,21 @@ paths:
             type: string
             example: ...
           required: true
+        - in: query
+          name: page
+          schema:
+            type: integer
+            example: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            example: 5
+        - in: query
+          name: q
+          schema:
+            type: string
+            example: search
       responses:
         '200':
           description: Get ideas successfully
@@ -294,14 +311,14 @@ paths:
                       "id": 4,
                       "title": "Bảo vệ môi trường biển",
                       "content": "Giảm thiểu rác thải nhựa, bảo vệ đa dạng sinh học biển",
-                      "userId": 3,
-                      "categoryId": 4,
                       "voteCount": 25,
                       "commentCount": 12,
                       "createdAt": "15/7/2024",
                       "updatedAt": "15/7/2024",
                       "User": {
-                          "username": "Jane Doe"
+                        "id": 1,
+                        "username": "Admin User",
+                        "email": "admin@example.com"
                       },
                       "Category": {
                           "title": "Môi trường",
@@ -315,6 +332,100 @@ paths:
                   ]
                 }
               }
+    post:
+      tags:
+        - Ideas
+      summary: Create new idea
+      parameters:
+        - in: header
+          name: x-client-id
+          schema:
+            type: integer
+            example: 1
+          required: true
+        - in: header
+          name: authorization
+          schema:
+            type: string
+            example: ...
+          required: true
+      requestBody:
+        description: Update an existent pet in the store
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: Idea Test
+                content:
+                  type: string
+                  example: Design an app
+                categoryId:
+                  type: integer
+                  example: 2
+
+      operationId: createIdea
+      responses:
+        '201':
+          description: Created idea successfully!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Created idea successfully!
+                  status:
+                    type: integer
+                    example: 201
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 10
+                      title: 
+                        type: string
+                        example: Idea Test
+                      content:
+                        type: string
+                        example: Design an app
+                      voteCount:
+                        type: integer
+                        example: 0
+                      commentCount: 
+                        type: integer
+                        example: 0
+                      createdAt:
+                        type: string
+                        example: hh:mm:ss dd:MM:yyyy
+                      updatedAt:
+                        type: string
+                        example: hh:mm:ss dd:MM:yyyy
+                      comments:
+                        type: array
+                        example: []
+                      User:
+                        type: object
+                        properties:
+                          username:
+                            type: string
+                            example: Admin User
+                          email:
+                            type: string
+                            example: admin@example.com
+                      Category:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                            example: Giáo dục
+                          icon:
+                            type: string
+                            example: https://localhost:8000/images/2.png
   /ideas/:ideaId:
     get:
       tags:
@@ -422,20 +533,392 @@ paths:
                           icon:
                             type: string
                             example: https://localhost:8000/images/1.png
+  /ideas/:ideaId/comments:
+    get:
+      tags:
+        - Ideas
+      summary: Get comments
+      parameters:
+        - in: header
+          name: x-client-id
+          schema:
+            type: integer
+            example: 1
+          required: true
+        - in: header
+          name: authorization
+          schema:
+            type: string
+            example: ...
+          required: true
+        - in: query
+          name: ideaId
+          schema:
+            type: integer
+            example: 10
+          required: true
+      operationId: get all comments
+      responses:
+        '200':
+          description: Get comments successfully!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Get comments successfully!
+                  status:
+                    type: integer
+                    example: 201
+                  data:
+                    type: object
+                    properties:
+                      comments:
+                        type: array
+                        items:
+                          type: object
+                          example:
+                            id:
+                              type: integer
+                              example: 10
+                            content:
+                              type: string
+                              example: Good idea
+                            userId:
+                              type: integer
+                              example: 1
+                            ideaId: 
+                              type: integer
+                              example: 12
+                            createdAt:
+                              type: string
+                              example: hh:mm:ss dd:MM:yyyy
+                            updatedAt:
+                              type: string
+                              example: hh:mm:ss dd:MM:yyyy
+                      commentCount:
+                        type: integer
+                        example: 2
 
+    post:
+      tags:
+        - Ideas
+      summary: Create new comment
+      parameters:
+        - in: header
+          name: x-client-id
+          schema:
+            type: integer
+            example: 1
+          required: true
+        - in: header
+          name: authorization
+          schema:
+            type: string
+            example: ...
+          required: true
+        - in: query
+          name: ideaId
+          schema:
+            type: integer
+            example: 10
+          required: true
+      requestBody:
+        description: Create new comment
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  example: Good Idea
+      operationId: createComment
+      responses:
+        '201':
+          description: Created comment successfully!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Created commentf successfully!
+                  status:
+                    type: integer
+                    example: 201
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 10
+                      content:
+                        type: string
+                        example: Good idea
+                      userId:
+                        type: integer
+                        example: 1
+                      ideaId: 
+                        type: integer
+                        example: 12
+                      createdAt:
+                        type: string
+                        example: hh:mm:ss dd:MM:yyyy
+                      updatedAt:
+                        type: string
+                        example: hh:mm:ss dd:MM:yyyy                  
+  /ideas/:ideaId/publish:
+    post:
+      tags:
+        - Ideas
+      summary: Publish idea
+      parameters:
+        - in: header
+          name: x-client-id
+          schema:
+            type: integer
+            example: 1
+          required: true
+        - in: header
+          name: authorization
+          schema:
+            type: string
+            example: ...
+          required: true
+        - in: query
+          name: userId
+          schema:
+            type: integer
+            example: 10
+          required: true
+      operationId: publishIdea
+      responses:
+        '200':
+          description: publishIdea successfully!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Publish idea successfully!
+                  status:
+                    type: integer
+                    example: 200
+                  data:
+                    type: integer
+                    example: 1
+  /ideas/:ideaId/unpublish:
+    post:
+      tags:
+        - Ideas
+      summary: unpublish idea
+      parameters:
+        - in: header
+          name: x-client-id
+          schema:
+            type: integer
+            example: 1
+          required: true
+        - in: header
+          name: authorization
+          schema:
+            type: string
+            example: ...
+          required: true
+        - in: query
+          name: userId
+          schema:
+            type: integer
+            example: 10
+          required: true
+      operationId: unpublishIdea
+      responses:
+        '200':
+          description: unpublish idea successfully!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unpublish idea successfully!
+                  status:
+                    type: integer
+                    example: 200
+                  data:
+                    type: integer
+                    example: 1
 
+# CATEGORIES
+  /categories:
+    get:
+      tags:
+        - Categoris
+      summary: Get all categoris
+      parameters:
+      - in: header
+        name: x-client-id
+        schema:
+          type: integer
+          example: 1
+        required: true
+      - in: header
+        name: authorization
+        schema:
+          type: string
+          example: ...
+        required: true
+      responses:
+        '200':
+          description: Get all categories successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Get all categories successfully
+                  status:
+                    type: integer
+                    example: 200
+                  data:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                        example: 5
+                      categories:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            title:
+                              type: string
+                              example: Education
+                            icon:
+                              type: string
+                              example: icon1.svg
+    post:
+      tags:
+        - Categoris
+      summary: Create category
+      parameters:
+      - in: header
+        name: x-client-id
+        schema:
+          type: integer
+          example: 1
+        required: true
+      - in: header
+        name: authorization
+        schema:
+          type: string
+          example: ...
+        required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: Du lịch
+                description:
+                  type: string
+                  example: Xung quanh chủ đề du lịch
+                icon:
+                  type: string
+                  example: picture.png
+      responses:
+        '201':
+          description: Create category successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Create category successfully
+                  status:
+                    type: integer
+                    example: 201
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      title:
+                        type: string
+                        example: Education
+                      icon:
+                        type: string
+                        example: icon1.svg                          
+  /categories/:categoryId:
+    get:
+      tags:
+        - Categoris
+      summary: Get category by id
+      parameters:
+      - in: header
+        name: x-client-id
+        schema:
+          type: integer
+          example: 1
+        required: true
+      - in: header
+        name: authorization
+        schema:
+          type: string
+          example: ...
+        required: true
+      - in: path
+        name: categoryId
+        schema:
+          type: integer
+          example: 1
+        required: true
+      responses:
+        '200':
+          description: Get a category successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Get a category successfully
+                  status:
+                    type: integer
+                    example: 200
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      title:
+                        type: string
+                        example: Education
+                      icon:
+                        type: string
+                        example: icon1.svg
 
-
-
-
-                        
-                            
-
-                      
-            
-        
-
-
+                  
 
 
 

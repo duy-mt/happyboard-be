@@ -58,7 +58,7 @@ const convertTime = (originTime) => {
     const seconds = String(date.getUTCSeconds()).padStart(2, '0')
     
     // Format: hh:mm:ss dd/MM/yyyy
-    const formattedDate = `${hours}:${minutes}:${seconds} ${day}/${month}/${year}`
+    const formattedDate = `${day}/${month}/${year} at ${hours}:${minutes}`
     return formattedDate
 };
 

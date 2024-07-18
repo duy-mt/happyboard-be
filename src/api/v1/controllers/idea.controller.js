@@ -42,7 +42,6 @@ class IdeaController {
     }
 
     upVoteCount = async (req, res, next) => {
-        console.log('VOTE IDEA');
         new OK({
             message: 'Up voteCount successfully',
             data: await IdeaService.upVoteCount({
@@ -74,6 +73,20 @@ class IdeaController {
         new OK({
             message: 'Comment successfully',
             data: await CommentService.getCommentByIdeaId(req.params.ideaId)
+        }).send(res)
+    }
+
+    publishIdea = async (req, res, next) => {
+        new OK({
+            message: 'Publish successfully',
+            data: await IdeaService.publishIdea(req.params.ideaId)
+        }).send(res)
+    }
+
+    unPublishIdea = async (req, res, next) => {
+        new OK({
+            message: 'Unpublish successfully',
+            data: await IdeaService.unPublishIdea(req.params.ideaId)
         }).send(res)
     }
 }
