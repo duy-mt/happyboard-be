@@ -1,7 +1,7 @@
 'use strict'
-const { QueryTypes, Op, where } = require('sequelize')
+const { Op } = require('sequelize')
 const { Idea, Comment, User, Category, sequelize } = require('../index')
-const { upVote, createVote, deleteVote, findVote } = require('./vote.repo')
+const { upVote, downVote, deleteVote } = require('./vote.repo')
 const { processReturnedData } = require('../../utils')
 
 // DEFIND OPTIONS
@@ -28,7 +28,10 @@ const optIdea = {
             attributes: ['username', 'email']
         },
     ],
-    attributes: ['id', 'title', 'content', 'voteCount', 'commentCount', 'createdAt', 'updatedAt']
+    // attributes: ['id', 'title', 'content', 'voteCount', 'commentCount', 'viewCount', 'createdAt', 'updatedAt']
+    attributes: {
+        exclude: ['isPublished', 'categoryId', 'userId']
+    }
 }
 
 const optIdeaNoComment = {
@@ -123,53 +126,63 @@ const increaseVoteCount = async ({
     const idea = await Idea.findByPk(ideaId)
     const t = await sequelize.transaction()
 
-    // const isUpdatedVote
-    // const vote = await User.(
-    //     {
-    //       firstName: 'Bart',
-    //       lastName: 'Simpson',
-    //     },
-    //     { transaction: t },
-    //   );
-    // await t.commit()
-    return 1
-    // await sequelize.transaction(async () => {
-    //     const { vote, isCreated } = await createVote({
-    //         userId, ideaId
-    //     })
-    //     if(isCreated) {
-    //         await idea.increment('voteCount', {
-    //             by: 1
-    //         })
-    //     }
-    // })
+    const point = await upVote({
+        ideaId, userId
+    })
+    await idea.increment('voteCount', {
+        by: point
+    })
+    await t.commit()
     return {
         voteCount: idea.voteCount
     }
 }
 
-const decrementVoteCount = async ({ userId, ideaId }) => {
-    const [idea, vote] = await Promise.all([
-        Idea.findByPk(ideaId),
-        findVote({ userId, ideaId })
-    ])
-    
-    if(vote) {
-        await sequelize.transaction(async (t) => {
-            await deleteVote({userId, ideaId})
-    
-            if (idea.voteCount > 0) {
-                await idea.decrement('voteCount', {
-                    by: 1,
-                    transaction: t
-                })
-            }
-        })
-    }
+const decrementVoteCount = async ({
+    ideaId, userId
+}) => {
+    const idea = await Idea.findByPk(ideaId)
+    const t = await sequelize.transaction()
 
+    const point = await downVote({
+        userId, ideaId 
+    })
+    await idea.decrement('voteCount', {
+        by: point
+    })
+    await t.commit()
     return {
         voteCount: idea.voteCount
     }
+}
+
+const cancelVote = async ({
+    ideaId, userId
+}) => {
+    const idea = await Idea.findByPk(ideaId)
+    const t = await sequelize.transaction()
+    const point = await deleteVote({
+        userId, ideaId 
+    })
+    await idea.increment('voteCount', {
+        by: point
+    })
+    await t.commit()
+    return {
+        voteCount: idea.voteCount
+    }
+}
+
+const upView = async (id) => {
+    const idea = await Idea.increment({
+        viewCount: 1
+    }, 
+    { 
+        where: { id },
+        raw: true
+    })
+
+    return idea.viewCount
 }
 
 const updateIdea = async ({ id, opt}) => {
@@ -189,5 +202,7 @@ module.exports = {
     findIdea,
     increaseVoteCount,
     decrementVoteCount,
-    updateIdea
+    cancelVote,
+    updateIdea,
+    upView
 }

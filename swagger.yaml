@@ -11,6 +11,8 @@ tags:
     description: Everything about ideas
   - name: Categoris
     description: Everything about categoris
+  - name: Profile
+    description: Everything about profile
 paths:
   /signup:
     post:
@@ -264,7 +266,7 @@ paths:
     get:
       tags:
         - Ideas
-      summary: Get all ideas
+      summary: Up voteCount successfully
       parameters:
         - in: header
           name: x-client-id
@@ -755,6 +757,138 @@ paths:
                   data:
                     type: integer
                     example: 1
+  /ideas/:ideaId/up:
+    post:
+      tags:
+        - Ideas
+      summary: Up voteCount successfully
+      parameters:
+        - in: header
+          name: x-client-id
+          schema:
+            type: integer
+            example: 1
+          required: true
+        - in: header
+          name: authorization
+          schema:
+            type: string
+            example: ...
+          required: true
+        - in: path
+          name: ideaId
+          schema:
+            type: integer
+            example: 1
+          required: true
+      responses:
+        '200':
+          description: Up voteCount successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Up voteCount successfully
+                  status:
+                    type: integer
+                    example: 200
+                  data:
+                    type: object
+                    properties:
+                      voteCount:
+                        type: integer
+                        example: 68
+  /ideas/:ideaId/down:
+    post:
+      tags:
+        - Ideas
+      summary: Down voteCount successfully
+      parameters:
+        - in: header
+          name: x-client-id
+          schema:
+            type: integer
+            example: 1
+          required: true
+        - in: header
+          name: authorization
+          schema:
+            type: string
+            example: ...
+          required: true
+        - in: path
+          name: ideaId
+          schema:
+            type: integer
+            example: 1
+          required: true
+      responses:
+        '200':
+          description: Down voteCount successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Down voteCount successfully
+                  status:
+                    type: integer
+                    example: 200
+                  data:
+                    type: object
+                    properties:
+                      voteCount:
+                        type: integer
+                        example: 68
+  /ideas/:ideaId/cancel:
+    post:
+      tags:
+        - Ideas
+      summary: Cancel vote successfully
+      parameters:
+        - in: header
+          name: x-client-id
+          schema:
+            type: integer
+            example: 1
+          required: true
+        - in: header
+          name: authorization
+          schema:
+            type: string
+            example: ...
+          required: true
+        - in: path
+          name: ideaId
+          schema:
+            type: integer
+            example: 1
+          required: true
+      responses:
+        '200':
+          description: Cancel vote successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Cancel vote successfully
+                  status:
+                    type: integer
+                    example: 200
+                  data:
+                    type: object
+                    properties:
+                      voteCount:
+                        type: integer
+                        example: 68
 
 # CATEGORIES
   /categories:
@@ -918,9 +1052,100 @@ paths:
                         type: string
                         example: icon1.svg
 
-                  
-
-
-
-
-
+# PROFILE
+  /profile:
+    get:
+      tags:
+        - Profile
+      summary: Get profile
+      parameters:
+      - in: header
+        name: x-client-id
+        schema:
+          type: integer
+          example: 1
+        required: true
+      - in: header
+        name: authorization
+        schema:
+          type: string
+          example: ...
+        required: true
+      responses:
+        '200':
+          description: Get profile successfully!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Get profile successfully!
+                  status:
+                    type: integer
+                    example: 200
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 2
+                      email:
+                        type: string
+                        example: john.doe@example.com
+                      username:
+                        type: string
+                        example: John Doe
+                      avatar:
+                        type: string
+                        example: https://example.com/john.png
+                      status:
+                        type: string
+                        example: active
+    put:
+      tags:
+        - Profile
+      summary: Update profile
+      parameters:
+      - in: header
+        name: x-client-id
+        schema:
+          type: integer
+          example: 1
+        required: true
+      - in: header
+        name: authorization
+        schema:
+          type: string
+          example: ...
+        required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: John Doe 1
+                avatar:
+                  type: string
+                  example: user.png
+      responses:
+        '200':
+          description: Get profile successfully!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Get profile successfully!
+                  status:
+                    type: integer
+                    example: 200
+                  data:
+                    example: [1]
+                      

@@ -1,7 +1,10 @@
 'use strict'
 
 const { BadRequest } = require("../core/error.response")
-const { createIdea, findAllIdeasByUsedId, findIdeaPage, findIdea, increaseVoteCount, decrementVoteCount, updateIdea } = require("../models/repo/idea.repo")
+const { 
+    createIdea, findAllIdeasByUsedId, findIdeaPage, findIdea, increaseVoteCount, decrementVoteCount, updateIdea, cancelVote,
+    upView
+} = require("../models/repo/idea.repo")
 const { insertDataByES, searchDataByES } = require('../elastic/idea.elastic')
 
 class IdeaService {
@@ -24,10 +27,10 @@ class IdeaService {
     }
 
     static getIdea = async (id) => {
-
-        const ideas = await findIdea({id})
-
-        return ideas
+        await upView(id)
+        const idea = await findIdea({id})
+        // const idea = 
+        return idea
     }
 
     static getAllIdeas = async ({
@@ -81,6 +84,15 @@ class IdeaService {
         ideaId, userId
     }) => {
         return await decrementVoteCount({
+            ideaId,
+            userId
+        })
+    }
+
+    static cancelVote = async({
+        ideaId, userId
+    }) => {
+        return await cancelVote({
             ideaId,
             userId
         })

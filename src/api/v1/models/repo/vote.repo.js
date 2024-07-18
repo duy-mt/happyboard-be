@@ -2,68 +2,85 @@
 
 const { Vote } = require('../index')
 
-const createVote = async ({
+const upVote = async ({
     userId, ideaId
 }) => {
     const [vote, isCreated] = await Vote.findOrCreate({
         where: {
             userId,
             ideaId
-        }
+        },
+        defaults: {
+            status: 1,
+        },
     })
+    let point = 1
 
-    return {
-        vote, isCreated
+    if(!isCreated) {
+        if(vote.status == -1) {
+            point = 2
+            vote.status = 1
+        } else {
+            point = 0
+        }
+        await vote.save()
     }
+
+    return point
+}
+
+const downVote = async ({
+    userId, ideaId
+}) => {
+    const [vote, isCreated] = await Vote.findOrCreate({
+        where: {
+            userId,
+            ideaId
+        },
+        defaults: {
+            status: -1,
+        },
+    })
+    let point = 1
+
+    if(!isCreated) {
+        if(vote.status == 1) {
+            point = 2
+            vote.status = -1
+        } else {
+            point = 0
+        }
+        await vote.save()
+    }
+
+    return point
 }
 
 const deleteVote = async ({
-    ideaId, userId
-}) => {
-    return await Vote.destroy({
-        where: {
-            ideaId,
-            userId
-        }
-    })
-}
-
-const findVote = async({
     userId, ideaId
 }) => {
-    return await Vote.findOne({
+    const v = await Vote.findOne({
         where: {
-            ideaId,
-            userId
-        }
+            userId, 
+            ideaId
+        },
+        raw: true
     })
+    let point = v ? -v.status : 0
+
+    await Vote.destroy({
+        where: {
+            userId, 
+            ideaId
+        },
+        force: true
+    })
+    return point
 }
 
-const upVote = async () => {
-    // const [vote, isCreated] = await Vote.findOrCreate({
-    //     where: {
-    //         userId,
-    //         ideaId
-    //     },
-    //     defaults: {
-    //         status: 1,
-    //     },
-    // })
-    // const point = 1
-
-    // const isVoted = vote.status == -1 ? true : false
-    // if(!isCreated) {
-    //     vote.status = -1
-    //     await vote.save()
-    // }
-
-    // return isVoted
-}
 
 module.exports = {
-    createVote,
-    deleteVote,
-    findVote,
-    // updateVote,
-    upVote
+    upVote,
+    downVote,
+    deleteVote
 }

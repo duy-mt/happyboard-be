@@ -29,6 +29,6 @@ router.post('/:ideaId/comments', asyncHandler(ideaController.createComment))
 // Vote
 router.post('/:ideaId/up', asyncHandler(ideaController.upVoteCount))
 router.post('/:ideaId/down', asyncHandler(ideaController.downVoteCount))
-router.post('/:ideaId/cancel', asyncHandler(ideaController.downVoteCount))
+router.delete('/:ideaId/cancel', asyncHandler(ideaController.cancelVote))
 
 module.exports = router

@@ -61,6 +61,16 @@ class IdeaController {
         }).send(res)
     }
 
+    cancelVote = async (req, res, next) => {
+        new OK({
+            message: 'Cancel vote successfully',
+            data: await IdeaService.cancelVote({
+                ideaId: req.params.ideaId,
+                userId: req.body.userId
+            })
+        }).send(res)
+    }
+
     createComment = async (req, res, next) => {
         req.body.ideaId = req.params.ideaId
         new Created({
