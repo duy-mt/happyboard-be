@@ -8,7 +8,10 @@ class IdeaController {
     getIdea = async (req, res, next) => {
         new OK({
             message: 'Get idea successfully',
-            data: await IdeaService.getIdea(req.params.ideaId)
+            data: await IdeaService.getIdea({
+                id: req.params.ideaId,
+                userId: req.body.userId
+            })
         }).send(res)
     }
 
@@ -17,12 +20,22 @@ class IdeaController {
         if(!q) {
             new OK({
                 message: 'Get ideas successfully',
-                data: await IdeaService.getAllIdeas(req.query)
+                data: await IdeaService.getAllIdeas({
+                    limit: req.query?.limit,
+                    page: req.query?.page,
+                    userId: req.body.userId,
+                    option: req.query?.option
+                })
             }).send(res)
         } else {
             new OK({
                 message: 'Get ideas successfully',
-                data: await IdeaService.searchIdea(req.query)
+                data: await IdeaService.searchIdea({
+                    q: req.query.q,
+                    limit: req.query.limit,
+                    page: req.query.page,
+                    userId: req.body.userId,
+                })
             }).send(res)
         }
     }
@@ -89,14 +102,46 @@ class IdeaController {
     publishIdea = async (req, res, next) => {
         new OK({
             message: 'Publish successfully',
-            data: await IdeaService.publishIdea(req.params.ideaId)
+            data: await IdeaService.publishIdea({
+                ideaId: req.params.ideaId,
+                userId: req.body.userId
+            })
         }).send(res)
     }
 
     unPublishIdea = async (req, res, next) => {
         new OK({
             message: 'Unpublish successfully',
-            data: await IdeaService.unPublishIdea(req.params.ideaId)
+            data: await IdeaService.unPublishIdea({
+                ideaId: req.params.ideaId,
+                userId: req.body.userId
+            })
+        }).send(res)
+    }
+
+    getRecentIdeas = async (req, res, next) => {
+        new OK({
+            message: 'Get recent ideas successfully',
+            data: await IdeaService.getRecentIdeas(req.body.userId)
+        }).send(res)
+    }
+
+    getSimilarIdeas = async (req, res, next) => {
+        new OK({
+            message: 'Get similar ideas successfully',
+            data: await IdeaService.getSimilarIdeas({
+                ideaId: req.query.id,
+                limit: req.query.limit
+            })
+        }).send(res)
+    }
+
+    getPopularIdeas = async (req, res, next) => {
+        new OK({
+            message: 'Get popular ideas successfully',
+            data: await IdeaService.getPopularIdeas({
+                limit: req.query.limit
+            })
         }).send(res)
     }
 }

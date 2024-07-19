@@ -1,13 +1,20 @@
 'use strict'
 
 const { BadRequest } = require("../core/error.response")
-const { createComment, getCommentsByIdeaId } = require("../models/repo/comment.repo")
+const { createComment, getCommentsByIdeaId, getCommentById } = require("../models/repo/comment.repo")
 const { processReturnedData } = require("../utils")
 
 class CommentService {
     static createComment = async ({
         content, userId, ideaId, parentId = null
     }) => {
+
+        if(parentId) {
+            const parentComment = await getCommentById(parentId)
+            if(parentComment.ideaId != ideaId) throw new BadRequest('Comment Again')
+            if(parentComment.parentId) parentId = parentComment.parentId
+        }
+
         const savedComment = await createComment({
             content, userId, ideaId, parentId
         })

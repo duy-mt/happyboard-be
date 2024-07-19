@@ -1,6 +1,6 @@
 'use strict'
-const { Op } = require('sequelize')
-const { Idea, Comment, User, Category, sequelize } = require('../index')
+const { Op,literal, where } = require('sequelize')
+const { Idea, Comment, User, Category, Vote, sequelize } = require('../index')
 const { upVote, downVote, deleteVote } = require('./vote.repo')
 const { processReturnedData } = require('../../utils')
 
@@ -21,7 +21,7 @@ const optIdea = {
         ]
         }, {
             model: Category,
-            attributes: ['title', 'icon']
+            attributes: ['id', 'title', 'icon'],
         }, 
         {
             model: User,
@@ -46,11 +46,11 @@ const optIdeaNoComment = {
         },
         {
             model: Category,
-            attributes: ['title', 'icon']
+            attributes: ['id', 'title', 'icon']
         }
     ],
     attributes: {
-        exclude: ['isPublished', 'categoryId', 'userId']
+        exclude: ['isPublished', 'categoryId', 'userId'],
     }
 }
 
@@ -80,6 +80,16 @@ const findIdea = async ({ id }) => {
     return idea && processReturnedData(idea)
 }
 
+const findDraftIdea = async ({ id }) => {
+    const idea = await Idea.findOne({
+        where: {
+            id,
+        },
+        raw: true
+    })
+    return idea && processReturnedData(idea)
+}
+
 const findAllIdeas = async () => {
     const ideas = await Idea.findAll()
     return processReturnedData(ideas)
@@ -96,7 +106,7 @@ const findAllIdeasByUsedId = async ({userId, isPublished = true}) => {
     return processReturnedData(ideas)
 }
 
-const findIdeaPage = async ({ limit, page, q = null }) => {
+const findIdeaPage = async ({ limit, page, q = null, fieldSort }) => {
     const offset = (page - 1) * limit
     const search = q ? {
         title: {
@@ -111,7 +121,11 @@ const findIdeaPage = async ({ limit, page, q = null }) => {
             isPublished: true,
             ...search
         },
-        ...optIdeaNoComment
+        ...optIdeaNoComment,
+        order: [
+            [fieldSort, 'DESC'],
+            ['id', 'DESC']
+        ],
     })
 
     return {
@@ -194,6 +208,43 @@ const updateIdea = async ({ id, opt}) => {
     return processReturnedData(idea)
 }
 
+const findIdeasByIds = async (ids = []) => {
+    let ideas = Promise.all(await ids.map(async (id) => {
+        let i = await Idea.findOne({
+            where: {
+                id
+            },
+            ...optIdeaNoComment,
+        })
+        return processReturnedData(i)
+    }))
+    
+    return ideas
+}
+
+const findIdeasByCategoryId = async ({categoryId, limit}) => {
+    const ideas = await Idea.findAll({
+        limit,
+        where: {
+            categoryId,
+            isPublished: true
+        },
+        ...optIdeaNoComment
+    })
+    return processReturnedData(ideas)
+}
+
+const findIdeasByVote = async ({ limit }) => {
+    const ideas = await Idea.findAll({
+        limit,
+        ...optIdeaNoComment,
+        order: [
+            ['voteCount', 'DESC']
+        ],
+    })
+    return processReturnedData(ideas)
+}
+
 module.exports = {
     createIdea,
     findAllIdeas,
@@ -204,5 +255,9 @@ module.exports = {
     decrementVoteCount,
     cancelVote,
     updateIdea,
-    upView
+    upView,
+    findDraftIdea,
+    findIdeasByIds,
+    findIdeasByCategoryId,
+    findIdeasByVote,
 }

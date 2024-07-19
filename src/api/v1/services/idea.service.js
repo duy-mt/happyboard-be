@@ -1,11 +1,19 @@
 'use strict'
 
-const { BadRequest } = require("../core/error.response")
+const { BadRequest, Forbidden } = require("../core/error.response")
 const { 
     createIdea, findAllIdeasByUsedId, findIdeaPage, findIdea, increaseVoteCount, decrementVoteCount, updateIdea, cancelVote,
-    upView
+    upView,
+    findDraftIdea,
+    findIdeasByIds,
+    findIdeasByCategoryId,
+    findIdeasByVote
 } = require("../models/repo/idea.repo")
 const { insertDataByES, searchDataByES } = require('../elastic/idea.elastic')
+const { sortComment } = require("../utils")
+const VoteService = require("./vote.service")
+const RedisService = require("./redis.service")
+const { OPTION_SHOW_IDEA } = require("../constants")
 
 class IdeaService {
     static createIdea = async ({
@@ -26,19 +34,45 @@ class IdeaService {
         return idea
     }
 
-    static getIdea = async (id) => {
+    static getIdea = async ({ id, userId }) => {
         await upView(id)
         const idea = await findIdea({id})
-        // const idea = 
-        return idea
+        const handledComment = sortComment(idea.comments)
+        
+        let status = await VoteService.getStatusVote({
+            ideaId: idea.id,
+            userId
+        })
+        idea.vote = status
+
+        const handledIdea = {
+            ...idea,
+            comments: handledComment
+        }
+        await RedisService.ZADD({
+            key: `currentIdeas:${userId}`,
+            value: `${idea.id}`,
+            score: Date.now()
+        })
+        return handledIdea
     }
 
     static getAllIdeas = async ({
-        limit = 5, page = 1
+        limit = 5, page = 1, userId, option = Object.keys(OPTION_SHOW_IDEA)[0]
     }) => {
-        const {
+        let fieldSort = OPTION_SHOW_IDEA[option]
+
+        let {
             ideas, totalIdea
-        } = await findIdeaPage({ limit, page })
+        } = await findIdeaPage({ limit, page, fieldSort })
+
+        for(let i = 0; i < ideas.length; i++) {
+            let status = await VoteService.getStatusVote({
+                ideaId: ideas[i].id,
+                userId
+            })
+            ideas[i].vote = status
+        }
 
         const totalPage = Math.ceil(totalIdea / limit)
 
@@ -53,14 +87,69 @@ class IdeaService {
 
     static getAllPublisedIdeas = async (userId) => {
         const ideas = await findAllIdeasByUsedId({userId}) 
+        for(let i = 0; i < ideas.length; i++) {
+            let status = await VoteService.getStatusVote({
+                ideaId: ideas[i].id,
+                userId
+            })
+            ideas[i].vote = status
+        }
         return ideas
     }
 
-    static searchIdea = async ({q, limit = 5, page = 1}) => {
-        const {ideas, totalIdea} = await findIdeaPage({
-            q, page, limit
+    static getRecentIdeas = async (userId) => {
+        const key = `currentIdeas:${userId}`
+        const recentIdeas = await RedisService.ZRANGE({
+            key,
+            start: 0,
+            stop: 4
         })
 
+        const ideas = await findIdeasByIds(recentIdeas)
+        for(let i = 0; i < ideas.length; i++) {
+            let status = await VoteService.getStatusVote({
+                ideaId: ideas[i].id,
+                userId
+            })
+            ideas[i].vote = status
+        }
+        return ideas
+    }
+
+    static getSimilarIdeas = async ({
+        ideaId,
+        limit = 3
+    }) => {
+        const idea = await findIdea({ id: ideaId })
+        const categoryId = idea.Category.dataValues.id
+
+        const ideas = await findIdeasByCategoryId({
+            categoryId,
+            limit
+        })
+        return ideas
+    }
+
+    static getPopularIdeas = async ({
+        limit = 3
+    }) => {
+        const ideas = await findIdeasByVote({
+            limit
+        })
+        return ideas
+    }
+
+    static searchIdea = async ({q, limit = 5, page = 1, userId}) => {
+        const {ideas, totalIdea} = await findIdeaPage({
+            q, page, limit, fieldSort: 'createdAt'
+        })
+        for(let i = 0; i < ideas.length; i++) {
+            let status = await VoteService.getStatusVote({
+                ideaId: ideas[i].id,
+                userId
+            })
+            ideas[i].vote = status
+        }
         const totalPage = Math.ceil(totalIdea / limit)
         return {
             totalPage: totalPage,
@@ -98,7 +187,12 @@ class IdeaService {
         })
     }
 
-    static publishIdea = async (ideaId) => {
+    static publishIdea = async ({
+        ideaId, userId
+    }) => {
+        const idea = await findDraftIdea({ id: ideaId })
+        if(idea.userId != userId) throw new Forbidden('You do not have permission to access this resource')
+
         const updatedIdea = await updateIdea({
             id: ideaId,
             opt: {
@@ -109,7 +203,11 @@ class IdeaService {
         return updatedIdea ? 1 : 0
     }
 
-    static unPublishIdea = async (ideaId) => {
+    static unPublishIdea = async ({
+        ideaId, userId
+    }) => {
+        const idea = await findDraftIdea({ id: ideaId })
+        if(idea.userId != userId) throw new Forbidden('You do not have permission to access this resource')
         const updatedIdea = await updateIdea({
             id: ideaId,
             opt: {
