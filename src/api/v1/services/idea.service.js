@@ -49,9 +49,10 @@ class IdeaService {
             ...idea,
             comments: handledComment
         }
-        await RedisService.LSET({
+        await RedisService.ZADD({
             key: `currentIdeas:${userId}`,
-            value: `${idea.id}`
+            value: `${idea.id}`,
+            score: Date.now()
         })
         return handledIdea
     }
@@ -98,10 +99,10 @@ class IdeaService {
 
     static getRecentIdeas = async (userId) => {
         const key = `currentIdeas:${userId}`
-        const recentIdeas = await RedisService.LRANGE({
+        const recentIdeas = await RedisService.ZRANGE({
             key,
             start: 0,
-            stop: 3
+            stop: 4
         })
 
         const ideas = await findIdeasByIds(recentIdeas)
@@ -140,7 +141,7 @@ class IdeaService {
 
     static searchIdea = async ({q, limit = 5, page = 1, userId}) => {
         const {ideas, totalIdea} = await findIdeaPage({
-            q, page, limit
+            q, page, limit, fieldSort: 'createdAt'
         })
         for(let i = 0; i < ideas.length; i++) {
             let status = await VoteService.getStatusVote({

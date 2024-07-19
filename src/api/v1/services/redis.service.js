@@ -21,6 +21,21 @@ class RedisService {
         const l = await this.client.lRange(key, start, stop)
         return l
     }
+
+    ZADD = async ({
+        key, value, score
+    }) => {
+        return await this.client.zAdd(key, {
+            score,
+            value
+        })
+    }
+
+    ZRANGE = async ({
+        key, start, stop
+    }) => {
+        return await this.client.zRange(key, start, stop, {'REV': true})
+    }
 }
 
 module.exports = new RedisService()

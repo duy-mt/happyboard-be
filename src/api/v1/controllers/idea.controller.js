@@ -28,7 +28,6 @@ class IdeaController {
                 })
             }).send(res)
         } else {
-            console.log('q::', q);
             new OK({
                 message: 'Get ideas successfully',
                 data: await IdeaService.searchIdea({
