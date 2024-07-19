@@ -32,6 +32,7 @@ module.exports = (sequelize, DataTypes) => {
         isPublished: DataTypes.BOOLEAN,
         voteCount: DataTypes.INTEGER,
         commentCount: DataTypes.INTEGER,
+        viewCount: DataTypes.INTEGER,
     }, {
         sequelize,
         modelName: 'Idea',

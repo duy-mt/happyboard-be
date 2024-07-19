@@ -47,19 +47,27 @@ const findUserByEmail = async (email) => {
 }
 
 const findUserByUserId = async (userId) => {
-    const user = await User.findByPk(userId)
-    return user?.dataValues
+    const user = await User.findByPk(userId, {
+        raw: true
+    })
+    return user
 }
 
 // UPDATE
 const updateUserByUserId = async ({
     userId, payload = {} 
 }) => {
-    const holderUser = await findUserByUserId(userId)
-    const updatedUser = await holderUser.update(
-        payload
+    const updatedUser = await User.update(
+        payload,
+        {
+            where: {
+                id: userId
+            },
+            attributes: ['id', 'email', 'username', 'password', 'avatar', 'status'],
+            raw: true,
+        }
     )
-    return await updatedUser
+    return updatedUser
 }
 
 // DELETE

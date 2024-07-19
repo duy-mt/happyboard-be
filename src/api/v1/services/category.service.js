@@ -12,10 +12,7 @@ class CategoryService {
     }
 
     static getAllCategories = async () => {
-        const options = {
-            attributes: ['id', 'icon']
-        }
-        const { categories, total } = await getAllCategories(options)
+        const { categories, total } = await getAllCategories()
 
         return {
             total,
@@ -24,10 +21,7 @@ class CategoryService {
     }    
 
     static getCategoryById = async (id) => {
-        const options = {
-            attributes: ['id', 'icon']
-        }
-        const category = await getCategoryById({id, options})
+        const category = await getCategoryById({id})
         return category
     }   
 }

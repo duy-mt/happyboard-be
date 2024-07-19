@@ -2,6 +2,10 @@
 
 const { Category } = require('../index')
 
+const optCategory = {
+    attributes: ['id', 'title', 'icon']
+}
+
 const createCategory = async ({
     title, description, icon
 }) => {
@@ -11,13 +15,13 @@ const createCategory = async ({
         icon
     })
 
-    return category
+    return category.get(optCategory)
 }
 
 // FIND
 const getAllCategories = async (options = {}) => {
     const { count: total, rows: categories } = await Category.findAndCountAll({
-        ...options
+        ...optCategory
     })
     
     return {
@@ -26,10 +30,10 @@ const getAllCategories = async (options = {}) => {
 }
 
 const getCategoryById = async ({
-    id, options = {}
+    id
 }) => await Category.findOne({
     where: {id},
-    ...options
+    ...optCategory
 })
 
 module.exports = {
