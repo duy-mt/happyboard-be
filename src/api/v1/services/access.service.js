@@ -55,8 +55,8 @@ class AccessService {
         email, password, username
     }) => {
         const holderUser = await findUserByEmail(email)
-        if(holderUser) throw new Conflict('Account already exists')
-
+        console.log(holderUser);
+        if(holderUser.user) throw new Conflict('Account already exists')
         const hashPW = await createHash(password)
         const newUser = await createUser({
             email, password: hashPW, username
