@@ -51,7 +51,6 @@ const optIdeaNoComment = {
     ],
     attributes: {
         exclude: ['isPublished', 'categoryId', 'userId'],
-        
     }
 }
 
@@ -107,7 +106,7 @@ const findAllIdeasByUsedId = async ({userId, isPublished = true}) => {
     return processReturnedData(ideas)
 }
 
-const findIdeaPage = async ({ limit, page, q = null }) => {
+const findIdeaPage = async ({ limit, page, q = null, fieldSort }) => {
     const offset = (page - 1) * limit
     const search = q ? {
         title: {
@@ -122,7 +121,11 @@ const findIdeaPage = async ({ limit, page, q = null }) => {
             isPublished: true,
             ...search
         },
-        ...optIdeaNoComment
+        ...optIdeaNoComment,
+        order: [
+            [fieldSort, 'DESC'],
+            ['id', 'DESC']
+        ],
     })
 
     return {

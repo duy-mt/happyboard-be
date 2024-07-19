@@ -28,8 +28,16 @@ const REDIS = {
     }
 }
 
+const OPTION_SHOW_IDEA = {
+    'newest': 'createdAt',
+    'highvote': 'voteCount',
+    'highview': 'viewCount',
+    'highcomment': 'commentCount'
+}
+
 module.exports = {
     HEADER,
     ROLE_USER,
     REDIS,
+    OPTION_SHOW_IDEA,
 }

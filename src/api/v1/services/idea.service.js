@@ -13,6 +13,7 @@ const { insertDataByES, searchDataByES } = require('../elastic/idea.elastic')
 const { sortComment } = require("../utils")
 const VoteService = require("./vote.service")
 const RedisService = require("./redis.service")
+const { OPTION_SHOW_IDEA } = require("../constants")
 
 class IdeaService {
     static createIdea = async ({
@@ -56,11 +57,13 @@ class IdeaService {
     }
 
     static getAllIdeas = async ({
-        limit = 5, page = 1, userId
+        limit = 5, page = 1, userId, option = Object.keys(OPTION_SHOW_IDEA)[0]
     }) => {
+        let fieldSort = OPTION_SHOW_IDEA[option]
+
         let {
             ideas, totalIdea
-        } = await findIdeaPage({ limit, page })
+        } = await findIdeaPage({ limit, page, fieldSort })
 
         for(let i = 0; i < ideas.length; i++) {
             let status = await VoteService.getStatusVote({
