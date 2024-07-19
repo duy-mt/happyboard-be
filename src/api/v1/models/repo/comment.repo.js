@@ -32,8 +32,14 @@ const getCommentsByParentId = async (parentId) => await Comment.findAll({
     where: { parentId }
 })
 
+const getCommentById = async (id) => {
+    return await Comment.findByPk(id, {
+        raw: true
+    })
+}
 module.exports = {
     createComment,
     getCommentsByIdeaId,
-    getCommentsByParentId
+    getCommentsByParentId,
+    getCommentById
 }
