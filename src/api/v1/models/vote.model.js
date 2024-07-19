@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
     Vote.init({
         userId: DataTypes.INTEGER,
         ideaId: DataTypes.INTEGER,
+        status: DataTypes.INTEGER,
     }, {
         sequelize,
         modelName: 'Vote',
