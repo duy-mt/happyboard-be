@@ -33,7 +33,7 @@ jobs:
         
   deploy:
     needs: build
-    runs-on: fe
+    runs-on: cicd-happyboard
     steps:
       - name: Pull image from docker hub
         run: docker pull duymt3/happyboard-be:latest
