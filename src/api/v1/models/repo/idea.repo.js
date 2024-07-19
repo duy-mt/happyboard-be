@@ -231,6 +231,17 @@ const findIdeasByCategoryId = async ({categoryId, limit}) => {
     return processReturnedData(ideas)
 }
 
+const findIdeasByVote = async ({ limit }) => {
+    const ideas = await Idea.findAll({
+        limit,
+        ...optIdeaNoComment,
+        order: [
+            ['voteCount', 'DESC']
+        ],
+    })
+    return processReturnedData(ideas)
+}
+
 module.exports = {
     createIdea,
     findAllIdeas,
@@ -244,5 +255,6 @@ module.exports = {
     upView,
     findDraftIdea,
     findIdeasByIds,
-    findIdeasByCategoryId
+    findIdeasByCategoryId,
+    findIdeasByVote,
 }

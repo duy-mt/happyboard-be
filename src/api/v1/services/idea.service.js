@@ -6,7 +6,8 @@ const {
     upView,
     findDraftIdea,
     findIdeasByIds,
-    findIdeasByCategoryId
+    findIdeasByCategoryId,
+    findIdeasByVote
 } = require("../models/repo/idea.repo")
 const { insertDataByES, searchDataByES } = require('../elastic/idea.elastic')
 const { sortComment } = require("../utils")
@@ -120,6 +121,15 @@ class IdeaService {
 
         const ideas = await findIdeasByCategoryId({
             categoryId,
+            limit
+        })
+        return ideas
+    }
+
+    static getPopularIdeas = async ({
+        limit = 3
+    }) => {
+        const ideas = await findIdeasByVote({
             limit
         })
         return ideas

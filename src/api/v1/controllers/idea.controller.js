@@ -21,8 +21,8 @@ class IdeaController {
             new OK({
                 message: 'Get ideas successfully',
                 data: await IdeaService.getAllIdeas({
-                    limit: req.params?.limit,
-                    page: req.params?.page,
+                    limit: req.query?.limit,
+                    page: req.query?.page,
                     userId: req.body.userId
                 })
             }).send(res)
@@ -131,6 +131,15 @@ class IdeaController {
             message: 'Get similar ideas successfully',
             data: await IdeaService.getSimilarIdeas({
                 ideaId: req.query.id,
+                limit: req.query.limit
+            })
+        }).send(res)
+    }
+
+    getPopularIdeas = async (req, res, next) => {
+        new OK({
+            message: 'Get popular ideas successfully',
+            data: await IdeaService.getPopularIdeas({
                 limit: req.query.limit
             })
         }).send(res)
