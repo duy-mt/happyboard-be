@@ -78,9 +78,21 @@ const deleteVote = async ({
     return point
 }
 
+const findVote = async ({
+    ideaId, userId
+}) => {
+    const v = await Vote.findOne({
+        where: {
+            ideaId, userId
+        },
+        raw: true
+    })
+    return v
+}
 
 module.exports = {
     upVote,
     downVote,
-    deleteVote
+    deleteVote,
+    findVote,
 }

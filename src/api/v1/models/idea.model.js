@@ -15,6 +15,11 @@ module.exports = (sequelize, DataTypes) => {
                 as: 'comments'
             })
 
+            this.hasMany(models.Vote, {
+                foreignKey: 'ideaId',
+                as: 'vote'
+            })
+
             this.belongsTo(models.User, {
                 foreignKey: 'userId'
             })

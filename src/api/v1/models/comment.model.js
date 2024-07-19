@@ -15,8 +15,13 @@ module.exports = (sequelize, DataTypes) => {
             });
 
             this.belongsTo(models.User, {
-                foreignKey: 'ideaId',
+                foreignKey: 'userId',
             });
+
+            this.hasMany(models.Comment, {
+                foreignKey: 'parentId',
+                as: 'children'
+            })
         }
     }
     Comment.init({

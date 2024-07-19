@@ -107,6 +107,27 @@ const processReturnedData = (obj) => {
     return obj
 }
 
+const sortComment = (comments) => {
+    const commentMap = {}
+
+    comments.forEach(comment => {
+        comment.children = []
+        commentMap[comment.id] = comment
+    })
+
+    const rootComments = []
+
+    comments.forEach(comment => {
+        if (comment.parentId) {
+            commentMap[comment.parentId].children.push(comment)
+        } else {
+            rootComments.push(comment)
+        }
+    })
+
+    return rootComments
+}
+
 module.exports = {
     createAccessToken,
     createRefreshToken,
@@ -118,5 +139,6 @@ module.exports = {
     getModel,
     removeUndefinedObject,
     removeField,
-    processReturnedData
+    processReturnedData,
+    sortComment
 }
