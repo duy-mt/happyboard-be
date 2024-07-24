@@ -1,14 +1,82 @@
-const { createClient } = require('redis')
-const client = createClient()
+const redis = require('redis')
+const { ErrorRedis } = require('../core/error.response')
+const { REDIS } = require('../constants')
 
-client.on('error', err => console.log('Redis Client Error', err))
+// Strategy create instance redis
+// 1. Create 1 instance -> share it across app
+// 2. Read, Write
 
-const getRedisInstance = async () => {
-    await client.connect()
+let client = {}
+let connectionTimeout
 
-    return client
+const initRedis = () => {
+
+    
+    const instanceRedis = redis.createClient({url: REDIS.URL})
+    client.instanceConnect = instanceRedis
+
+
+    handleEventConnection({
+        cntRedis: instanceRedis
+    })
+}
+
+const closeInstanceRedis = () => {
+    client.instanceConnect.quit()
+}
+
+const getInstanceRedis = () => client 
+
+const handleTimeoutError = () => {
+    connectionTimeout = setTimeout(() => {
+        throw new ErrorRedis({
+            message: REDIS.CONNECT.MESSAGE.VN
+        })
+    }, REDIS.CONNECT.TIMEOUT)
+}
+
+const handleEventConnection = ({
+    cntRedis
+}) => {
+    cntRedis.on(REDIS.STATUS.CONNECT, () => {
+        console.log(`Redis connected`)
+        clearTimeout(connectionTimeout)
+    })
+
+    cntRedis.on(REDIS.STATUS.END, () => {
+        console.log(`Redis end`)
+        handleTimeoutError()
+    })
+
+    cntRedis.on(REDIS.STATUS.RECONNECT, () => {
+        console.log(`Redis reconnecting`)
+        clearTimeout(connectionTimeout)
+        handleTimeoutError()
+    })
+
+    cntRedis.on(REDIS.STATUS.ERROR, (err) => {
+        console.log(`Redis error:`, err)
+        handleTimeoutError()
+    })
+}
+
+initRedis()
+
+class Redis {
+    constructor () {
+        this.connect()
+    }
+
+    connect() {
+
+    }
+
+    getInstance () {
+        
+    }
 }
 
 module.exports = {
-    getRedisInstance
+    getInstanceRedis,
+    closeInstanceRedis
 }

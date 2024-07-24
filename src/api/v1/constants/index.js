@@ -1,5 +1,4 @@
 'use strict'
-
 const HEADER = {
     API_KEY:'x-api-key',
     CLIENT_ID: 'x-client-id',
@@ -12,6 +11,7 @@ const ROLE_USER = {
 }
 
 const REDIS = {
+    URL: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
     STATUS: {
         CONNECT: 'connect',
         END: 'end',
@@ -19,7 +19,7 @@ const REDIS = {
         ERROR: 'error'
     },
     CONNECT: {
-        TIMEOUT: 100000,
+        TIMEOUT: 1000,
         CODE: -99,
         MESSAGE: {
             VN: 'Có lỗi xảy ra với redis',
@@ -28,16 +28,8 @@ const REDIS = {
     }
 }
 
-const OPTION_SHOW_IDEA = {
-    'newest': 'createdAt',
-    'highvote': 'voteCount',
-    'highview': 'viewCount',
-    'highcomment': 'commentCount'
-}
-
 module.exports = {
     HEADER,
     ROLE_USER,
     REDIS,
-    OPTION_SHOW_IDEA,
 }
