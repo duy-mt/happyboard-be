@@ -24,6 +24,8 @@ jobs:
           echo "DEV_ES_USER=${{secrets.DEV_ES_USER}}" >> .env
           echo "DEV_ES_PW=${{secrets.DEV_ES_PW}}" >> .env
           echo "DEV_ES_INDEX=${{secrets.DEV_ES_INDEX}}" >> .env
+          echo "REDIS_HOST=${{secrets.REDIS_HOST}}" >> .env
+          echo "REDIS_PORT=${{secrets.REDIS_PORT}}" >> .env
       - name: Login to docker hub
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}       
       - name: Build docker image
