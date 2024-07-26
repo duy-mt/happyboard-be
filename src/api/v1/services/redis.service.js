@@ -1,4 +1,4 @@
-const { getInstanceRedis } = require('../dbs/redis.init')
+const { getRedisInstance } = require('../dbs/redis.init')
 
 class RedisService {
     constructor() {
@@ -6,7 +6,7 @@ class RedisService {
     }
 
     run = async () => {
-        this.client = await getInstanceRedis()
+        this.client = await getRedisInstance()
     }
 
     LSET = async ({
