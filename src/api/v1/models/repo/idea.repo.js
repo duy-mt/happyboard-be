@@ -134,6 +134,13 @@ const findIdeaPage = async ({ limit, page, q = null, fieldSort }) => {
     }
 }
 
+const findUserIdByIdeaId = async ({
+    id
+}) => {
+    const idea = await Idea.findByPk(id)
+    return idea.userId
+}
+
 const increaseVoteCount = async ({
     ideaId, userId
 }) => {
@@ -260,4 +267,5 @@ module.exports = {
     findIdeasByIds,
     findIdeasByCategoryId,
     findIdeasByVote,
+    findUserIdByIdeaId
 }

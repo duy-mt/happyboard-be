@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
     async up(queryInterface, Sequelize) {
-        await queryInterface.createTable('votes', {
+        await queryInterface.createTable('user_has_permissions', {
         id: {
             allowNull: false,
             autoIncrement: true,
@@ -13,11 +13,7 @@ module.exports = {
             type: Sequelize.INTEGER,
             allowNull: false
         },
-        ideaId: {
-            type: Sequelize.INTEGER,
-            allowNull: false
-        },
-        status: {
+        permissionId: {
             type: Sequelize.INTEGER,
             allowNull: false
         },
@@ -32,6 +28,6 @@ module.exports = {
         })
     },
     async down(queryInterface, Sequelize) {
-        await queryInterface.dropTable('votes');
+        await queryInterface.dropTable('user_has_permissions');
     }
 }

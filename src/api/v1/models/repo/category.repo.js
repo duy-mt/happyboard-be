@@ -9,7 +9,7 @@ const optCategory = {
 const createCategory = async ({
     title, description, icon
 }) => {
-    const category = Category.create({
+    const category = await Category.create({
         title,
         description,
         icon

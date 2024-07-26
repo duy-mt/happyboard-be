@@ -11,20 +11,26 @@ class CommentController {
         }).send(res)
     }
 
-    getCommentsByIdeaId = async (req, res, next) => {
-        new OK({
-            message: 'Get comment successfully!',
-            data: await CommentService.getCommentByIdeaId(req.params.ideaId)
+    reactionComment = async (req, res, next) => {
+        new Created({
+            message: "Reaction comment successfully",
+            data: await CommentService.reactionComment({
+                commentId: req.params.commentId,
+                userId: req.body.userId,
+                reaction: req.body.reaction
+            })
         }).send(res)
     }
 
-    // getCommentsByParentId = async (req, res, next) => {
-    //     new OK({
-    //         message: 'Get comment successfully!',
-    //         data: await CommentService.getCommentByParentId(req.params.parentId)
-    //     }).send(res)
-    // }
-
+    cancelReaction = async (req, res, next) => {
+        new Created({
+            message: "Cancel reaction successfully",
+            data: await CommentService.cancelReaction({
+                commentId: req.params.commentId,
+                userId: req.body.userId
+            })
+        }).send(res)
+    }
 }
 
 module.exports = new CommentController()

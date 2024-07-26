@@ -3,169 +3,208 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
     async up(queryInterface, Sequelize) {
-        // fk_token_user
-        await queryInterface.addConstraint('Tokens', {
+        // fk_tokens_user
+        await queryInterface.addConstraint('tokens', {
             fields: ['userId'],
             type: 'foreign key',
-            name: 'fk_token_user',
+            name: 'fk_tokens_user',
             references: {
-                table: 'Users',
-                field: 'id',
-            },
-            onUpdate: 'CASCADE', // Automatically update foreign key when primary key changes
-            onDelete: 'CASCADE', // Automatically delete related records when referenced record is deleted
-        });
-
-        // fk_idea_user
-        await queryInterface.addConstraint('Ideas', {
-            fields: ['userId'],
-            type: 'foreign key',
-            name: 'fk_idea_user',
-            references: {
-                table: 'Users',
+                table: 'users',
                 field: 'id',
             },
             onUpdate: 'CASCADE',
             onDelete: 'CASCADE',
         });
 
-        // fk_comment_user
-        await queryInterface.addConstraint('Comments', {
+        // fk_ideas_user
+        await queryInterface.addConstraint('ideas', {
             fields: ['userId'],
             type: 'foreign key',
-            name: 'fk_comment_user',
+            name: 'fk_ideas_user',
             references: {
-                table: 'Users',
+                table: 'users',
                 field: 'id',
             },
             onUpdate: 'CASCADE',
             onDelete: 'CASCADE',
         });
 
-        // fk_vote_user
-        await queryInterface.addConstraint('Votes', {
-            fields: ['userId'],
-            type: 'foreign key',
-            name: 'fk_vote_user',
-            references: {
-                table: 'Users',
-                field: 'id',
-            },
-            onUpdate: 'CASCADE',
-            onDelete: 'CASCADE',
-        });
-
-        // fk_reaction_user
-        await queryInterface.addConstraint('Reactions', {
-            fields: ['userId'],
-            type: 'foreign key',
-            name: 'fk_reaction_user',
-            references: {
-                table: 'Users',
-                field: 'id',
-            },
-            onUpdate: 'CASCADE',
-            onDelete: 'CASCADE',
-        });
-
-        // fk_ur_user
-        await queryInterface.addConstraint('User_Role', {
-            fields: ['userId'],
-            type: 'foreign key',
-            name: 'fk_ur_user',
-            references: {
-                table: 'Users',
-                field: 'id',
-            },
-            onUpdate: 'CASCADE',
-            onDelete: 'CASCADE',
-        });
-
-        // fk_idea_category
-        await queryInterface.addConstraint('Ideas', {
+        // fk_ideas_category
+        await queryInterface.addConstraint('ideas', {
             fields: ['categoryId'],
             type: 'foreign key',
-            name: 'fk_idea_category',
+            name: 'fk_ideas_category',
             references: {
-                table: 'Categories',
+                table: 'categories',
+                field: 'id',
+            },
+            onUpdate: 'CASCADE',
+            onDelete: 'SET NULL',
+        });
+
+        // fk_comments_user
+        await queryInterface.addConstraint('comments', {
+            fields: ['userId'],
+            type: 'foreign key',
+            name: 'fk_comments_user',
+            references: {
+                table: 'users',
                 field: 'id',
             },
             onUpdate: 'CASCADE',
             onDelete: 'CASCADE',
         });
 
-        // fk_comment_idea
-        await queryInterface.addConstraint('Comments', {
+        // fk_comments_idea
+        await queryInterface.addConstraint('comments', {
             fields: ['ideaId'],
             type: 'foreign key',
-            name: 'fk_comment_idea',
+            name: 'fk_comments_idea',
             references: {
-                table: 'Ideas',
+                table: 'ideas',
                 field: 'id',
             },
             onUpdate: 'CASCADE',
             onDelete: 'CASCADE',
         });
 
-        // fk_vote_idea
-        await queryInterface.addConstraint('Votes', {
-            fields: ['ideaId'],
+        // fk_comments_parent
+        await queryInterface.addConstraint('comments', {
+            fields: ['parentId'],
             type: 'foreign key',
-            name: 'fk_vote_idea',
+            name: 'fk_comments_parent',
             references: {
-                table: 'Ideas',
+                table: 'comments',
                 field: 'id',
             },
             onUpdate: 'CASCADE',
             onDelete: 'CASCADE',
         });
 
-        // fk_reaction_comment
-        await queryInterface.addConstraint('Reactions', {
+        // fk_reactions_user
+        await queryInterface.addConstraint('reactions', {
+            fields: ['userId'],
+            type: 'foreign key',
+            name: 'fk_reactions_user',
+            references: {
+                table: 'users',
+                field: 'id',
+            },
+            onUpdate: 'CASCADE',
+            onDelete: 'CASCADE',
+        });
+
+        // fk_reactions_comment
+        await queryInterface.addConstraint('reactions', {
             fields: ['commentId'],
             type: 'foreign key',
-            name: 'fk_reaction_comment',
+            name: 'fk_reactions_comment',
             references: {
-                table: 'Comments',
+                table: 'comments',
                 field: 'id',
             },
             onUpdate: 'CASCADE',
             onDelete: 'CASCADE',
         });
 
-        // fk_ur_role
-        await queryInterface.addConstraint('User_Role', {
+        // fk_votes_user
+        await queryInterface.addConstraint('votes', {
+            fields: ['userId'],
+            type: 'foreign key',
+            name: 'fk_votes_user',
+            references: {
+                table: 'users',
+                field: 'id',
+            },
+            onUpdate: 'CASCADE',
+            onDelete: 'CASCADE',
+        });
+
+        // fk_votes_idea
+        await queryInterface.addConstraint('votes', {
+            fields: ['ideaId'],
+            type: 'foreign key',
+            name: 'fk_votes_idea',
+            references: {
+                table: 'ideas',
+                field: 'id',
+            },
+            onUpdate: 'CASCADE',
+            onDelete: 'CASCADE',
+        });
+
+        // fk_user_has_roles_user
+        await queryInterface.addConstraint('user_has_roles', {
+            fields: ['userId'],
+            type: 'foreign key',
+            name: 'fk_user_has_roles_user',
+            references: {
+                table: 'users',
+                field: 'id',
+            },
+            onUpdate: 'CASCADE',
+            onDelete: 'CASCADE',
+        });
+
+        // fk_user_has_roles_role
+        await queryInterface.addConstraint('user_has_roles', {
             fields: ['roleId'],
             type: 'foreign key',
-            name: 'fk_ur_role',
+            name: 'fk_user_has_roles_role',
             references: {
-                table: 'Roles',
+                table: 'roles',
                 field: 'id',
             },
             onUpdate: 'CASCADE',
             onDelete: 'CASCADE',
         });
 
-        // fk_rf_role
-        await queryInterface.addConstraint('Role_Feature', {
+        // fk_user_has_permissions_user
+        await queryInterface.addConstraint('user_has_permissions', {
+            fields: ['userId'],
+            type: 'foreign key',
+            name: 'fk_user_has_permissions_user',
+            references: {
+                table: 'users',
+                field: 'id',
+            },
+            onUpdate: 'CASCADE',
+            onDelete: 'CASCADE',
+        });
+
+        // fk_user_has_permissions_permission
+        await queryInterface.addConstraint('user_has_permissions', {
+            fields: ['permissionId'],
+            type: 'foreign key',
+            name: 'fk_user_has_permissions_permission',
+            references: {
+                table: 'permissions',
+                field: 'id',
+            },
+            onUpdate: 'CASCADE',
+            onDelete: 'CASCADE',
+        });
+
+        // fk_role_has_permissions_role
+        await queryInterface.addConstraint('role_has_permissions', {
             fields: ['roleId'],
             type: 'foreign key',
-            name: 'fk_rf_role',
+            name: 'fk_role_has_permissions_role',
             references: {
-                table: 'Roles',
+                table: 'roles',
                 field: 'id',
             },
             onUpdate: 'CASCADE',
             onDelete: 'CASCADE',
         });
 
-        // fk_rf_feature
-        await queryInterface.addConstraint('Role_Feature', {
-            fields: ['featureId'],
+        // fk_role_has_permissions_permission
+        await queryInterface.addConstraint('role_has_permissions', {
+            fields: ['permissionId'],
             type: 'foreign key',
-            name: 'fk_rf_feature',
+            name: 'fk_role_has_permissions_permission',
             references: {
-                table: 'Features',
+                table: 'permissions',
                 field: 'id',
             },
             onUpdate: 'CASCADE',
@@ -175,19 +214,21 @@ module.exports = {
 
     async down(queryInterface, Sequelize) {
         // Remove foreign key constraints
-
-        await queryInterface.removeConstraint('Tokens', 'fk_token_user');
-        await queryInterface.removeConstraint('Ideas', 'fk_idea_user');
-        await queryInterface.removeConstraint('Comments', 'fk_comment_user');
-        await queryInterface.removeConstraint('Votes', 'fk_vote_user');
-        await queryInterface.removeConstraint('Reactions', 'fk_reaction_user');
-        await queryInterface.removeConstraint('User_Role', 'fk_ur_user');
-        await queryInterface.removeConstraint('Ideas', 'fk_idea_category');
-        await queryInterface.removeConstraint('Comments', 'fk_comment_idea');
-        await queryInterface.removeConstraint('Votes', 'fk_vote_idea');
-        await queryInterface.removeConstraint('Reactions', 'fk_reaction_comment');
-        await queryInterface.removeConstraint('User_Role', 'fk_ur_role');
-        await queryInterface.removeConstraint('Role_Feature', 'fk_rf_role');
-        await queryInterface.removeConstraint('Role_Feature', 'fk_rf_feature');
+        await queryInterface.removeConstraint('tokens', 'fk_tokens_user');
+        await queryInterface.removeConstraint('ideas', 'fk_ideas_user');
+        await queryInterface.removeConstraint('ideas', 'fk_ideas_category');
+        await queryInterface.removeConstraint('comments', 'fk_comments_user');
+        await queryInterface.removeConstraint('comments', 'fk_comments_idea');
+        await queryInterface.removeConstraint('comments', 'fk_comments_parent');
+        await queryInterface.removeConstraint('reactions', 'fk_reactions_user');
+        await queryInterface.removeConstraint('reactions', 'fk_reactions_comment');
+        await queryInterface.removeConstraint('votes', 'fk_votes_user');
+        await queryInterface.removeConstraint('votes', 'fk_votes_idea');
+        await queryInterface.removeConstraint('user_has_roles', 'fk_user_has_roles_user');
+        await queryInterface.removeConstraint('user_has_roles', 'fk_user_has_roles_role');
+        await queryInterface.removeConstraint('user_has_permissions', 'fk_user_has_permissions_user');
+        await queryInterface.removeConstraint('user_has_permissions', 'fk_user_has_permissions_permission');
+        await queryInterface.removeConstraint('role_has_permissions', 'fk_role_has_permissions_role');
+        await queryInterface.removeConstraint('role_has_permissions', 'fk_role_has_permissions_permission');
     }
 };

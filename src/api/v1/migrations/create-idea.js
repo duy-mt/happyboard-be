@@ -29,7 +29,7 @@ module.exports = {
             type: Sequelize.INTEGER,
             defaultValue: 0
         }, 
-        voteCount: {
+        viewCount: {
             type: Sequelize.INTEGER,
             defaultValue: 0
         }, 
@@ -37,6 +37,10 @@ module.exports = {
             type: Sequelize.INTEGER,
             defaultValue: 0
         }, 
+        isPublished: {
+            type: Sequelize.BOOLEAN,
+            defaultValue: false
+        },
         createdAt: {
             allowNull: false,
             type: Sequelize.DATE
