@@ -9,8 +9,24 @@ const dev = {
     dialect: 'postgres',
 }
 
+const prod = {
+    host: process.env.PROD_POSTGRES_HOST || 'localhost',
+    username: process.env.PROD_POSTGRES_USER || 'postgres',
+    password: process.env.PROD_POSTGRES_PW || 'rootpass',
+    database: process.env.PROD_POSTGRES_DB || 'hb',
+    port: process.env.PROD_POSTGRES_PORT || '5455',
+    dialect: 'postgres',
+    dialectOptions: {
+        ssl: {
+            rejectUnauthorized: false
+        }
+    },
+}
+
+
 const config = {
-    dev
+    dev,
+    prod
 }
 
 const env = process.env.NODE_ENV || 'dev'
