@@ -7,13 +7,15 @@ const {
     findDraftIdea,
     findIdeasByIds,
     findIdeasByCategoryId,
-    findIdeasByVote
+    findIdeasByVote,
+    findUserIdByIdeaId
 } = require("../models/repo/idea.repo")
 const { insertDataByES, searchDataByES } = require('../elastic/idea.elastic')
 const { sortComment } = require("../utils")
 const VoteService = require("./vote.service")
 const RedisService = require("./redis.service")
 const { OPTION_SHOW_IDEA } = require("../constants")
+const { sendMessage } = require("./rabbitmq.service")
 
 class IdeaService {
     static createIdea = async ({
@@ -163,6 +165,16 @@ class IdeaService {
     static upVoteCount = async({
         ideaId, userId
     }) => {
+        const receiver = await findUserIdByIdeaId({ id: ideaId })
+        const data = {
+            sender: userId,
+            receiver: receiver.toString() 
+        }
+        await sendMessage({
+            queueName: 'vote',
+            msg: JSON.stringify(data)
+        })
+
         return await increaseVoteCount({
             ideaId,
             userId
