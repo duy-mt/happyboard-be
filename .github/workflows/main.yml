@@ -13,19 +13,32 @@ jobs:
         uses: actions/checkout@v4
       - name: Create .env file
         run: |
-          echo `NODE_ENV=${{secrets.NODE_ENV}}` >> .env
+          echo "NODE_ENV=${{secrets.NODE_ENV}}" >> .env
           echo "DEV_APP_PORT=${{secrets.DEV_APP_PORT}}" >> .env
           echo "DEV_SECRET_KEY=${{secrets.DEV_SECRET_KEY}}" >> .env
+          echo "DEV_SECRET_KEY=${{secrets.DEV_CLIENT_TOKEN}}" >> .env
+
           echo "DEV_POSTGRES_HOST=${{secrets.DEV_POSTGRES_HOST}}" >> .env
           echo "DEV_POSTGRES_PW=${{secrets.DEV_POSTGRES_PW}}" >> .env
           echo "DEV_POSTGRES_DB=${{secrets.DEV_POSTGRES_DB}}" >> .env
           echo "DEV_POSTGRES_PORT=${{secrets.DEV_POSTGRES_PORT}}" >> .env
+
           echo "DEV_ES_CLOUDID=${{secrets.DEV_ES_CLOUDID}}" >> .env
           echo "DEV_ES_USER=${{secrets.DEV_ES_USER}}" >> .env
           echo "DEV_ES_PW=${{secrets.DEV_ES_PW}}" >> .env
           echo "DEV_ES_INDEX=${{secrets.DEV_ES_INDEX}}" >> .env
+
           echo "REDIS_HOST=${{secrets.REDIS_HOST}}" >> .env
           echo "REDIS_PORT=${{secrets.REDIS_PORT}}" >> .env
+
+          echo `PROD_POSTGRES_HOST=${{secrets.PROD_POSTGRES_HOST}}` >> .env
+          echo "PROD_POSTGRES_USER=${{secrets.PROD_POSTGRES_USER}}" >> .env
+          echo "PROD_POSTGRES_PW=${{secrets.PROD_POSTGRES_PW}}" >> .env
+          echo "PROD_POSTGRES_DB=${{secrets.PROD_POSTGRES_DB}}" >> .env
+          echo "PROD_POSTGRES_PORT=${{secrets.PROD_POSTGRES_PORT}}" >> .env
+
+          echo "PROD_REDIS_HOST=${{secrets.PROD_REDIS_HOST}}" >> .env
+          echo "PROD_REDIS_PORT=${{secrets.PROD_REDIS_PORT}}" >> .env
       - name: Login to docker hub
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}       
       - name: Build docker image
@@ -41,5 +54,7 @@ jobs:
         run: docker pull duymt3/happyboard-be:latest
       - name: Delete old container
         run: docker rm -f happyboard-be-container
+      - name: Delete old image
+        run: docker rmi duymt3/happyboard-be:latest
       - name: Run docker container
-        run: docker run -d -p 8000:8000 --name happyboard-be-container duymt3/happyboard-be
+        run: docker run -d -p 8000:8000 --name happyboard-be-container duymt3/happyboard-be:latest

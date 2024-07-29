@@ -26,7 +26,8 @@ const prod = {
 
 
 const config = {
-    dev, prod
+    dev,
+    prod
 }
 
 let env = process.env.NODE_ENV || 'dev'
