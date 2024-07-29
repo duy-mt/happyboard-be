@@ -1,12 +1,6 @@
-const dev = {
-    host: process.env.DEV_REDIS_HOST || 'localhost',
-    port: process.env.DEV_REDIS_PORT || '6379',
-}
+const dev = process.env.DEV_REDIS_URI
 
-const prod = {
-    host: process.env.PROD_REDIS_HOST || 'localhost',
-    port: process.env.PROD_REDIS_PORT || '6379',
-}
+const prod = process.env.PROD_REDIS_URI
 
 const config = {
     dev, prod
