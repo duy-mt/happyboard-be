@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+
+  redis-stack-server:
+    image: redis/redis-stack-server:latest
+    container_name: redis-stack-server
+    ports:
+      - "6379:6379"
+
+  es01:
+    image: elasticsearch/elasticsearch:8.14.3
+    container_name: es01
+    networks:
+      - elastic
+    ports:
+      - "9200:9200"
+    deploy:
+      resources:
+        limits:
+          memory: 1GB
+    environment:
+      - discovery.type=single-node
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+  
+  server:
+    image: duymt3/happyboard-be:latest
+    container_name: happyboard-be
+    ports:
+      - "8000:8000"
+    depends_on:
+      - elasticsearch
+      - rabbitmq
+      - redis-stack-server
+    environment:
+      - REDIS_HOST=172.31.33.195
+      - REDIS_PORT=6379
+      - ELASTICSEARCH_HOST=172.31.33.195
+      - ELASTICSEARCH_PORT=9200
+      - RABBITMQ_HOST=172.31.33.195
+      - RABBITMQ_PORT=5672
+
+networks:
+  elastic:
+    driver: bridge
