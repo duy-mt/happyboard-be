@@ -1,14 +1,17 @@
 const dev = {
-    cloudID: `DEPLOYMENT_NAME:${process.env.DEV_ES_CLOUDID}`, 
-    username: process.env.DEV_ES_USER,
-    password: process.env.DEV_ES_PW
+    host: process.env.DEV_REDIS_HOST || 'localhost',
+    port: process.env.DEV_REDIS_PORT || '6379',
+}
+
+const prod = {
+    host: process.env.PROD_REDIS_HOST || 'localhost',
+    port: process.env.PROD_REDIS_PORT || '6379',
 }
 
 const config = {
-    dev
+    dev, prod
 }
 
 const env = process.env.NODE_ENV || 'dev'
-
 
 module.exports = config[env]

@@ -10,12 +10,12 @@ const {
     findIdeasByVote,
     findUserIdByIdeaId
 } = require("../models/repo/idea.repo")
-const { insertDataByES, searchDataByES } = require('../elastic/idea.elastic')
 const { sortComment } = require("../utils")
 const VoteService = require("./vote.service")
 const RedisService = require("./redis.service")
 const { OPTION_SHOW_IDEA } = require("../constants")
 const { sendMessage } = require("./rabbitmq.service")
+const ElasticSearch = require("./es.service")
 
 class IdeaService {
     static createIdea = async ({
@@ -27,11 +27,14 @@ class IdeaService {
         const savedIdea = await createIdea({
             title, content, categoryId, userId, isPublished
         })
-        const idea = await findIdea({id: savedIdea.id})
         // Ingest elastic
-        await insertDataByES({
-            obj: savedIdea
+        await ElasticSearch.createDocument({
+            // Using dynamic index getting from db
+            index: 'ideas',
+            body: savedIdea.dataValues
         })
+        
+        const idea = await findIdea({id: savedIdea.id})
 
         return idea
     }
@@ -142,24 +145,50 @@ class IdeaService {
     }
 
     static searchIdea = async ({q, limit = 5, page = 1, userId}) => {
-        const {ideas, totalIdea} = await findIdeaPage({
-            q, page, limit, fieldSort: 'createdAt'
-        })
-        for(let i = 0; i < ideas.length; i++) {
-            let status = await VoteService.getStatusVote({
-                ideaId: ideas[i].id,
-                userId
+        try {
+            const ideas = await ElasticSearch.searchDocument({
+                // Using dynamic
+                index: 'ideas',
+                query: {
+                    match: {
+                        title: q
+                    }
+                },
+                start: (page - 1) * limit,
+                limit
             })
-            ideas[i].vote = status
+            // 
+            let totalIdea = 1
+            let totalPage = 1
+            return {
+                totalPage: totalPage,
+                currentPage: page,
+                pageSize: limit,
+                total: totalIdea,
+                ideas,
+            }
+        } catch (error) {
+            return null
         }
-        const totalPage = Math.ceil(totalIdea / limit)
-        return {
-            totalPage: totalPage,
-            currentPage: page,
-            pageSize: limit,
-            total: totalIdea,
-            ideas,
-        }
+        
+        // const {ideas, totalIdea} = await findIdeaPage({
+        //     q, page, limit, fieldSort: 'createdAt'
+        // })
+        // for(let i = 0; i < ideas.length; i++) {
+        //     let status = await VoteService.getStatusVote({
+        //         ideaId: ideas[i].id,
+        //         userId
+        //     })
+        //     ideas[i].vote = status
+        // }
+        // const totalPage = Math.ceil(totalIdea / limit)
+        // return {
+        //     totalPage: totalPage,
+        //     currentPage: page,
+        //     pageSize: limit,
+        //     total: totalIdea,
+        //     ideas,
+        // }
     }
 
     static upVoteCount = async({
