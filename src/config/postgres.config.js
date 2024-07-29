@@ -1,5 +1,7 @@
 'use strict'
 
+require('dotenv').config()
+
 const dev = {
     host: process.env.DEV_POSTGRES_HOST || 'localhost',
     username: process.env.DEV_POSTGRES_USER || 'postgres',

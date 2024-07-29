@@ -1,17 +1,24 @@
 const { createClient } = require('redis')
 const { redis } = require('../../../config')
 
-const client = createClient(redis)
+class RDB {
+    static client;
 
-client.on('error', err => console.log('Connect Redis error', err))
-client.on('ready', () => { console.log('\x1b[42m%s\x1b[0m', 'Redis: Connect succefully')})
+    static async getClient() {
+        if (RDB.client && RDB.client.isOpen) {
+            return RDB.client;
+        }
+        RDB.client = createClient({
+            url: redis
+        })
+        RDB.client.on('error', err => console.log('Connect Redis error', err))
+        RDB.client.on('ready', () => { console.log('\x1b[42m%s\x1b[0m', 'Redis: Connect succefully')})
+        await RDB.client.connect();
 
-const getRedisInstance = async () => {
-    await client.connect()
-
-    return client
+        return RDB.client;
+    }
 }
 
 module.exports = {
-    getRedisInstance
+    getRedisInstance: RDB.getClient
 }

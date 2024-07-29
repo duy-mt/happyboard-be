@@ -1,17 +1,20 @@
 const amqp = require('amqplib')
+const { rabbitmq } = require('../../../config')
 
-const connectToRabbitMQ = async () => {
-    try {
-        const connection = await amqp.connect('amqp://guest:guest@localhost')
-        if(!connection) throw new Error('Connect failed')
-            const channel = await connection.createChannel()
-        console.log(`Connect RabbitMQ success`)
-        return { channel, connection }
-    } catch (error) {
-        console.log(`Connect RabbitMQ Error:`, error);
-    }
+let instance
+
+const connect = async () => {
+    instance = await amqp.connect(rabbitmq)
+}
+
+connect()
+.then(() => console.log('\x1b[42m%s\x1b[0m', 'RabbitMQ: Connect successfully'))
+.catch(err => console.log('RabbitMQ: Connect failed ', err))
+
+const getInstanceMQ = async () => {
+    return instance
 }
 
 module.exports = {
-    connectToRabbitMQ
+    getInstanceMQ
 }
