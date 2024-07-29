@@ -18,9 +18,10 @@ const prod = {
     dialect: 'postgres',
     dialectOptions: {
         ssl: {
-            rejectUnauthorized: false
+            require: true,
+            rejectUnauthorized: false,
         }
-    },
+    }
 }
 
 
@@ -29,6 +30,6 @@ const config = {
     prod
 }
 
-const env = process.env.NODE_ENV || 'dev'
+let env = process.env.NODE_ENV || 'dev'
 
 module.exports = config[env]
