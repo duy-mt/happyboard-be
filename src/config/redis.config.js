@@ -1,6 +1,6 @@
 const dev = process.env.DEV_REDIS_URI
 
-const prod = process.env.PROD_REDIS_URI
+const prod ="redis://172.31.33.195:6379"
 
 const config = {
     dev, prod
