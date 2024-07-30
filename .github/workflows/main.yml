@@ -18,16 +18,6 @@ jobs:
           echo "DEV_SECRET_KEY=${{secrets.DEV_SECRET_KEY}}" >> .env
           echo "DEV_SECRET_KEY=${{secrets.DEV_CLIENT_TOKEN}}" >> .env
 
-          echo "DEV_POSTGRES_HOST=${{secrets.DEV_POSTGRES_HOST}}" >> .env
-          echo "DEV_POSTGRES_PW=${{secrets.DEV_POSTGRES_PW}}" >> .env
-          echo "DEV_POSTGRES_DB=${{secrets.DEV_POSTGRES_DB}}" >> .env
-          echo "DEV_POSTGRES_PORT=${{secrets.DEV_POSTGRES_PORT}}" >> .env
-
-          echo "DEV_ES_CLOUDID=${{secrets.DEV_ES_CLOUDID}}" >> .env
-          echo "DEV_ES_USER=${{secrets.DEV_ES_USER}}" >> .env
-          echo "DEV_ES_PW=${{secrets.DEV_ES_PW}}" >> .env
-          echo "DEV_ES_INDEX=${{secrets.DEV_ES_INDEX}}" >> .env
-
           echo "REDIS_HOST=${{secrets.REDIS_HOST}}" >> .env
           echo "REDIS_PORT=${{secrets.REDIS_PORT}}" >> .env
 
@@ -39,6 +29,11 @@ jobs:
 
           echo "PROD_REDIS_HOST=${{secrets.PROD_REDIS_HOST}}" >> .env
           echo "PROD_REDIS_PORT=${{secrets.PROD_REDIS_PORT}}" >> .env
+          
+          echo "PROD_RMQ_USER=${{secrets.PROD_RMQ_USER}}" >> .env
+          echo "PROD_RMQ_PW=${{secrets.PROD_RMQ_PW}}" >> .env
+          echo "PROD_RMQ_HOST=${{secrets.PROD_RMQ_HOST}}" >> .env
+          
       - name: Login to docker hub
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}       
       - name: Build docker image
