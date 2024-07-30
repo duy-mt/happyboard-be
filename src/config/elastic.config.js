@@ -11,15 +11,7 @@ const dev = {
 
 // LOCAL
 const prod = {
-    node: `https://${process.env.PROD_ES_URL}`,
-    auth: {
-        username: process.env.PROD_ES_USER,
-        password: process.env.PROD_ES_PW
-    },
-    tls: {
-        ca: process.env.PROD_ES_CA,
-        rejectUnauthorized: false
-    }
+    node: `https://172.31.33.195:9200`,
 }
 
 const config = {
