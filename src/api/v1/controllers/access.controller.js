@@ -5,6 +5,7 @@ const AccessService = require("../services/access.service")
 
 class AccessController {
     login = async (req, res, next) => {
+        req.body.deviceToken = req.headers['device-token']
         const data = await AccessService.login(req.body)
 
         res.cookie('access-token', data.tokens.accessToken, {

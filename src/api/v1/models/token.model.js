@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
         userId: DataTypes.INTEGER,
         refreshToken: DataTypes.STRING,
         accessToken: DataTypes.STRING,
+        deviceToken: DataTypes.STRING,
     }, {
         sequelize,
         modelName: 'Token',

@@ -1,64 +1,63 @@
 'use strict'
 
-const { connectToRabbitMQ } = require('../dbs/rabbitmq.init')
+const { getRabbitMQInstance } = require('../dbs/rabbitmq.init')
 
-const sendMessage = async ({
-    queueName, msg
-}) => {
-    const { connection, channel } = await connectToRabbitMQ()
+class MessageQueue {
+    static send = async ({ nameExchange, message = {} }) => {
+        try {
+            const { connection, channel } = await getRabbitMQInstance()
+    
+            await channel.assertExchange(nameExchange, 'fanout', {
+                durable: false,
+                autoDelete: true
+            })
+    
+            channel.publish(nameExchange, '', Buffer.from(JSON.stringify(message)))
+    
+            console.log(`[x] ${nameExchange} sent: `, message)
+    
+            setTimeout(() => {
+                connection.close()
+            }, 2000)
+        } catch (error) {
+            console.error(`Error in sendMQ: ${error.message}`)
+        }
+    }
 
-    await channel.assertQueue(queueName)
-    await channel.sendToQueue(queueName, new Buffer(msg),
-    {
-        persistent: true
-    })
-
-    connection.on("error", function(err)
-    {
-        console.log(err);
-        setTimeout(connectRabbitMQ, 10000)
-    })
-
-    connection.on("close", function()
-    {
-        console.error("Connection to RabbitQM closed!")
-        setTimeout(connectRabbitMQ, 10000)
-    })
-}
-
-const receiveMessage = async (queueName, callback) => {
-    try {
-        const { connection, channel } = await connectToRabbitMQ()
-
-        await channel.assertQueue(queueName);
-
-        await channel.consume(queueName, async (message) => {
-            try {
-                await callback(message.content.toString())
-                channel.ack(message)
-            } catch (err) {
-                console.error("Error processing message:", err);
-                channel.nack(message, false, true)
+    static receive = async ({ subscribedExchanges = [] }) => {
+        try {
+            const { connection, channel } = await getRabbitMQInstance()
+    
+            for (let i = 0; i < subscribedExchanges.length; i++) {
+                const exchange = subscribedExchanges[i].name
+                
+                await channel.assertExchange(exchange, 'fanout', {
+                    durable: false,
+                    autoDelete: true
+                })
+    
+                const { queue } = await channel.assertQueue('', {
+                    exclusive: true
+                })
+    
+                console.log(`[x] Waiting for messages in ${queue}. To exit press CTRL+C`)
+    
+                channel.bindQueue(queue, exchange, '')
+    
+                await channel.consume(queue, async msgBuffer => {
+                    // INSTANCE.EXECUTE(MSG)
+                    const msg = JSON.parse(msgBuffer.content.toString())
+                    console.log(`[x] Received: `, msg)
+                    // await FirebaseService.notification(msg)
+                    await subscribedExchanges[i].cb(msg)
+                }, {
+                    noAck: true
+                })
             }
-        })
-
-        connection.on("error", (err) => {
-            console.error("Connection error:", err);
-            setTimeout(connectRabbitMQ, 10000, callback);
-        })
-
-        connection.on("close", () => {
-            console.error("Connection to RabbitMQ closed!");
-            setTimeout(connectRabbitMQ, 10000, callback);
-        })
-
-    } catch (err) {
-        console.error("Failed to connect to RabbitMQ:", err);
-        setTimeout(connectRabbitMQ, 10000, callback);
+        } catch (error) {
+            console.error(`Error in receiveMQ: ${error.message}`)
+        }
     }
 }
 
-module.exports = {
-    sendMessage,
-    receiveMessage
-}
+module.exports = MessageQueue

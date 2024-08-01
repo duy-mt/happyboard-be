@@ -21,6 +21,10 @@ module.exports = {
             type: Sequelize.STRING,
             defaultValue: ''
         },
+        deviceToken: {
+            type: Sequelize.STRING,
+            defaultValue: ''
+        },
         createdAt: {
             allowNull: false,
             type: Sequelize.DATE

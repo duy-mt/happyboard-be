@@ -14,8 +14,8 @@ const { sortComment } = require("../utils")
 const VoteService = require("./vote.service")
 const RedisService = require("./redis.service")
 const { OPTION_SHOW_IDEA } = require("../constants")
-const { sendMessage } = require("./rabbitmq.service")
 const ElasticSearch = require("./es.service")
+const MessageQueue = require('./rabbitmq.service')
 
 class IdeaService {
     static createIdea = async ({
@@ -197,11 +197,13 @@ class IdeaService {
         const receiver = await findUserIdByIdeaId({ id: ideaId })
         const data = {
             sender: userId,
-            receiver: receiver.toString() 
+            receiver: receiver.toString(),
+            target: 'idea',
+            action: 'up'
         }
-        await sendMessage({
-            queueName: 'vote',
-            msg: JSON.stringify(data)
+        await MessageQueue.send({
+            nameExchange: 'post_notification',
+            message: data
         })
 
         return await increaseVoteCount({
