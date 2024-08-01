@@ -200,7 +200,10 @@ class IdeaService {
             sender: userId,
             receiver: receiver.toString(),
             target: 'idea',
-            action: 'up'
+            action: 'up',
+            metadata: {
+                targetId: ideaId
+            }
         }
         await MessageQueue.send({
             nameExchange: 'post_notification',

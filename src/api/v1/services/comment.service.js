@@ -26,7 +26,10 @@ class CommentService {
             sender: userId,
             receiver: receiver.toString(),
             target: 'idea',
-            action: 'comment'
+            action: 'comment',
+            metadata: {
+                targetId: ideaId
+            }
         }
         await MessageQueue.send({
             nameExchange: 'post_notification',
@@ -81,7 +84,10 @@ class CommentService {
             sender: userId,
             receiver: receiver.toString(),
             target: 'comment',
-            action: 'reaction'
+            action: 'reaction',
+            metadata: {
+                targetId: commentId
+            }
         }
 
         await MessageQueue.send({
