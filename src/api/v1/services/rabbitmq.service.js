@@ -3,7 +3,7 @@
 const { getRabbitMQInstance } = require('../dbs/rabbitmq.init')
 
 class MessageQueue {
-    static send = async ({ nameExchange, message }) => {
+    static send = async ({ nameExchange, message = {} }) => {
         try {
             const { connection, channel } = await getRabbitMQInstance()
     
@@ -14,7 +14,7 @@ class MessageQueue {
     
             channel.publish(nameExchange, '', Buffer.from(JSON.stringify(message)))
     
-            console.log(`[x] ${nameExchange} sent: ${message}`)
+            console.log(`[x] ${nameExchange} sent: `, message)
     
             setTimeout(() => {
                 connection.close()

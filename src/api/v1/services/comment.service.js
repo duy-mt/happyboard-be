@@ -7,7 +7,7 @@ const {
 const { findUserIdByIdeaId } = require("../models/repo/idea.repo")
 const { updateReaction, countReactionByCommentId, checkReaction, deleteReaction } = require("../models/repo/reaction.repo")
 const { processReturnedData, sortComment } = require("../utils")
-const { sendMessage } = require('./rabbitmq.service')
+const MessageQueue = require("./rabbitmq.service")
 
 class CommentService {
     static createComment = async ({
@@ -21,13 +21,16 @@ class CommentService {
         }
 
         const receiver = await findUserIdByIdeaId({ id: ideaId })
+
         const data = {
             sender: userId,
-            receiver: receiver.toString() 
+            receiver: receiver.toString(),
+            target: 'idea',
+            action: 'comment'
         }
-        await sendMessage({
-            queueName: 'comment',
-            msg: JSON.stringify(data)
+        await MessageQueue.send({
+            nameExchange: 'post_notification',
+            message: data
         })
 
         const savedComment = await createComment({
@@ -70,14 +73,20 @@ class CommentService {
         const r = await updateReaction({
             commentId, userId, reaction
         })
-        const receiver = await findUserIdByIdeaId({ id:1 }) //fake
+
+        const cmt = await getCommentById(commentId)
+        const receiver = cmt.userId
+
         const data = {
             sender: userId,
-            receiver: receiver.toString() 
+            receiver: receiver.toString(),
+            target: 'comment',
+            action: 'reaction'
         }
-        await sendMessage({
-            queueName: 'reaction',
-            msg: JSON.stringify(data)
+
+        await MessageQueue.send({
+            nameExchange: 'post_notification',
+            message: data
         })
 
         return r

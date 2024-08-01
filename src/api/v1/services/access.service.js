@@ -1,7 +1,7 @@
 'use strict'
 
 const { Conflict, BadRequest, Unauthorized } = require("../core/error.response")
-const { createNewToken, updatePairToken, removeTokenById, findTokenByRefreshToken } = require("../models/repo/token.repo")
+const { createNewToken, updatePairToken, removeTokenById, findTokenByRefreshToken, removeTokenByAccessToken } = require("../models/repo/token.repo")
 const { findUserByEmail, createUser } = require("../models/repo/user.repo")
 const { 
     createAccessToken, 
@@ -14,7 +14,7 @@ const {
 } = require("../utils")
 
 class AccessService {
-    static login = async ({ email, password }) => {
+    static login = async ({ email, password, deviceToken }) => {
         // 1.Check email
         if(!email || !password) throw new BadRequest('Email and password are required')
         const { password: foundPW, user: foundUser } = await findUserByEmail(email)
@@ -39,7 +39,8 @@ class AccessService {
         await updatePairToken({
             userId: foundUser.id,
             accessToken: newAccessToken,
-            refreshToken: newRefreshToken
+            refreshToken: newRefreshToken,
+            deviceToken: deviceToken,
         })
 
         return {
@@ -94,8 +95,9 @@ class AccessService {
         return null
     }
 
-    static logout = async (token) => {
-        const delToken = await removeTokenById(token.id)
+    static logout = async ({ accessToken }) => {
+        // const delToken = await removeTokenById(token.id)
+        const delToken = await removeTokenByAccessToken({ accessToken })
         return delToken
     }
 

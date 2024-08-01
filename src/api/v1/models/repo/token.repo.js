@@ -15,11 +15,11 @@ const createNewToken = async ({
 }
 
 const updatePairToken = async ({
-    userId, accessToken, refreshToken
+    userId, accessToken, refreshToken, deviceToken
 }) => {
     const [token, isCreated] = await Token.findOrCreate(
         { 
-            where: { userId },
+            where: { userId, deviceToken },
             defaults: {
                 accessToken,
                 refreshToken
@@ -37,13 +37,14 @@ const updatePairToken = async ({
 
 // FIND
 const findAccessKeyByUserId = async (userId) => {
-    const token = await Token.findOne({
+    const tokens = await Token.findAll({
         where: {
             userId
-        }
+        },
+        attributes: ['accessToken'],
+        raw: true
     })
-
-    return token?.dataValues
+    return tokens
 }
 
 const findTokenByRefreshToken = async (refreshToken) => {
@@ -65,10 +66,19 @@ const removeTokenById = async (id) => {
     })
 }
 
+const removeTokenByAccessToken = async ({accessToken}) => {
+    return await Token.destroy({
+        where: {
+            accessToken
+        },
+    })
+}
+
 module.exports = {
     createNewToken,
     updatePairToken,
     findAccessKeyByUserId,
     removeTokenById,
-    findTokenByRefreshToken
+    findTokenByRefreshToken,
+    removeTokenByAccessToken
 }

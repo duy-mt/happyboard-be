@@ -12,7 +12,7 @@ router.post('/test', async (req, res, next) => {
     
     await MessageQueue.send({
         nameExchange: 'post_notification',
-        message: msg
+        message: JSON.stringify(msg)
     })
     res.json('Send OK')
 })
