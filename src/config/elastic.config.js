@@ -11,7 +11,7 @@ const dev = {
 
 // LOCAL
 const prod = {
-    node: `https://172.31.33.195:9200`,
+    node: `http://47.129.21.145:9200`,
 }
 
 const config = {
