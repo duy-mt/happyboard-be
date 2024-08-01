@@ -168,6 +168,7 @@ class IdeaService {
                 ideas,
             }
         } catch (error) {
+            console.log(`Search Elastic Error:`, error)
             return null
         }
         
