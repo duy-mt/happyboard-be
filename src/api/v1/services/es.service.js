@@ -44,8 +44,8 @@ class ElasticSearch {
                     console.log('Create document successfully');
                 }
             })
-        } catch (error) {
-            console.error('Error create document:', err)
+        } catch (err) {
+            console.log('Error create document:', err)
         }
     }
 
@@ -74,8 +74,8 @@ class ElasticSearch {
                     // return resp
                 }
             })
-        } catch (error) {
-            console.error('Error create document:', err)
+        } catch (err) {
+            console.log('Error create document:', err)
         }
         return ideas?.hits?.hits
     }
