@@ -4,12 +4,13 @@ const { processReturnedData, removeField } = require('../../utils')
 const { User } = require('../index')
 
 // CREATE
-const createUser = async ({ email, password, username }) => {
+const createUser = async ({ email, password, username, avatar = '' }) => {
     try {
         const user = await User.create({
             email,
             password,
             username,
+            avatar
         })
         
         return user.get({ plain: true });
