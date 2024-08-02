@@ -101,7 +101,7 @@ class AccessService {
         return delToken
     }
 
-    static handleRefreshToken = async ({userId, refreshToken}) => {
+    static handleRefreshToken = async ({userId, refreshToken, deviceToken}) => {
         if(!refreshToken) throw new BadRequest('Wrong infomation. Relogin please')
 
         // 1. Check refreshToken exists in db
@@ -129,7 +129,8 @@ class AccessService {
         const token = await updatePairToken({
             userId,
             accessToken,
-            refreshToken
+            refreshToken,
+            deviceToken: deviceToken
         })
 
         if(!token) throw new BadRequest('Wrong infomation. Relogin please')

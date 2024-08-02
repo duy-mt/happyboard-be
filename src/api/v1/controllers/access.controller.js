@@ -50,6 +50,7 @@ class AccessController {
     }
 
     refreshToken = async (req, res, next) => {
+        req.body.deviceToken = req.headers['device-token']
         const data = await AccessService.handleRefreshToken(req.body)
 
         res.cookie('access-token', data.accessToken, {

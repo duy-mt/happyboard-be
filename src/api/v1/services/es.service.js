@@ -49,13 +49,18 @@ class ElasticSearch {
         }
     }
 
-    static searchDocument = async ({ index, query = queryDefault, start = 0, limit = 5 }) => {
-        let ideas = null
+    static searchDocument = async ({ index, queryString, start = 0, limit = 5 }) => {
         try {
-            ideas = await this.elasticClient.search({
+            const resp = await this.elasticClient.search({
                 index,
                 body: {
-                    query,
+                    query: {
+                        multi_match: {
+                            query: queryString,
+                            fields: ['title'],
+                            fuzziness: 'AUTO'
+                        }
+                    },
                     sort: [
                         {
                             _score: {
@@ -66,19 +71,15 @@ class ElasticSearch {
                     from: start,
                     size: limit,
                 }
-            }, function (err,resp,status) {
-                if (err) {
-                    console.log('Search document failed')
-                } else {
-                    ideas = resp
-                    // return resp
-                }
             })
+            
+            return resp.hits.hits;
         } catch (err) {
-            console.log('Error create document:', err)
+            console.log('Error search document:', err);
+            return null;
         }
-        return ideas?.hits?.hits
     }
+    
 }
 
 module.exports = ElasticSearch
