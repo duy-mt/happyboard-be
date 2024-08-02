@@ -8,8 +8,22 @@ const morgan = require('morgan')
 const cookieParser = require('cookie-parser')
 const cors = require('cors')
 const { NotFound } = require('./api/v1/core/error.response')
+const passport = require('passport')
+const session = require('express-session')
 
 const app = express()
+
+// TEST PASSPORT
+app.use(
+    session({
+        secret: 'keyboard cat',
+        resave: false,
+        saveUninitialized: false,
+    })
+)
+
+app.use(passport.initialize())
+app.use(passport.session())
 
 app.use(morgan('dev'))
 app.use(cors())

@@ -101,7 +101,7 @@ class AccessService {
         return delToken
     }
 
-    static handleRefreshToken = async ({userId, refreshToken}) => {
+    static handleRefreshToken = async ({userId, refreshToken, deviceToken}) => {
         if(!refreshToken) throw new BadRequest('Wrong infomation. Relogin please')
 
         // 1. Check refreshToken exists in db
@@ -129,12 +129,85 @@ class AccessService {
         const token = await updatePairToken({
             userId,
             accessToken,
-            refreshToken
+            refreshToken,
+            deviceToken: deviceToken
         })
 
         if(!token) throw new BadRequest('Wrong infomation. Relogin please')
         return {
             accessToken: token.accessToken
+        }
+    }
+
+    static signUpWithGoogle = async ({ user, deviceToken = '' }) => {
+        const email = user.emails[0].value
+        const username = email.split('@')[0]
+        const password = 'password123'
+        const avatar = user.photos[0].value
+
+        const { user: foundUser } = await findUserByEmail(email)
+        if(foundUser) {
+            const payload = {
+                userId: foundUser.id, 
+                email,
+            }
+            const secretKey = createSecretKey()
+            const newAccessToken = await createAccessToken({
+                payload, secretKey
+            })
+            const newRefreshToken = await createRefreshToken({
+                payload, secretKey
+            })
+    
+            await updatePairToken({
+                userId: foundUser.id,
+                accessToken: newAccessToken,
+                refreshToken: newRefreshToken,
+                deviceToken: deviceToken,
+            })
+    
+            return {
+                user: foundUser,
+                tokens: {
+                    accessToken: newAccessToken,
+                    refreshToken: newRefreshToken
+                }
+            }
+        } else {
+            const hashPW = await createHash(password)
+            const newUser = await createUser({
+                email, password: hashPW, username, avatar
+            })
+
+            if(newUser) {
+                const payload = {
+                    userId: newUser.id, 
+                    email,
+                }
+                const secretKey = createSecretKey()
+                const accessToken = await createAccessToken({
+                    payload, secretKey
+                })
+                const refreshToken = await createRefreshToken({
+                    payload, secretKey
+                })
+                await createNewToken({
+                    userId: newUser.id,
+                    accessToken,
+                    refreshToken 
+                })
+
+                return {
+                    user: removeField({
+                        obj: newUser,
+                        field: ['password', 'createdAt', 'updatedAt']
+                    }),
+                    tokens: {
+                        accessToken,
+                        refreshToken
+                    }
+                }
+            }   
         }
     }
 }

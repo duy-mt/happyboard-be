@@ -49,17 +49,18 @@ const verifyJWT = async ({token, secretKey}) => {
 // END AUTH
 
 const convertTime = (originTime) => {
-    const date = new Date(originTime)
-    const day = String(date.getUTCDate()).padStart(2, '0')
-    const month = String(date.getUTCMonth() + 1).padStart(2, '0')
-    const year = date.getUTCFullYear()
-    const hours = String(date.getUTCHours() + 7).padStart(2, '0')
-    const minutes = String(date.getUTCMinutes()).padStart(2, '0')
-    const seconds = String(date.getUTCSeconds()).padStart(2, '0')
+    // const date = new Date(originTime)
+    // const day = String(date.getUTCDate()).padStart(2, '0')
+    // const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+    // const year = date.getUTCFullYear()
+    // const hours = String(date.getUTCHours() + 7).padStart(2, '0')
+    // const minutes = String(date.getUTCMinutes()).padStart(2, '0')
+    // const seconds = String(date.getUTCSeconds()).padStart(2, '0')
     
-    // Format: hh:mm:ss dd/MM/yyyy
-    const formattedDate = `${day}/${month}/${year} at ${hours}:${minutes}`
-    return formattedDate
+    // // Format: hh:mm:ss dd/MM/yyyy
+    // const formattedDate = `${day}/${month}/${year} at ${hours}:${minutes}`
+    // return formattedDate
+    return originTime
 }
 
 

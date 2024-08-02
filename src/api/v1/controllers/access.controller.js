@@ -50,6 +50,7 @@ class AccessController {
     }
 
     refreshToken = async (req, res, next) => {
+        req.body.deviceToken = req.headers['device-token']
         const data = await AccessService.handleRefreshToken(req.body)
 
         res.cookie('access-token', data.accessToken, {
@@ -58,6 +59,26 @@ class AccessController {
 
         new OK({
             message: 'Logout successfully',
+            data
+        }).send(res)
+    }
+
+    signUpWithGoogle = async (req, res, next) => {
+        const data = await AccessService.signUpWithGoogle({
+            user: req.user,
+            deviceToken: req.headers['device-token']
+        })
+
+        res.cookie('access-token', data.tokens.accessToken, {
+            maxAge: 10 * 24 * 60 * 60 * 1000
+        }).cookie('refresh-token', data.tokens.refreshToken, {
+            maxAge: 10 * 24 * 60 * 60 * 1000
+        }).cookie('userId', data.user.id, {
+            maxAge: 10 * 24 * 60 * 60 * 1000
+        })
+
+        new Created({
+            message: 'Register with google successfully',
             data
         }).send(res)
     }

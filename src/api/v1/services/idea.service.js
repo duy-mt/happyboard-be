@@ -146,20 +146,18 @@ class IdeaService {
 
     static searchIdea = async ({q, limit = 5, page = 1, userId}) => {
         try {
-            const ideas = await ElasticSearch.searchDocument({
+            const resp = await ElasticSearch.searchDocument({
                 // Using dynamic
                 index: 'ideas',
-                query: {
-                    match: {
-                        title: q
-                    }
-                },
-                start: (page - 1) * limit,
-                limit
+                queryString: q
             })
-            // 
-            let totalIdea = 1
             let totalPage = 1
+            const ideaIds = resp.map(i => i._source.id)
+            console.log(ideaIds);
+            let totalIdea = ideaIds.length > 5 ? 5 :  ideaIds.length
+            
+            let ideas = await findIdeasByIds(ideaIds)
+
             return {
                 totalPage: totalPage,
                 currentPage: page,
@@ -200,7 +198,10 @@ class IdeaService {
             sender: userId,
             receiver: receiver.toString(),
             target: 'idea',
-            action: 'up'
+            action: 'up',
+            metadata: {
+                targetId: ideaId
+            }
         }
         await MessageQueue.send({
             nameExchange: 'post_notification',
