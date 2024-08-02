@@ -26,6 +26,7 @@ router.get('/auth/google/callback',
 }))
 // router.use('/api/v1/vote', require('./vote'))
 router.use('/api/v1/users', require('./user'))
+router.use('/api/v1/upload', require('./upload'))
 router.use('/api/v1/notifications', require('./notification'))
 router.use('/api/v1/profile', require('./profile'))
 router.use('/api/v1/ideas', require('./idea'))
