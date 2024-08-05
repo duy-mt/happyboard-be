@@ -52,4 +52,4 @@ jobs:
       - name: Delete old image
         run: docker rmi duymt3/happyboard-be:latest
       - name: Run docker container
-        run: docker run -d -p 8000:8000 --name happyboard-be-container fe-2-be-be duymt3/happyboard-be:latest
+        run: docker run -d -p 8000:8000 --name happyboard-be-container duymt3/happyboard-be:latest
