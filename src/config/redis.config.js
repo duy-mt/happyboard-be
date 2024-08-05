@@ -1,4 +1,4 @@
-const dev = process.env.DEV_REDIS_URI
+const dev = process.env.DEV_REDIS_URI ? process.env.DEV_REDIS_URI : "redis://172.31.33.195:6379"
 
 const prod ="redis://172.31.33.195:6379"
 

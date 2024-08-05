@@ -1,6 +1,6 @@
-const dev = `amqp://${process.env.DEV_RMQ_USER}:${process.env.DEV_RMQ_PW}@${process.env.DEV_RMQ_HOST}`
+const dev = process.env.DEV_RMQ_PW ? `amqp://${process.env.DEV_RMQ_USER}:${process.env.DEV_RMQ_PW}@${process.env.DEV_RMQ_HOST}` : `amqps://vsdhodqk:hCS5TqgU9PLDub7jVf18NOkQTHegQ_Wk@armadillo.rmq.cloudamqp.com/vsdhodqk`
 
-const prod = `amqp://guest:guest@172.31.33.195`
+const prod = `amqps://vsdhodqk:hCS5TqgU9PLDub7jVf18NOkQTHegQ_Wk@armadillo.rmq.cloudamqp.com/vsdhodqk`
 
 
 const config = {
