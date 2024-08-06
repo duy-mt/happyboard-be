@@ -21,6 +21,7 @@ const { OPTION_SHOW_IDEA } = require("../constants")
 const ElasticSearch = require("./es.service")
 const MessageQueue = require('./rabbitmq.service')
 const CommentService = require("./comment.service")
+const HistoryService = require("./history.service")
 
 class IdeaService {
     static createIdea = async ({
@@ -30,6 +31,12 @@ class IdeaService {
 
         const savedIdea = await createIdea({
             title, content, categoryId, userId, isPublished
+        })
+        await HistoryService.createHistory({
+            type: 'CI01',
+            userId,
+            userTargetId: userId,
+            objectTargetId: savedIdea.id
         })
         // Ingest elastic
         await ElasticSearch.createDocument({
@@ -191,7 +198,6 @@ class IdeaService {
     static upVoteCount = async({
         ideaId, userId
     }) => {
-
         // 1. Up vote
         let {
             voteCount,
@@ -216,6 +222,13 @@ class IdeaService {
                 nameExchange: 'post_notification',
                 message: data
             })
+
+            await HistoryService.createHistory({
+                type: 'VI01',
+                userId,
+                userTargetId: receiver,
+                objectTargetId: ideaId
+            })
             console.log(`Send msg`);
         }
 
@@ -227,6 +240,13 @@ class IdeaService {
     static downVoteCount = async({
         ideaId, userId
     }) => {
+        const receiver = await findUserIdByIdeaId({ id: ideaId })
+        await HistoryService.createHistory({
+            type: 'VI01',
+            userId,
+            userTargetId: receiver,
+            objectTargetId: ideaId
+        })
         return await decrementVoteCount({
             ideaId,
             userId
@@ -236,6 +256,13 @@ class IdeaService {
     static cancelVote = async({
         ideaId, userId
     }) => {
+        const receiver = await findUserIdByIdeaId({ id: ideaId })
+        await HistoryService.createHistory({
+            type: 'VI01',
+            userId,
+            userTargetId: receiver,
+            objectTargetId: ideaId
+        })
         return await cancelVote({
             ideaId,
             userId
@@ -295,6 +322,14 @@ class IdeaService {
         if(ideaHolder.isPublished) {
             this.unPublishIdea({ ideaId })
         }
+
+        await HistoryService.createHistory({
+            type: 'EI01',
+            userId,
+            userTargetId: userId,
+            objectTargetId: ideaId
+        })
+
         return updatedIdea ? 1 : 0
     }
 
@@ -308,7 +343,16 @@ class IdeaService {
             await deleteIdea(ideaId),
             await CommentService.deleteCommentByIdeaId(ideaId)
         ])
-        return deleted[0] && deleted[1] ? 1 : 0
+        if(deleted[0] && deleted[1]) {
+            await HistoryService.createHistory({
+                type: 'DI01',
+                userId,
+                userTargetId: userId,
+                objectTargetId: ideaId
+            })
+            return 1
+        }
+        return 0
     }
 
     // FOR OWN USER

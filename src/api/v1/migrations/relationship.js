@@ -236,6 +236,32 @@ module.exports = {
             onUpdate: 'CASCADE',
             onDelete: 'CASCADE',
         });
+        // ADD HISTORY
+        // fk_histories_user_field_userId
+        await queryInterface.addConstraint('histories', {
+            fields: ['userId'],
+            type: 'foreign key',
+            name: 'fk_histories_user_field_userId',
+            references: {
+                table: 'users',
+                field: 'id',
+            },
+            onUpdate: 'CASCADE',
+            onDelete: 'CASCADE',
+        });
+
+        // fk_histories_user_field_userTargetId
+        await queryInterface.addConstraint('histories', {
+            fields: ['userTargetId'],
+            type: 'foreign key',
+            name: 'fk_histories_user_field_userTargetId',
+            references: {
+                table: 'users',
+                field: 'id',
+            },
+            onUpdate: 'CASCADE',
+            onDelete: 'CASCADE',
+        });
     },
 
     async down(queryInterface, Sequelize) {
@@ -258,5 +284,7 @@ module.exports = {
         await queryInterface.removeConstraint('role_has_permissions', 'fk_role_has_permissions_permission');
         await queryInterface.removeConstraint('notifications', 'fk_notifications_user_field_from');
         await queryInterface.removeConstraint('notifications', 'fk_notifications_user_field_to');
+        await queryInterface.removeConstraint('histories', 'fk_histories_user_field_userId');
+        await queryInterface.removeConstraint('histories', 'fk_histories_user_field_userTargetId');
     }
 };

@@ -20,6 +20,7 @@ router.post('/test', async (req, res, next) => {
 /////////// END TEST MESSAGE QUEUE /////////////////
 
 // router.use('/api/v1/vote', require('./vote'))
+router.use('/api/v1/hitories', require('./history'))
 router.use('/api/v1/users', require('./user'))
 router.use('/api/v1/upload', require('./upload'))
 router.use('/api/v1/notifications', require('./notification'))
