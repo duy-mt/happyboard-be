@@ -11,7 +11,7 @@ const queryConfig = {
         {
             model: User,
             as: 'fromUser',
-            attributes: ['id', 'username', 'email']
+            attributes: ['id', 'username', 'email', 'avatar']
         }
     ],
     attributes: ['id', 'type', 'target', 'status', 'createdAt']
