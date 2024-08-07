@@ -53,8 +53,23 @@ const updateStatusNotification = async ({
     })
 }
 
+const getUnreadNotificationsByUserId = async ({
+    userId, offset, limit, status
+}) => {
+    return await Notification.findAll({
+        offset,
+        limit,
+        ...queryConfig,
+        where: {
+            to: userId || '3',
+            status: 0
+        }
+    })
+}
+
 module.exports = {
     createNotification,
     getAllNotificationsByUserId,
-    updateStatusNotification
+    updateStatusNotification,
+    getUnreadNotificationsByUserId
 }

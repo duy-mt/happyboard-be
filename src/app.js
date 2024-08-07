@@ -39,6 +39,8 @@ app.use(cookieParser())
 // require('./api/v1/dbs/mysql.init')
 require('./api/v1/dbs/postgres.init')
 require('./api/v1/dbs/es.init')
+require('./api/v1/dbs/rabbitmq.init')
+
 
 // INIT ROUTES
 app.use('', require('./api/v1/routes/index'))
