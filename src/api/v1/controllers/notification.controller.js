@@ -24,6 +24,17 @@ class NotificationController {
         }).send(res)
     }
 
+    getUnreadNotifications = async (req, res, next) => {
+        new OK({
+            message: 'Get unread notification successfully!',
+            data: await NotificationService.getUnreadNotifications({
+                userId: req.body.userId,
+                limit: req.query?.limit,
+                page: req.query?.page,
+            })
+        }).send(res)
+    }
+
 
 }
 
