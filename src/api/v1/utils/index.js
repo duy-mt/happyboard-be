@@ -128,6 +128,19 @@ const sortComment = (comments) => {
     return rootComments
 }
 
+const heartbeatSocket = (wss) => {
+    setInterval(() => {
+        wss.clients.forEach((ws) => {
+            if (!ws.isAlive) {
+              console.log('Client is not alive, terminating connection');
+              ws.terminate(); 
+            }
+            ws.isAlive = false;
+            ws.ping(); 
+        });
+    }, 5000)
+}
+
 module.exports = {
     createAccessToken,
     createRefreshToken,
@@ -140,5 +153,6 @@ module.exports = {
     removeUndefinedObject,
     removeField,
     processReturnedData,
-    sortComment
+    sortComment,
+    heartbeatSocket
 }

@@ -40,6 +40,7 @@ app.use(cookieParser())
 require('./api/v1/dbs/postgres.init')
 require('./api/v1/dbs/es.init')
 require('./api/v1/dbs/rabbitmq.init')
+require('./api/v1/dbs/websocket.init')
 
 
 // INIT ROUTES

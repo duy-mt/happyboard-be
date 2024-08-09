@@ -65,7 +65,7 @@ const updateUserByUserId = async ({
             where: {
                 id: userId
             },
-            attributes: ['id', 'email', 'username', 'password', 'avatar', 'status'],
+            attributes: ['id', 'email', 'username', 'password', 'avatar', 'status', 'isOnline'],
             raw: true,
         }
     )

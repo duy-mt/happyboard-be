@@ -9,6 +9,7 @@ module.exports = {
         username: 'Administrator',
         avatar: '',
         status: 'active',
+        isOnline: false,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -18,6 +19,7 @@ module.exports = {
         username: 'Thang Vu Ba',
         avatar: '',
         status: 'active',
+        isOnline: false,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -27,6 +29,7 @@ module.exports = {
         username: 'Khai Phan Ngoc',
         avatar: '',
         status: 'active',
+        isOnline: false,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -36,6 +39,7 @@ module.exports = {
         username: 'Duy Mai Tran',
         avatar: '',
         status: 'active',
+        isOnline: false,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -45,6 +49,7 @@ module.exports = {
         username: 'Hung La Duc',
         avatar: '',
         status: 'active',
+        isOnline: false,
         createdAt: new Date(),
         updatedAt: new Date()
       }
