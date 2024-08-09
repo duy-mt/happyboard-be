@@ -22,4 +22,6 @@ const initializeWebSocket = async () => {
     });
 }
 
+initializeWebSocket()
+
 module.exports = initializeWebSocket

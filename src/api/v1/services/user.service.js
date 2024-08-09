@@ -26,8 +26,6 @@ class UserService {
     static updateActivityUser = async ({
         userId, isOnline
     }) => {
-        console.log('userId && isOnline', userId)
-        console.log(isOnline)
         // Check user isAdmin? if admin -> throw err
         // ...
         const usr = await updateUserByUserId({

@@ -10,7 +10,6 @@ const cors = require('cors')
 const { NotFound } = require('./api/v1/core/error.response')
 const passport = require('passport')
 const session = require('express-session')
-const initializeWebSocket = require('./api/v1/dbs/websocket.init')
 
 const app = express()
 
@@ -41,8 +40,7 @@ app.use(cookieParser())
 require('./api/v1/dbs/postgres.init')
 require('./api/v1/dbs/es.init')
 require('./api/v1/dbs/rabbitmq.init')
-// require('./api/v1/dbs/websocket.init')
-initializeWebSocket()
+require('./api/v1/dbs/websocket.init')
 
 
 // INIT ROUTES
