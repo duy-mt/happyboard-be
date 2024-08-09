@@ -22,6 +22,19 @@ class UserService {
         console.log(STATUS_USER[status])
         return usr
     }
+
+    static updateActivityUser = async ({
+        userId, isOnline
+    }) => {
+        console.log('userId && isOnline', userId)
+        console.log(isOnline)
+        // Check user isAdmin? if admin -> throw err
+        // ...
+        const usr = await updateUserByUserId({
+            userId, payload: { isOnline : isOnline }
+        })
+        return usr
+    }
 }
 
 module.exports = UserService

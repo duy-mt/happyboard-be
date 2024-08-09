@@ -30,6 +30,10 @@ module.exports = {
             type: Sequelize.ENUM('active', 'pending', 'block'),
             defaultValue: 'active'
         },
+        isOnline: {
+            type: Sequelize.BOOLEAN,
+            defaultValue: false
+        },
         createdAt: {
             allowNull: false,
             type: Sequelize.DATE
