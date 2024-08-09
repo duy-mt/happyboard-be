@@ -10,6 +10,13 @@ class UserController {
             data: await UserService.getAllUsers()
         }).send(res)
     }
+
+    updateStatusUser = async (req, res, next) => {
+        new OK({
+            message: 'Change status user successfully',
+            data: await UserService.updateStatusUser(req.body)
+        }).send(res)
+    }
 }
 
 module.exports = new UserController()

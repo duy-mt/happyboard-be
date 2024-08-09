@@ -19,17 +19,16 @@ const updatePairToken = async ({
 }) => {
     const [token, isCreated] = await Token.findOrCreate(
         { 
-            where: { userId, deviceToken },
+            where: { userId, refreshToken },
             defaults: {
                 accessToken,
-                refreshToken
+                deviceToken
             } 
         },    
     )
 
     if(!isCreated) token.update({
-        accessToken,
-        refreshToken
+        accessToken
     })
 
     return token?.dataValues

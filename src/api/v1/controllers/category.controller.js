@@ -24,6 +24,24 @@ class CategoryController {
             data: await CategoryService.getCategoryById(req.params.categoryId)
         }).send(res)
     }
+
+    updateCategory = async (req, res, next) => {
+        let payload = {
+            ...req.body,
+            categoryId: req.params.categoryId
+        }
+        new OK({
+            message: 'Update category successfully',
+            data: await CategoryService.updateCategory(payload)
+        }).send(res)
+    }
+
+    deleteCategory = async (req, res, next) => {
+        new OK({
+            message: 'Delete category successfully',
+            data: await CategoryService.deleteCategory(req.params.categoryId)
+        }).send(res)
+    }
 }
 
 module.exports = new CategoryController()

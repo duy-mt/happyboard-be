@@ -17,13 +17,19 @@ module.exports = {
       },
       {
         userId: 3,
-        roleId: 2,
+        roleId: 3,
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
         userId: 4,
-        roleId: 2,
+        roleId: 3,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        userId: 5,
+        roleId: 3,
         createdAt: new Date(),
         updatedAt: new Date()
       }

@@ -36,8 +36,35 @@ const getCategoryById = async ({
     ...optCategory
 })
 
+const updateCategory = async ({
+    categoryId, payload = {}
+}) => {
+    const updatedData = await Category.update(
+        payload,
+        {
+            where: {
+                id: categoryId
+            },
+            ...optCategory,
+            raw: true,
+        }
+    )
+    return updatedData
+}
+
+const deleteCategory = async (categoryId) => {
+    const deleted = await Category.destroy({
+        where: {
+            id: categoryId
+        }
+    })
+    return deleted
+}
+
 module.exports = {
     createCategory,
     getAllCategories,
-    getCategoryById
+    getCategoryById,
+    updateCategory,
+    deleteCategory
 }

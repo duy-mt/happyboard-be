@@ -10,7 +10,8 @@ const createUser = async ({ email, password, username, avatar = '' }) => {
             email,
             password,
             username,
-            avatar
+            avatar,
+            status: 'active'
         })
         
         return user.get({ plain: true });

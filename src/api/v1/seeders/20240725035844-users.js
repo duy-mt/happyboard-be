@@ -6,35 +6,44 @@ module.exports = {
       {
         email: 'admin@example.com',
         password: '$2a$10$GyqMakjEG34Jjn76BKQk8eFVwiW1aECKdq4TfVcTZMl6Ph6J0mJEq', // password123
-        username: 'Admin User',
-        avatar: 'https://example.com/admin.png',
+        username: 'Administrator',
+        avatar: '',
         status: 'active',
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
-        email: 'john.doe@example.com',
+        email: 'thangvb2@example.com',
         password: '$2a$10$GyqMakjEG34Jjn76BKQk8eFVwiW1aECKdq4TfVcTZMl6Ph6J0mJEq',
-        username: 'John Doe',
-        avatar: 'https://example.com/john.png',
+        username: 'Thang Vu Ba',
+        avatar: '',
         status: 'active',
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
-        email: 'jane.doe@example.com',
+        email: 'khaipn2@example.com',
         password: '$2a$10$GyqMakjEG34Jjn76BKQk8eFVwiW1aECKdq4TfVcTZMl6Ph6J0mJEq',
-        username: 'Jane Doe',
-        avatar: 'https://example.com/jane.png',
+        username: 'Khai Phan Ngoc',
+        avatar: '',
         status: 'active',
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
-        email: 'peter.pan@example.com',
+        email: 'duymt3@example.com',
         password: '$2a$10$GyqMakjEG34Jjn76BKQk8eFVwiW1aECKdq4TfVcTZMl6Ph6J0mJEq',
-        username: 'Peter Pan',
-        avatar: 'https://example.com/peter.png',
+        username: 'Duy Mai Tran',
+        avatar: '',
+        status: 'active',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        email: 'hungld23@example.com',
+        password: '$2a$10$GyqMakjEG34Jjn76BKQk8eFVwiW1aECKdq4TfVcTZMl6Ph6J0mJEq',
+        username: 'Hung La Duc',
+        avatar: '',
         status: 'active',
         createdAt: new Date(),
         updatedAt: new Date()

@@ -35,9 +35,22 @@ const OPTION_SHOW_IDEA = {
     'highcomment': 'commentCount'
 }
 
+const STATUS_USER = {
+    block: {
+        role: '' 
+    },
+    pending: {
+        role: 'pending_user'
+    },
+    active: {
+        role: 'user'
+    }
+}
+
 module.exports = {
     HEADER,
     ROLE_USER,
     REDIS,
     OPTION_SHOW_IDEA,
+    STATUS_USER,
 }

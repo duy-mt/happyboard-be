@@ -28,7 +28,7 @@ module.exports = {
         },
         status: {
             type: Sequelize.ENUM('active', 'pending', 'block'),
-            defaultValue: 'pending'
+            defaultValue: 'active'
         },
         createdAt: {
             allowNull: false,
@@ -36,6 +36,10 @@ module.exports = {
         },
         updatedAt: {
             allowNull: false,
+            type: Sequelize.DATE
+        },
+        deletedAt: {
+            allowNull: true,
             type: Sequelize.DATE
         }
         });

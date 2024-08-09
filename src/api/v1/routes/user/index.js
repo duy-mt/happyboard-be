@@ -10,6 +10,7 @@ const router = express.Router()
 
 router.use(asyncHandler(authentication))
 ////////////////////////////////////////
-router.get('', authorize(['read all users']), asyncHandler(userController.getAllUsers))
+router.get('', authorize(['USR01']), asyncHandler(userController.getAllUsers))
+router.put('/status', authorize(['USR06']), asyncHandler(userController.updateStatusUser))
 
 module.exports = router

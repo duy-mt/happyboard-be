@@ -5,21 +5,26 @@ const {
     createIdea, findAllIdeasByUsedId, findIdeaPage, findIdea, increaseVoteCount, decrementVoteCount, updateIdea, cancelVote,
     upView,
     findDraftIdea,
+    findPublisedIdea,
     findIdeasByIds,
     findIdeasByCategoryId,
     findIdeasByVote,
-    findUserIdByIdeaId
+    findUserIdByIdeaId,
+    findAllIdeas,
+    deleteIdea,
+    findAllOwnIdeas,
 } = require("../models/repo/idea.repo")
-const { sortComment } = require("../utils")
+const { sortComment, removeField } = require("../utils")
 const VoteService = require("./vote.service")
 const RedisService = require("./redis.service")
 const { OPTION_SHOW_IDEA } = require("../constants")
 const ElasticSearch = require("./es.service")
 const MessageQueue = require('./rabbitmq.service')
+const CommentService = require("./comment.service")
 
 class IdeaService {
     static createIdea = async ({
-        title, content, categoryId, userId, isPublished = true
+        title, content, categoryId, userId, isPublished = false
     }) => {
         if(!content || !title) throw new BadRequest('Title and content are required')
         categoryId = categoryId ? categoryId : 0
@@ -63,13 +68,12 @@ class IdeaService {
     }
 
     static getAllIdeas = async ({
-        limit = 5, page = 1, userId, option = Object.keys(OPTION_SHOW_IDEA)[0]
+        limit = 5, page = 1, userId, option = Object.keys(OPTION_SHOW_IDEA)[0], isPublished = null
     }) => {
         let fieldSort = OPTION_SHOW_IDEA[option]
-
         let {
             ideas, totalIdea
-        } = await findIdeaPage({ limit, page, fieldSort })
+        } = await findAllIdeas({ limit, page, fieldSort, isPublished })
 
         for(let i = 0; i < ideas.length; i++) {
             let status = await VoteService.getStatusVote({
@@ -90,16 +94,20 @@ class IdeaService {
         }
     }
 
-    static getAllPublisedIdeas = async (userId) => {
-        const ideas = await findAllIdeasByUsedId({userId}) 
-        for(let i = 0; i < ideas.length; i++) {
-            let status = await VoteService.getStatusVote({
-                ideaId: ideas[i].id,
-                userId
-            })
-            ideas[i].vote = status
-        }
-        return ideas
+    static getAllPublisedIdeas = async ({
+        limit = 5, page = 1, userId, option = Object.keys(OPTION_SHOW_IDEA)[0]
+    }) => {
+        return await this.getAllIdeas({
+            limit, page, userId, option, isPublished: true 
+        })
+    }
+
+    static getAllDraftIdeas = async ({
+        limit = 5, page = 1, userId, option = Object.keys(OPTION_SHOW_IDEA)[0]
+    }) => {
+        return await this.getAllIdeas({
+            limit, page, userId, option, isPublished: false 
+        })
     }
 
     static getRecentIdeas = async (userId) => {
@@ -233,11 +241,10 @@ class IdeaService {
     }
 
     static publishIdea = async ({
-        ideaId, userId
+        ideaId
     }) => {
         const idea = await findDraftIdea({ id: ideaId })
-        if(idea.userId != userId) throw new Forbidden('You do not have permission to access this resource')
-
+        if(!idea) throw new BadRequest('Not found idea')
         const updatedIdea = await updateIdea({
             id: ideaId,
             opt: {
@@ -249,10 +256,10 @@ class IdeaService {
     }
 
     static unPublishIdea = async ({
-        ideaId, userId
+        ideaId
     }) => {
-        const idea = await findDraftIdea({ id: ideaId })
-        if(idea.userId != userId) throw new Forbidden('You do not have permission to access this resource')
+        const idea = await findPublisedIdea({ id: ideaId })
+        if(!idea) throw new BadRequest('Not found idea')
         const updatedIdea = await updateIdea({
             id: ideaId,
             opt: {
@@ -261,6 +268,73 @@ class IdeaService {
         })
 
         return updatedIdea ? 1 : 0
+    }
+
+    static updateIdea = async ({
+        ideaId, payload
+    }) => {
+        let userId = payload.userId
+        let prePayload = {
+            title: payload.title,
+            content: payload.content
+        }
+        prePayload = removeField({
+            obj: prePayload
+        })
+        let ideaHolder = await findIdea({ id: ideaId, isPublished: null })
+        if(ideaHolder.userId != userId) throw new BadRequest('[o] You don\'t have permission to execute action')
+        let updatedIdea = await updateIdea({
+            id: ideaId,
+            opt: {
+                ...prePayload
+            }
+        })
+        if(ideaHolder.isPublished) {
+            this.unPublishIdea({ ideaId })
+        }
+        return updatedIdea ? 1 : 0
+    }
+
+    static deleteIdea = async ({
+        ideaId, userId
+    }) => {
+        let ideaHolder = await findIdea({ id: ideaId, isPublished: null })
+        if(ideaHolder.userId != userId) throw new BadRequest('You don\'t have permission to access resource')
+
+        let deleted = await Promise.all([
+            await deleteIdea(ideaId),
+            await CommentService.deleteCommentByIdeaId(ideaId)
+        ])
+        console.log(deleted);
+        // let deleted = await deleteIdea(ideaId)
+        return deleted[0] && deleted[1] ? 1 : 0
+    }
+
+    // FOR OWN USER
+    static getAllOwnIdeas = async ({
+        limit = 5, page = 1, userId
+    }) => {
+        let {
+            ideas, totalIdea
+        } = await findAllOwnIdeas({ limit, page, userId })
+
+        for(let i = 0; i < ideas.length; i++) {
+            let status = await VoteService.getStatusVote({
+                ideaId: ideas[i].id,
+                userId
+            })
+            ideas[i].vote = status
+        }
+
+        const totalPage = Math.ceil(totalIdea / limit)
+
+        return {
+            totalPage: totalPage,
+            currentPage: page,
+            pageSize: limit,
+            total: totalIdea,
+            ideas,
+        }
     }
 }
 

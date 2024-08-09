@@ -55,6 +55,7 @@ class AccessService {
     static signUp = async ({
         email, password, username
     }) => {
+        if(!email || !password) throw new BadRequest('Missing Email Or Password')
         const holderUser = await findUserByEmail(email)
         console.log(holderUser);
         if(holderUser.user) throw new Conflict('Account already exists')

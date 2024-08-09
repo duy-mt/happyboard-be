@@ -2,7 +2,7 @@
 
 const { BadRequest } = require("../core/error.response")
 const { 
-    createComment, getCommentsByIdeaId, getCommentById 
+    createComment, getCommentsByIdeaId, getCommentById, deleteCommentByIdeaId
 } = require("../models/repo/comment.repo")
 const { findUserIdByIdeaId } = require("../models/repo/idea.repo")
 const { updateReaction, countReactionByCommentId, checkReaction, deleteReaction } = require("../models/repo/reaction.repo")
@@ -104,6 +104,11 @@ class CommentService {
         return await deleteReaction({
             userId, commentId
         })
+    }
+
+    static deleteCommentByIdeaId = async (ideaId) => {
+        let deleted = await deleteCommentByIdeaId(ideaId)
+        return deleted
     }
 }
 

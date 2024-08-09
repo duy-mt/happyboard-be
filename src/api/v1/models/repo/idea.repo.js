@@ -30,13 +30,36 @@ const optIdea = {
     ],
     // attributes: ['id', 'title', 'content', 'voteCount', 'commentCount', 'viewCount', 'createdAt', 'updatedAt']
     attributes: {
-        exclude: ['isPublished', 'categoryId', 'userId']
+        exclude: ['categoryId']
     }
 }
 
 const optIdeaNoComment = {
     order: [
         ['createdAt', 'DESC'],
+        ['id', 'DESC']
+    ],
+    include: [
+        {
+            model: User,
+            attributes: ['id', 'username', 'email']
+        },
+        {
+            model: Category,
+            attributes: ['id', 'title', 'icon']
+        }
+    ],
+    attributes: {
+        exclude: ['isPublished', 'categoryId', 'userId'],
+    }
+}
+
+const baseQueryFindIdeas = {
+    offset: 0,
+    limit: 5,
+    where: {},
+    order: [
+        ['createdAt', 'DESC'],  
         ['id', 'DESC']
     ],
     include: [
@@ -69,13 +92,28 @@ const createIdea = async ({
 }
 
 // FIND
-const findIdea = async ({ id }) => {    
+const findIdea = async ({ id, isPublished = true }) => {  
+    let where = {
+        id
+    }
+    
+    if(isPublished != null) where.isPublished = isPublished
+
+    const idea = await Idea.findOne({
+        where,
+        ...optIdea
+    })
+
+    return idea && processReturnedData(idea)
+}
+
+const findPublisedIdea = async ({ id }) => {
     const idea = await Idea.findOne({
         where: {
             id,
             isPublished: true
         },
-        ...optIdea
+        raw: true
     })
     return idea && processReturnedData(idea)
 }
@@ -84,15 +122,36 @@ const findDraftIdea = async ({ id }) => {
     const idea = await Idea.findOne({
         where: {
             id,
+            isPublished: false
         },
         raw: true
     })
     return idea && processReturnedData(idea)
 }
 
-const findAllIdeas = async () => {
-    const ideas = await Idea.findAll()
-    return processReturnedData(ideas)
+const findAllIdeas = async ({
+    limit, page, fieldSort, isPublished = true
+}) => {
+    console.log(`isPublished::`, isPublished)
+    // DEFINE query
+    let queryFindIdeas = { ...baseQueryFindIdeas }
+    console.log(`queryFindIdeas Before:`, queryFindIdeas);
+    let offset = (page - 1) * limit
+    queryFindIdeas.offset = offset
+    queryFindIdeas.limit = limit
+    queryFindIdeas.order[0][0] = fieldSort
+    if(isPublished != null) {
+        queryFindIdeas.where.isPublished = isPublished
+    } else {
+        queryFindIdeas.attributes.exclude = ['categoryId', 'userId']
+    }
+    console.log(`queryFindIdeas After:`, queryFindIdeas);
+    let { count, rows: ideas } = await Idea.findAndCountAll(queryFindIdeas)
+
+    return {
+        ideas: processReturnedData(ideas),
+        totalIdea: count
+    }
 }
 
 const findAllIdeasByUsedId = async ({userId, isPublished = true}) => {
@@ -118,7 +177,7 @@ const findIdeaPage = async ({ limit, page, q = null, fieldSort }) => {
         offset,
         limit,
         where: {
-            isPublished: true,
+            isPublished: null,
             ...search
         },
         ...optIdeaNoComment,
@@ -140,6 +199,24 @@ const findUserIdByIdeaId = async ({
     const idea = await Idea.findByPk(id)
     return idea.userId
 }
+
+// OWN USER
+const findAllOwnIdeas = async ({
+    limit, page, userId
+}) => {
+    let queryFindIdeas = { ...baseQueryFindIdeas }
+    let offset = (page - 1) * limit
+    queryFindIdeas.offset = offset
+    queryFindIdeas.limit = limit
+    queryFindIdeas.where.id = userId
+    let { count, rows: ideas } = await Idea.findAndCountAll(queryFindIdeas)
+
+    return {
+        ideas: processReturnedData(ideas),
+        totalIdea: count
+    }
+}
+// ENDOWN USER
 
 const increaseVoteCount = async ({
     ideaId, userId
@@ -264,6 +341,15 @@ const findIdeasByVote = async ({ limit }) => {
     return processReturnedData(ideas)
 }
 
+const deleteIdea = async (id) => {
+    const deleted = await Idea.destroy({
+        where: {
+            id
+        }
+    })
+    return deleted
+}
+
 module.exports = {
     createIdea,
     findAllIdeas,
@@ -276,8 +362,11 @@ module.exports = {
     updateIdea,
     upView,
     findDraftIdea,
+    findPublisedIdea,
     findIdeasByIds,
     findIdeasByCategoryId,
     findIdeasByVote,
-    findUserIdByIdeaId
+    findUserIdByIdeaId,
+    deleteIdea,
+    findAllOwnIdeas,
 }

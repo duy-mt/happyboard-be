@@ -73,7 +73,7 @@ const removeUndefinedObject = obj => {
 } 
 
 const removeField = ({
-    obj, field
+    obj, field = []
 }) => {
     Object.keys(obj).forEach(key => {
         if(obj[key] == null) delete obj[key]
