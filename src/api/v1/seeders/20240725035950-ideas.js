@@ -12,6 +12,7 @@ module.exports = {
         commentCount: 0,
         viewCount: 0,
         isPublished: true,
+        isDrafted: false,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -24,6 +25,7 @@ module.exports = {
         commentCount: 0,
         viewCount: 0,
         isPublished: true,
+        isDrafted: true,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -36,6 +38,7 @@ module.exports = {
         commentCount: 0,
         viewCount: 0,
         isPublished: true,
+        isDrafted: false,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -48,6 +51,7 @@ module.exports = {
         commentCount: 0,
         viewCount: 0,
         isPublished: true,
+        isDrafted: false,
         createdAt: new Date(),
         updatedAt: new Date()
       }
