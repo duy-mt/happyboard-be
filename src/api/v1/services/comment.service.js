@@ -7,6 +7,7 @@ const {
 const { findUserIdByIdeaId, findIdea } = require("../models/repo/idea.repo")
 const { updateReaction, countReactionByCommentId, checkReaction, deleteReaction } = require("../models/repo/reaction.repo")
 const { processReturnedData, sortComment } = require("../utils")
+const HistoryService = require("./history.service")
 const MessageQueue = require("./rabbitmq.service")
 
 class CommentService {
@@ -20,10 +21,12 @@ class CommentService {
             id: ideaId
         })
         if(!ideaHolder) throw new BadRequest('Idea is not exist! So don\'t create comment')
+        let type = 'CC01'
         if(parentId) {
             const parentComment = await getCommentById(parentId)
             if(parentComment.ideaId != ideaId) throw new BadRequest('Comment Again')
             if(parentComment.parentId) parentId = parentComment.parentId
+            type = 'RC01'
         }
 
         const receiver = await findUserIdByIdeaId({ id: ideaId })
@@ -45,7 +48,12 @@ class CommentService {
         const savedComment = await createComment({
             content, userId, ideaId, parentId
         })
-        
+        await HistoryService.createHistory({
+            type,
+            userId,
+            userTargetId: receiver,
+            objectTargetId: ideaId // Idea or Comment
+        })
         return processReturnedData(savedComment)
     }
 
@@ -103,10 +111,17 @@ class CommentService {
                 targetId: commentId
             }
         }
-
+        
         await MessageQueue.send({
             nameExchange: 'post_notification',
             message: data
+        })
+
+        await HistoryService.createHistory({
+            type: 'RC02',
+            userId,
+            userTargetId: receiver,
+            objectTargetId: commentId // Idea or Comment or Reaction
         })
 
         return r
