@@ -1,5 +1,8 @@
 'use strict'
 
+const { BadRequest } = require('../core/error.response');
+const { convetToTimestamp } = require('../utils');
+
 class ElasticSearch {
     static elasticClient = require('../dbs/es.init')
 
@@ -49,34 +52,49 @@ class ElasticSearch {
         }
     }
 
-    static searchDocument = async ({ index, queryString, start = 0, limit = 5 }) => {
+    static searchDocument = async ({ index, queryString, start = 0, limit = 5, duration = '30d' }) => {
         try {
-            const resp = await this.elasticClient.search({
+            let now = Date.now()
+            let time = now - convetToTimestamp(duration)
+            const result = await this.elasticClient.search({
                 index,
+                _source: ['id', 'title', 'content'],
                 body: {
                     query: {
-                        multi_match: {
-                            query: queryString,
-                            fields: ['title'],
-                            fuzziness: 'AUTO'
-                        }
-                    },
-                    sort: [
-                        {
-                            _score: {
-                                order: 'desc'
+                        bool: {
+                            must: {
+                                multi_match: {
+                                    query: queryString,
+                                    fields: ['title', 'content'],
+                                    // minimum_should_match: '3<90%',
+                                    fuzziness: 'AUTO',
+                                    type: 'best_fields'
+                                }
+                            },
+                            filter: {
+                                range: {
+                                    updatedAt: {
+                                        gte: time
+                                    }
+                                }
                             }
                         }
-                    ],
+                    },
+                    highlight: {
+                        fields: {
+                            title: {},
+                            content: {},
+                        }
+                    },
                     from: start,
                     size: limit,
                 }
             })
-            
-            return resp.hits.hits;
+
+            return result.hits.hits
         } catch (err) {
-            console.log('Error search document:', err);
-            return null;
+            console.log('Error search document:', err)
+            throw new BadRequest(err.message)
         }
     }
     

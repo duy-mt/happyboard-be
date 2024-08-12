@@ -84,11 +84,12 @@ const removeField = ({
 }
 
 const processReturnedData = (obj) => {
-    obj = obj?.dataValues || obj
+    if(obj == null) return obj
+    obj = JSON.parse(JSON.stringify(obj))
 
     if(Array.isArray(obj)) {
         obj = obj.map(child => {
-            return processReturnedData(child?.dataValues || child)
+            return processReturnedData(child)
         })
     }
 
@@ -96,13 +97,13 @@ const processReturnedData = (obj) => {
         if(obj[key] == null) {
             delete obj[key]
         } else if(Array.isArray(obj[key])) {
-            obj[key] = processReturnedData(obj[key]?.dataValues || obj[key])
+            obj[key] = processReturnedData(obj[key])
         }
     })
 
-    // Convert time
-    if(obj?.createdAt) obj.createdAt = convertTime(obj.createdAt)
-    if(obj?.updatedAt) obj.updatedAt = convertTime(obj.updatedAt)
+    // // Convert time
+    // if(obj?.createdAt) obj.createdAt = convertTime(obj.createdAt)
+    // if(obj?.updatedAt) obj.updatedAt = convertTime(obj.updatedAt)
 
     return obj
 }
@@ -141,6 +142,19 @@ const heartbeatSocket = (wss) => {
     }, 5000)
 }
 
+const convetToTimestamp = (time) => {
+    let types = {
+        m: 60*1000,
+        h: 60*60*1000,
+        d: 24*60*60*1000,
+        M: 30*24*60*60*1000,
+        y: 365*24*60*60*1000
+    }
+    let type = time.slice(-1)
+    let amount = parseInt(time.slice(0, -1))
+    return types[type] * amount
+}
+
 module.exports = {
     createAccessToken,
     createRefreshToken,
@@ -154,5 +168,6 @@ module.exports = {
     removeField,
     processReturnedData,
     sortComment,
-    heartbeatSocket
+    heartbeatSocket,
+    convetToTimestamp,
 }

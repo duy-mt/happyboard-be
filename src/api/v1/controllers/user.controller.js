@@ -7,7 +7,7 @@ class UserController {
     getAllUsers = async (req, res, next) => {
         new OK({
             message: 'Get all users successfully',
-            data: await UserService.getAllUsers()
+            data: await UserService.getAllUsers(req.query)
         }).send(res)
     }
 

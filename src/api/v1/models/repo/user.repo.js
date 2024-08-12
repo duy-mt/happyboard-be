@@ -22,12 +22,19 @@ const createUser = async ({ email, password, username, avatar = '' }) => {
 }
 
 // READ
-const findAllUsers = async () => {
-    const users = await User.findAll({
+const findAllUsers = async ({
+    offset, limit
+}) => {
+    const { count, rows: users } = await User.findAndCountAll({
         attributes: ['username', 'email', 'avatar', 'status', 'createdAt', 'updatedAt'],
-        raw: true
+        offset,
+        limit        
     })
-    return processReturnedData(users)
+    
+    return {
+        users: processReturnedData(users),
+        count
+    }
 }
 
 const findUserByEmail = async (email) => {
@@ -59,7 +66,8 @@ const findUserByUserId = async (userId) => {
 const updateUserByUserId = async ({
     userId, payload = {} 
 }) => {
-    const updatedUser = await User.update(
+    if(Object.keys(payload).length === 0) return 1
+    const [updatedUser] = await User.update(
         payload,
         {
             where: {

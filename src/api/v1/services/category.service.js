@@ -1,5 +1,6 @@
 'use strict'
 
+const { BadRequest } = require("../core/error.response")
 const { createCategory, getAllCategories, getCategoryById, updateCategory, deleteCategory } = require("../models/repo/category.repo")
 const { removeField } = require("../utils")
 
@@ -23,12 +24,14 @@ class CategoryService {
 
     static getCategoryById = async (id) => {
         const category = await getCategoryById({id})
+        if(!category) throw new BadRequest('Category is not exist')
         return category
     }   
 
     static updateCategory = async ({
         categoryId, title, description, icon
     }) => {
+        await this.getCategoryById(categoryId)
         let prePayload = {
             title, description, icon
         }
@@ -45,6 +48,7 @@ class CategoryService {
     }   
 
     static deleteCategory = async (categoryId) => {
+        await this.getCategoryById(categoryId)
         const deleted = await deleteCategory(categoryId)
         return deleted
     } 
