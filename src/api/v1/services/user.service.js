@@ -5,8 +5,22 @@ const { BadRequest } = require("../core/error.response")
 const { findAllUsers, updateUserByUserId } = require("../models/repo/user.repo")
 
 class UserService {
-    static getAllUsers = async () => {
-        return await findAllUsers()
+    static getAllUsers = async ({
+        page = 1, limit = 10 
+    }) => {
+        console.log(`page::`, page);
+        let offset = (page - 1) * limit
+        let { count, users } = await findAllUsers({
+            offset, limit
+        })
+        const totalPage = Math.ceil(count / limit)
+        return {
+            totalPage,
+            currentPage: page,
+            pageSize: limit,
+            total: count,
+            users,
+        }
     }
 
     static updateStatusUser = async ({

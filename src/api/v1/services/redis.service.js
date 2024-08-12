@@ -32,9 +32,36 @@ class RedisService {
     }
 
     ZRANGE = async ({
-        key, start, stop
+        key, page = 1, limit = 5, duration = 30 * 24 * 60 * 60 * 1000 // 1 Month
     }) => {
-        return await this.client.zRange(key, start, stop, {'REV': true})
+        let offset = (page - 1) * limit
+        let timeNow = Date.now()
+        let timeStart = timeNow - duration
+
+        let items = await this.client.sendCommand([
+            'ZRANGE', 
+            key, 
+            timeStart.toString(), 
+            timeNow.toString(), 
+            'BYSCORE',
+            'LIMIT',
+            offset.toString(),
+            limit.toString()
+        ])
+
+        return items
+    }
+
+    set = async ({}) => {
+
+    }
+    
+    setEx = async ({}) => {
+        
+    }
+
+    get = async ({}) => {
+        
     }
 }
 

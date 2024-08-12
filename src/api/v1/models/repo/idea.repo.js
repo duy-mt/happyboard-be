@@ -54,29 +54,6 @@ const optIdeaNoComment = {
     }
 }
 
-const baseQueryFindIdeas = {
-    offset: 0,
-    limit: 5,
-    where: {},
-    order: [
-        ['createdAt', 'DESC'],  
-        ['id', 'DESC']
-    ],
-    include: [
-        {
-            model: User,
-            attributes: ['id', 'username', 'email']
-        },
-        {
-            model: Category,
-            attributes: ['id', 'title', 'icon']
-        }
-    ],
-    attributes: {
-        exclude: ['isPublished', 'categoryId', 'userId'],
-    }
-}
-
 const createIdea = async ({
     title, content, categoryId, userId, isPublished
 }) => {
@@ -132,10 +109,28 @@ const findDraftIdea = async ({ id }) => {
 const findAllIdeas = async ({
     limit, page, fieldSort, isPublished = true
 }) => {
-    console.log(`isPublished::`, isPublished)
-    // DEFINE query
-    let queryFindIdeas = { ...baseQueryFindIdeas }
-    console.log(`queryFindIdeas Before:`, queryFindIdeas);
+    let queryFindIdeas = {
+        offset: 0,
+        limit: 5,
+        where: {},
+        order: [
+            ['createdAt', 'DESC'],  
+            ['id', 'DESC']
+        ],
+        include: [
+            {
+                model: User,
+                attributes: ['id', 'username', 'email']
+            },
+            {
+                model: Category,
+                attributes: ['id', 'title', 'icon']
+            }
+        ],
+        attributes: {
+            exclude: ['categoryId', 'userId'],
+        }
+    }
     let offset = (page - 1) * limit
     queryFindIdeas.offset = offset
     queryFindIdeas.limit = limit
@@ -143,9 +138,9 @@ const findAllIdeas = async ({
     if(isPublished != null) {
         queryFindIdeas.where.isPublished = isPublished
     } else {
+        delete queryFindIdeas.where.isPublished
         queryFindIdeas.attributes.exclude = ['categoryId', 'userId']
     }
-    console.log(`queryFindIdeas After:`, queryFindIdeas);
     let { count, rows: ideas } = await Idea.findAndCountAll(queryFindIdeas)
 
     return {
@@ -204,11 +199,32 @@ const findUserIdByIdeaId = async ({
 const findAllOwnIdeas = async ({
     limit, page, userId
 }) => {
-    let queryFindIdeas = { ...baseQueryFindIdeas }
+    let queryFindIdeas = {
+        offset: 0,
+        limit: 5,
+        where: {},
+        order: [
+            ['createdAt', 'DESC'],  
+            ['id', 'DESC']
+        ],
+        include: [
+            {
+                model: User,
+                attributes: ['id', 'username', 'email']
+            },
+            {
+                model: Category,
+                attributes: ['id', 'title', 'icon']
+            }
+        ],
+        attributes: {
+            exclude: ['categoryId', 'userId'],
+        }
+    }
     let offset = (page - 1) * limit
     queryFindIdeas.offset = offset
     queryFindIdeas.limit = limit
-    queryFindIdeas.where.id = userId
+    queryFindIdeas.where.userId = userId
     let { count, rows: ideas } = await Idea.findAndCountAll(queryFindIdeas)
 
     return {
@@ -223,8 +239,10 @@ const increaseVoteCount = async ({
 }) => {
     const vote = await findVote({ ideaId, userId })
     const idea = await Idea.findByPk(ideaId)
-    if(vote?.status == 1) return {
-        voteCount: idea.voteCount
+    let updated = vote?.status == 1
+    if(updated) return {
+        voteCount: idea.voteCount,
+        updated: !updated
     }
 
     const t = await sequelize.transaction()
@@ -236,7 +254,8 @@ const increaseVoteCount = async ({
     })
     await t.commit()
     return {
-        voteCount: idea.voteCount
+        voteCount: idea.voteCount,
+        updated: !updated
     }
 }
 
@@ -305,23 +324,27 @@ const updateIdea = async ({ id, opt}) => {
 }
 
 const findIdeasByIds = async (ids = []) => {
-    let ideas = Promise.all(await ids.map(async (id) => {
+    if(ids.length === 0) return ids
+    let ideas = []
+    await Promise.all(await ids.map(async (id) => {
         let i = await Idea.findOne({
             where: {
                 id
             },
             ...optIdeaNoComment,
         })
-        return processReturnedData(i)
+        if(i) ideas.push(processReturnedData(i))
     }))
-    
     return ideas
 }
 
-const findIdeasByCategoryId = async ({categoryId, limit}) => {
+const findIdeasByCategoryId = async ({categoryId, limit, ideaId}) => {
     const ideas = await Idea.findAll({
         limit,
         where: {
+            id: {
+                [Op.not]: ideaId
+            },
             categoryId,
             isPublished: true
         },

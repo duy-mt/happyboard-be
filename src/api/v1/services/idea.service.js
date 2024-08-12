@@ -26,8 +26,7 @@ class IdeaService {
     static createIdea = async ({
         title, content, categoryId, userId, isPublished = false
     }) => {
-        if(!content || !title) throw new BadRequest('Title and content are required')
-        categoryId = categoryId ? categoryId : 0
+        if(!content || !title || !categoryId) throw new BadRequest('Title, content and category are required')
 
         const savedIdea = await createIdea({
             title, content, categoryId, userId, isPublished
@@ -38,15 +37,14 @@ class IdeaService {
             index: 'ideas',
             body: savedIdea.dataValues
         })
-        
-        const idea = await findIdea({id: savedIdea.id})
 
-        return idea
+        return 1
     }
 
-    static getIdea = async ({ id, userId }) => {
+    static getIdea = async ({ id, userId, isPublished }) => {
         await upView(id)
-        const idea = await findIdea({id})
+        const idea = await findIdea({id, isPublished})
+        if(!idea) throw new BadRequest('Idea is not exist')
         const handledComment = sortComment(idea.comments)
         
         let status = await VoteService.getStatusVote({
@@ -95,10 +93,10 @@ class IdeaService {
     }
 
     static getAllPublisedIdeas = async ({
-        limit = 5, page = 1, userId, option = Object.keys(OPTION_SHOW_IDEA)[0]
+        limit = 5, page = 1, userId, option = Object.keys(OPTION_SHOW_IDEA)[0], duration
     }) => {
         return await this.getAllIdeas({
-            limit, page, userId, option, isPublished: true 
+            limit, page, userId, option, isPublished: true, duration
         })
     }
 
@@ -113,19 +111,9 @@ class IdeaService {
     static getRecentIdeas = async (userId) => {
         const key = `currentIdeas:${userId}`
         const recentIdeas = await RedisService.ZRANGE({
-            key,
-            start: 0,
-            stop: 4
+            key
         })
-
         const ideas = await findIdeasByIds(recentIdeas)
-        for(let i = 0; i < ideas.length; i++) {
-            let status = await VoteService.getStatusVote({
-                ideaId: ideas[i].id,
-                userId
-            })
-            ideas[i].vote = status
-        }
         return ideas
     }
 
@@ -134,11 +122,12 @@ class IdeaService {
         limit = 3
     }) => {
         const idea = await findIdea({ id: ideaId })
-        const categoryId = idea.Category.dataValues.id
-
+        const categoryId = idea?.Category.id
+        if(!categoryId) throw new BadRequest('Not found category')
         const ideas = await findIdeasByCategoryId({
             categoryId,
-            limit
+            limit,
+            ideaId
         })
         return ideas
     }
@@ -152,12 +141,13 @@ class IdeaService {
         return ideas
     }
 
-    static searchIdea = async ({q, limit = 5, page = 1, userId}) => {
+    static searchIdea = async ({q, limit = 5, page = 1, userId, duration }) => {
         try {
             const resp = await ElasticSearch.searchDocument({
                 // Using dynamic
                 index: 'ideas',
-                queryString: q
+                queryString: q,
+                duration
             })
             let totalPage = 1
             const ideaIds = resp.map(i => i._source.id)
@@ -175,7 +165,7 @@ class IdeaService {
             }
         } catch (error) {
             console.log(`Search Elastic Error:`, error)
-            return null
+            throw new BadRequest(error.message)
         }
         
         // const {ideas, totalIdea} = await findIdeaPage({
@@ -201,25 +191,37 @@ class IdeaService {
     static upVoteCount = async({
         ideaId, userId
     }) => {
-        const receiver = await findUserIdByIdeaId({ id: ideaId })
-        const data = {
-            sender: userId,
-            receiver: receiver.toString(),
-            target: 'idea',
-            action: 'up',
-            metadata: {
-                targetId: ideaId
-            }
-        }
-        await MessageQueue.send({
-            nameExchange: 'post_notification',
-            message: data
-        })
 
-        return await increaseVoteCount({
+        // 1. Up vote
+        let {
+            voteCount,
+            updated
+        } = await increaseVoteCount({
             ideaId,
             userId
         })
+        // 2. Send notification
+        if(updated) {
+            const receiver = await findUserIdByIdeaId({ id: ideaId })
+            const data = {
+                sender: userId,
+                receiver: receiver.toString(),
+                target: 'idea',
+                action: 'up',
+                metadata: {
+                    targetId: ideaId
+                }
+            }
+            await MessageQueue.send({
+                nameExchange: 'post_notification',
+                message: data
+            })
+            console.log(`Send msg`);
+        }
+
+        return {
+            voteCount
+        }
     }
 
     static downVoteCount = async({
@@ -281,7 +283,8 @@ class IdeaService {
         prePayload = removeField({
             obj: prePayload
         })
-        let ideaHolder = await findIdea({ id: ideaId, isPublished: null })
+        // let ideaHolder = await findIdea({ id: ideaId, isPublished: null })
+        let ideaHolder = await this.getIdea({ id: ideaId, userId, isPublished: null })
         if(ideaHolder.userId != userId) throw new BadRequest('[o] You don\'t have permission to execute action')
         let updatedIdea = await updateIdea({
             id: ideaId,
@@ -298,15 +301,13 @@ class IdeaService {
     static deleteIdea = async ({
         ideaId, userId
     }) => {
-        let ideaHolder = await findIdea({ id: ideaId, isPublished: null })
+        let ideaHolder = await this.getIdea({ id: ideaId, userId, isPublished: null })
         if(ideaHolder.userId != userId) throw new BadRequest('You don\'t have permission to access resource')
 
         let deleted = await Promise.all([
             await deleteIdea(ideaId),
             await CommentService.deleteCommentByIdeaId(ideaId)
         ])
-        console.log(deleted);
-        // let deleted = await deleteIdea(ideaId)
         return deleted[0] && deleted[1] ? 1 : 0
     }
 
