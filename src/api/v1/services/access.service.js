@@ -3,6 +3,7 @@
 const { Conflict, BadRequest, Unauthorized } = require("../core/error.response")
 const { createNewToken, updatePairToken, removeTokenById, findTokenByRefreshToken, removeTokenByAccessToken } = require("../models/repo/token.repo")
 const { findUserByEmail, createUser } = require("../models/repo/user.repo")
+const { createRole } = require("../models/repo/user_has_roles.repo")
 const { 
     createAccessToken, 
     createSecretKey, 
@@ -19,7 +20,10 @@ class AccessService {
         if(!email || !password) throw new BadRequest('Email and password are required')
         const { password: foundPW, user: foundUser } = await findUserByEmail(email)
         if(!foundUser) throw new Conflict('Account does not exist')
-        // 2.Match pw
+        // 2.Match status pw
+
+        if(foundUser.status === 'block') throw new BadRequest('Account is blocked')
+
         const isPw = await compareHash(password, foundPW)
         if(!isPw) throw new BadRequest('Password is incorrect')
 
@@ -65,6 +69,11 @@ class AccessService {
         })
 
         if(newUser) {
+            // Add role user
+            await createRole({
+                userId: newUser.id
+            })
+            
             const payload = {
                 userId: newUser.id, 
                 email,

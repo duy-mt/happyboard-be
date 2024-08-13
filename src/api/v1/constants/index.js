@@ -37,13 +37,16 @@ const OPTION_SHOW_IDEA = {
 
 const STATUS_USER = {
     block: {
-        role: '' 
+        roleId: 4,
+        role: 'Pending-User'
     },
     pending: {
-        role: 'pending_user'
+        roleId: 4,
+        role: 'Pending-User'
     },
     active: {
-        role: 'user'
+        roleId: 3,
+        role: 'User'
     }
 }
 

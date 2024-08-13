@@ -1,4 +1,15 @@
+const { processReturnedData } = require('../../utils')
 const { User_has_roles } = require('../index')
+
+// CREATE
+const createRole = async({
+    userId, roleId = 3
+}) => {
+    let role = await User_has_roles.create({
+        userId, roleId
+    })
+    return role
+}
 
 // READ
 const findRoleIdsByUserId = async (userId) => {
@@ -13,6 +24,35 @@ const findRoleIdsByUserId = async (userId) => {
     return roleIds
 }
 
+const findRoleIdByUserId = async (userId) => {
+    const role = await User_has_roles.findOne({
+        where: {
+            userId
+        },
+        attributes: ['roleId']
+    })
+
+    return role?.roleId
+}
+
+const updateRole = async ({
+    userId, roleId 
+}) => {
+    console.log(`userId: ${userId}, roleId: ${roleId}`);
+    let role = await User_has_roles.update(
+        {roleId},
+        {
+            where: {
+                userId
+            }
+        }
+    )
+    return role
+}
+
 module.exports = {
-    findRoleIdsByUserId
+    createRole,
+    findRoleIdsByUserId,
+    findRoleIdByUserId,
+    updateRole,
 }

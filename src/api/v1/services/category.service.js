@@ -44,7 +44,7 @@ class CategoryService {
             categoryId, payload
         })
 
-        return updatedCategory
+        return updatedCategory[0]
     }   
 
     static deleteCategory = async (categoryId) => {
