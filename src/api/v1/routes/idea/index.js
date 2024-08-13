@@ -12,7 +12,7 @@ router.use(asyncHandler(authentication))
 ////////////////////////////////////////
 // Admin
 router.get('/all', authorize(['IDE02']), asyncHandler(ideaController.getAllIdeas))
-router.get('/draft/all', authorize(['IDE02']), asyncHandler(ideaController.getAllDraftIdeas))
+router.get('/pending', authorize(['IDE02']), asyncHandler(ideaController.getAllPendingIdeas))
 router.post('/:ideaId/publish', authorize(['IDE07']), asyncHandler(ideaController.publishIdea))
 router.post('/:ideaId/unpublish', authorize(['IDE07']), asyncHandler(ideaController.unPublishIdea))
 // End Admin
@@ -29,7 +29,7 @@ router.get('/own/draft/:ideaId', asyncHandler(ideaController.getOwnDraftedIdea))
 
 router.get('', asyncHandler(ideaController.getAllPublishedIdeas))
 router.post('', authorize(['IDE04']), asyncHandler(ideaController.createIdea))
-router.post('/drafted', asyncHandler(ideaController.draftIdea))
+router.post('/draft', asyncHandler(ideaController.draftIdea))
 
 
 

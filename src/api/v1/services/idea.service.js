@@ -172,11 +172,11 @@ class IdeaService {
         })
     }
 
-    static getAllDraftIdeas = async ({
+    static getAllPengindIdeas = async ({
         limit = 5, page = 1, userId, option = Object.keys(OPTION_SHOW_IDEA)[0], duration
     }) => {
         return await this.getAllIdeas({
-            limit, page, userId, option, isPublished: false, isDrafted: true, duration
+            limit, page, userId, option, isPublished: false, isDrafted: false, duration
         })
     }
 
