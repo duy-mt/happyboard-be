@@ -21,6 +21,8 @@ router.get('/own', asyncHandler(ideaController.getAllOwnIdeas))
 
 router.get('', asyncHandler(ideaController.getAllPublishedIdeas))
 router.post('', asyncHandler(ideaController.createIdea))
+router.post('/drafted', asyncHandler(ideaController.draftIdea))
+
 
 
 router.get('/popular', asyncHandler(ideaController.getPopularIdeas))

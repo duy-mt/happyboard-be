@@ -48,6 +48,30 @@ class IdeaService {
         return 1
     }
 
+    static draftIdea = async ({
+        title, content, categoryId, userId, isPublished = false, isDrafted = true
+    }) => {
+        if(!content || !title || !categoryId) throw new BadRequest('Title, content and category are required')
+
+        const savedIdea = await createIdea({
+            title, content, categoryId, userId, isPublished, isDrafted
+        })
+        await HistoryService.createHistory({
+            type: 'CI01',
+            userId,
+            userTargetId: userId,
+            objectTargetId: savedIdea.id
+        })
+        // Ingest elastic
+        await ElasticSearch.createDocument({
+            // Using dynamic index getting from db
+            index: 'ideas',
+            body: savedIdea.dataValues
+        })
+
+        return 1
+    }
+
     static getIdea = async ({ id, userId, isPublished }) => {
         await upView(id)
         const idea = await findIdea({id, isPublished})
@@ -73,12 +97,12 @@ class IdeaService {
     }
 
     static getAllIdeas = async ({
-        limit = 5, page = 1, userId, option = Object.keys(OPTION_SHOW_IDEA)[0], isPublished = null
+        limit = 5, page = 1, userId, option = Object.keys(OPTION_SHOW_IDEA)[0], isPublished = null, isDrafted = null
     }) => {
         let fieldSort = OPTION_SHOW_IDEA[option]
         let {
             ideas, totalIdea
-        } = await findAllIdeas({ limit, page, fieldSort, isPublished })
+        } = await findAllIdeas({ limit, page, fieldSort, isPublished, isDrafted })
 
         for(let i = 0; i < ideas.length; i++) {
             let status = await VoteService.getStatusVote({
@@ -108,10 +132,10 @@ class IdeaService {
     }
 
     static getAllDraftIdeas = async ({
-        limit = 5, page = 1, userId, option = Object.keys(OPTION_SHOW_IDEA)[0]
+        limit = 5, page = 1, userId, option = Object.keys(OPTION_SHOW_IDEA)[0], duration
     }) => {
         return await this.getAllIdeas({
-            limit, page, userId, option, isPublished: false 
+            limit, page, userId, option, isPublished: false, isDrafted: true, duration
         })
     }
 

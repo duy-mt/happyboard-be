@@ -39,10 +39,10 @@ const findAllUsers = async ({
 
 const findUserByEmail = async (email) => {
     const user = await User.findOne({ 
-        where: { 
+        where: {    
             email 
         },
-        attributes: ['id', 'email', 'username', 'password', 'avatar', 'status'],
+        attributes: ['id', 'email', 'username', 'password', 'avatar', 'status', 'isOnline'],
         raw: true,
     })
 
