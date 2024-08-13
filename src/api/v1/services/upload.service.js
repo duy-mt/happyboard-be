@@ -44,6 +44,33 @@ class UploadService {
             console.log(err)
         }
     }
+
+    static uploadFromBuffer = async ({
+        file, folderName = 'user/avatar', filename = 'unknown'
+    }) => {
+        console.log(`filename::`, filename);
+        try {
+            const buffer = new Uint8Array(file.buffer)
+            let result = await new Promise ((resolve, reject) => {
+                cloudinary.uploader.upload_stream({
+                    use_filename: true,
+                    unique_filename: false,
+                    folder: folderName,
+                    overwrite: true,
+                    public_id: filename   
+                }, function (error, result){
+                    if ( error ) {
+                        reject(error)
+                        return
+                    }
+                    resolve(result)
+                }).end(buffer)
+            })
+            return result
+        } catch (error) {
+            console.log(`Error Upload Image:`, error.message)
+        }
+    }
 }
 
 module.exports = UploadService

@@ -11,6 +11,15 @@ const router = express.Router()
 router.use(asyncHandler(authentication))
 ////////////////////////////////////////
 router.get('', authorize(['USR01']), asyncHandler(userController.getAllUsers))
-router.put('/status', authorize(['USR06']), asyncHandler(userController.updateStatusUser))
+router.get('/:userId', authorize(['USR01']), asyncHandler(userController.getUser))
+
+router.get('/:userId/role', authorize(['USR01']), asyncHandler(userController.getRole))
+router.put('/:userId/role', authorize(['USR07']), asyncHandler(userController.updateRole))
+
+router.get('/:userId/permissions', authorize(['USR01']), asyncHandler(userController.getAllPermissons))
+router.put('/:userId/permissions', authorize(['USR07']), asyncHandler(userController.addPermissions))
+router.delete('/:userId/permissions', authorize(['USR07']), asyncHandler(userController.removePermissions))
+
+router.put('/:userId/status', authorize(['USR06']), asyncHandler(userController.updateStatusUser))
 
 module.exports = router

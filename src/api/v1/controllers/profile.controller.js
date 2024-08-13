@@ -5,9 +5,15 @@ const ProfileService = require('../services/profile.service')
 
 class ProfileController {
     updateProfile = async (req, res, next) => {
+        const { file } = req
+        const userId = req.headers['x-client-id']
         new OK({
             message: 'Update profile successfully!',
-            data: await ProfileService.updateProfile(req.body)
+            data: await ProfileService.updateProfile({
+                file,
+                userId,
+                body: req.body
+            })
         }).send(res)
     }
 

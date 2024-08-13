@@ -26,9 +26,10 @@ const findAllUsers = async ({
     offset, limit
 }) => {
     const { count, rows: users } = await User.findAndCountAll({
-        attributes: ['username', 'email', 'avatar', 'status', 'createdAt', 'updatedAt'],
+        attributes: ['id', 'username', 'email', 'avatar', 'status', 'createdAt', 'updatedAt'],
         offset,
-        limit        
+        limit,
+        order: [['id', 'DESC']]     
     })
     
     return {
@@ -56,10 +57,8 @@ const findUserByEmail = async (email) => {
 }
 
 const findUserByUserId = async (userId) => {
-    const user = await User.findByPk(userId, {
-        raw: true
-    })
-    return user
+    const user = await User.findByPk(userId)
+    return processReturnedData(user)
 }
 
 // UPDATE

@@ -24,7 +24,7 @@ router.get('/own/draft', asyncHandler(ideaController.getAllOwnDraftedIdeas))
 
 
 router.get('', asyncHandler(ideaController.getAllPublishedIdeas))
-router.post('', asyncHandler(ideaController.createIdea))
+router.post('', authorize(['IDE04']), asyncHandler(ideaController.createIdea))
 router.post('/drafted', asyncHandler(ideaController.draftIdea))
 
 
@@ -40,11 +40,11 @@ router.delete('/:ideaId', asyncHandler(ideaController.deleteIdea))
 
 // Comment
 router.get('/:ideaId/comments', asyncHandler(ideaController.getCommentByIdeaId))
-router.post('/:ideaId/comments', asyncHandler(ideaController.createComment))
+router.post('/:ideaId/comments', authorize(['IDE04']), asyncHandler(ideaController.createComment))
 
 // Vote
-router.post('/:ideaId/up', asyncHandler(ideaController.upVoteCount))
-router.post('/:ideaId/down', asyncHandler(ideaController.downVoteCount))
-router.delete('/:ideaId/cancel', asyncHandler(ideaController.cancelVote))
+router.post('/:ideaId/up', authorize(['IDE04']), asyncHandler(ideaController.upVoteCount))
+router.post('/:ideaId/down', authorize(['IDE04']), asyncHandler(ideaController.downVoteCount))
+router.delete('/:ideaId/cancel', authorize(['IDE04']), asyncHandler(ideaController.cancelVote))
 
 module.exports = router
