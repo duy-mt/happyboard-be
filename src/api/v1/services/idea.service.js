@@ -25,12 +25,12 @@ const HistoryService = require("./history.service")
 
 class IdeaService {
     static createIdea = async ({
-        title, content, categoryId, userId, isPublished = false
+        title, content, categoryId, userId, isPublished = false, isDrafted = false
     }) => {
         if(!content || !title || !categoryId) throw new BadRequest('Title, content and category are required')
 
         const savedIdea = await createIdea({
-            title, content, categoryId, userId, isPublished
+            title, content, categoryId, userId, isPublished, isDrafted
         })
         await HistoryService.createHistory({
             type: 'CI01',

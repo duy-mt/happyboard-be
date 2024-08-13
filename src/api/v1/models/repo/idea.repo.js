@@ -50,7 +50,7 @@ const optIdeaNoComment = {
         }
     ],
     attributes: {
-        exclude: ['isPublished', 'categoryId', 'userId'],
+        exclude: ['isDrafted', 'isPublished', 'categoryId', 'userId'],
     }
 }
 
@@ -62,7 +62,8 @@ const createIdea = async ({
         content,
         userId,
         categoryId,
-        isPublished
+        isPublished,
+        isDrafted
     })
 
     return idea
