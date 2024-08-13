@@ -204,7 +204,7 @@ const findUserIdByIdeaId = async ({
 
 // OWN USER
 const findAllOwnIdeas = async ({
-    limit, page, userId
+    limit, page, userId, isPublished = true, isDrafted = false
 }) => {
     let queryFindIdeas = {
         offset: 0,
@@ -232,6 +232,18 @@ const findAllOwnIdeas = async ({
     queryFindIdeas.offset = offset
     queryFindIdeas.limit = limit
     queryFindIdeas.where.userId = userId
+    if (isPublished != null) {
+        queryFindIdeas.where.isPublished = isPublished
+    }
+    else {
+        delete queryFindIdeas.where.isPublished
+    }
+    if (isDrafted != null) {
+        queryFindIdeas.where.isDrafted = isDrafted
+    }
+    else {
+        delete queryFindIdeas.where.isDrafted
+    }
     let { count, rows: ideas } = await Idea.findAndCountAll(queryFindIdeas)
 
     return {
