@@ -381,11 +381,11 @@ class IdeaService {
 
     // FOR OWN USER
     static getAllOwnIdeas = async ({
-        limit = 5, page = 1, userId
+        limit = 5, page = 1, userId, isPublished = null, isDrafted = null
     }) => {
         let {
             ideas, totalIdea
-        } = await findAllOwnIdeas({ limit, page, userId })
+        } = await findAllOwnIdeas({ limit, page, userId, isPublished, isDrafted })
 
         for(let i = 0; i < ideas.length; i++) {
             let status = await VoteService.getStatusVote({
@@ -404,6 +404,24 @@ class IdeaService {
             total: totalIdea,
             ideas,
         }
+    }
+
+    static getAllOwnPublishedIdeas = async ({
+        limit = 5, page = 1, userId,
+    }) => {
+        return await this.getAllOwnIdeas({ limit, page, userId, isPublished: true })
+    }
+
+    static getAllOwnHidedIdeas = async ({
+        limit = 5, page = 1, userId,
+    }) => {
+        return await this.getAllOwnIdeas({ limit, page, userId, isPublished: false, isDrafted: false })
+    }
+
+    static getAllOwnDraftedIdeas = async ({
+        limit = 5, page = 1, userId,
+    }) => {
+        return await this.getAllOwnIdeas({ limit, page, userId, isPublished: false, isDrafted: true })
     }
 }
 

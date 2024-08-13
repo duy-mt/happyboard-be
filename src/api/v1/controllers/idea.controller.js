@@ -36,6 +36,39 @@ class IdeaController {
         }).send(res)
     }
 
+    getAllOwnPublishedIdeas = async (req, res, next) => {
+        new OK({
+            message: 'Get own published ideas successfully',
+            data: await IdeaService.getAllOwnPublishedIdeas({
+                limit: req.query?.limit,
+                page: req.query?.page,
+                userId: req.body.userId
+            })
+        }).send(res)
+    }
+
+    getAllOwnHidedIdeas = async (req, res, next) => {
+        new OK({
+            message: 'Get own hided ideas successfully',
+            data: await IdeaService.getAllOwnHidedIdeas({
+                limit: req.query?.limit,
+                page: req.query?.page,
+                userId: req.body.userId
+            })
+        }).send(res)
+    }
+
+    getAllOwnDraftedIdeas = async (req, res, next) => {
+        new OK({
+            message: 'Get own drafted ideas successfully',
+            data: await IdeaService.getAllOwnDraftedIdeas({
+                limit: req.query?.limit,
+                page: req.query?.page,
+                userId: req.body.userId
+            })
+        }).send(res)
+    }
+
     getAllIdeas = async (req, res, next) => {
         const {q} = req.query
         if(!q) {
