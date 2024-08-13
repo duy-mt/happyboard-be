@@ -55,7 +55,7 @@ const optIdeaNoComment = {
 }
 
 const createIdea = async ({
-    title, content, categoryId, userId, isPublished
+    title, content, categoryId, userId, isPublished, isDrafted
 }) => {
     const idea = await Idea.create({
         title,
@@ -107,7 +107,7 @@ const findDraftIdea = async ({ id }) => {
 }
 
 const findAllIdeas = async ({
-    limit, page, fieldSort, isPublished = true
+    limit, page, fieldSort, isPublished = true, isDrafted = false
 }) => {
     let queryFindIdeas = {
         offset: 0,
@@ -139,6 +139,13 @@ const findAllIdeas = async ({
         queryFindIdeas.where.isPublished = isPublished
     } else {
         delete queryFindIdeas.where.isPublished
+        queryFindIdeas.attributes.exclude = ['categoryId', 'userId']
+    }
+    if (isDrafted != null) {
+        queryFindIdeas.where.isDrafted = isDrafted
+    }
+    else {
+        delete queryFindIdeas.where.isDrafted
         queryFindIdeas.attributes.exclude = ['categoryId', 'userId']
     }
     let { count, rows: ideas } = await Idea.findAndCountAll(queryFindIdeas)

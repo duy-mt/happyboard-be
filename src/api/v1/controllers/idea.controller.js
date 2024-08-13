@@ -119,6 +119,13 @@ class IdeaController {
         }).send(res)
     }
 
+    draftIdea = async (req, res, next) => {
+        new Created({
+            message: 'Drafted idea successfully!',
+            data: await IdeaService.draftIdea(req.body)
+        }).send(res)
+    }
+
     upVoteCount = async (req, res, next) => {
         new OK({
             message: 'Up voteCount successfully',

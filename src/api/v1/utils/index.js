@@ -29,7 +29,7 @@ const createRefreshToken = async ({
 }
 
 const createSecretKey = () => {
-    return process.env.DEV_SECRET_KEY
+    return process.env.DEV_SECRET_KEY ? process.env.DEV_SECRET_KEY : `Happyboard`
 }
 
 const createHash = (input) => {

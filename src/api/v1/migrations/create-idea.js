@@ -41,6 +41,10 @@ module.exports = {
             type: Sequelize.BOOLEAN,
             defaultValue: false
         },
+        isDrafted: {
+            type: Sequelize.BOOLEAN,
+            defaultValue: true
+        },
         createdAt: {
             allowNull: false,
             type: Sequelize.DATE
