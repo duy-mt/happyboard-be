@@ -91,6 +91,29 @@ class IdeaService {
         return handledIdea
     }
 
+    static getOwnDraftedIdea = async ({ id, userId}) => {
+        const idea = await findIdea({id})
+        if(!idea) throw new BadRequest('Idea is not exist')
+        const handledComment = sortComment(idea.comments)
+        
+        let status = await VoteService.getStatusVote({
+            ideaId: idea.id,
+            userId
+        })
+        idea.vote = status
+
+        const handledIdea = {
+            ...idea,
+            comments: handledComment
+        }
+        // await RedisService.ZADD({
+        //     key: `currentIdeas:${userId}`,
+        //     value: `${idea.id}`,
+        //     score: Date.now()
+        // })
+        return handledIdea
+    }
+
     static getAllIdeas = async ({
         limit = 5, page = 1, userId, option = Object.keys(OPTION_SHOW_IDEA)[0], isPublished = null, isDrafted = null
     }) => {
