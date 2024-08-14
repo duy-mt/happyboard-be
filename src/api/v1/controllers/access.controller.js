@@ -75,8 +75,9 @@ class AccessController {
             maxAge: 10 * 24 * 60 * 60 * 1000
         }).cookie('userId', data.user.id, {
             maxAge: 10 * 24 * 60 * 60 * 1000
-        })
-
+        }).redirect(process.env.DOMAIN_FRONTEND ? process.env.DOMAIN_FRONTEND : 'http://localhost:8888/')
+        
+        res.redirect('http://localhost:8888/')
         new Created({
             message: 'Register with google successfully',
             data
