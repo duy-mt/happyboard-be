@@ -67,9 +67,9 @@ class IdeaService {
         return 1
     }
 
-    static getIdea = async ({ id, userId, isPublished }) => {
+    static getIdea = async ({ id, userId}) => {
         await upView(id)
-        const idea = await findIdea({id, isPublished})
+        const idea = await findIdea({id})
         if(!idea) throw new BadRequest('Idea is not exist')
         const handledComment = sortComment(idea.comments)
         
@@ -92,7 +92,30 @@ class IdeaService {
     }
 
     static getOwnDraftedIdea = async ({ id, userId}) => {
-        const idea = await findIdea({id})
+        const idea = await findIdea({id, isPublished: false, isDrafted: true})
+        if(!idea) throw new BadRequest('Idea is not exist')
+        const handledComment = sortComment(idea.comments)
+        
+        let status = await VoteService.getStatusVote({
+            ideaId: idea.id,
+            userId
+        })
+        idea.vote = status
+
+        const handledIdea = {
+            ...idea,
+            comments: handledComment
+        }
+        // await RedisService.ZADD({
+        //     key: `currentIdeas:${userId}`,
+        //     value: `${idea.id}`,
+        //     score: Date.now()
+        // })
+        return handledIdea
+    }
+
+    static getOwnHidedIdea = async ({ id, userId}) => {
+        const idea = await findIdea({id, isPublished: false, isDrafted: false})
         if(!idea) throw new BadRequest('Idea is not exist')
         const handledComment = sortComment(idea.comments)
         

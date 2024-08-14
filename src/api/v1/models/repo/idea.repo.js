@@ -70,7 +70,7 @@ const createIdea = async ({
 }
 
 // FIND
-const findIdea = async ({ id, isPublished = false, isDrafted = true}) => {  
+const findIdea = async ({ id, isPublished = true, isDrafted = false}) => {  
     let where = {
         id
     }
