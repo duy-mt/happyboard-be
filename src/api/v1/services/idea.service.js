@@ -36,7 +36,8 @@ class IdeaService {
             type: 'CI01',
             userId,
             userTargetId: userId,
-            objectTargetId: savedIdea.id
+            objectTargetId: savedIdea.id,
+            contentIdea: savedIdea.content
         })
         // Ingest elastic
         await ElasticSearch.createDocument({
@@ -55,12 +56,6 @@ class IdeaService {
 
         const savedIdea = await createIdea({
             title, content, categoryId, userId, isPublished, isDrafted
-        })
-        await HistoryService.createHistory({
-            type: 'CI01',
-            userId,
-            userTargetId: userId,
-            objectTargetId: savedIdea.id
         })
         // Ingest elastic
         await ElasticSearch.createDocument({
@@ -222,6 +217,9 @@ class IdeaService {
     static upVoteCount = async({
         ideaId, userId
     }) => {
+
+        // 0. find idea
+        const idea = await findIdea({id: ideaId})
         // 1. Up vote
         let {
             voteCount,
@@ -251,7 +249,8 @@ class IdeaService {
                 type: 'VI01',
                 userId,
                 userTargetId: receiver,
-                objectTargetId: ideaId
+                objectTargetId: ideaId,
+                contentIdea: idea.title
             })
             console.log(`Send msg`);
         }
@@ -264,12 +263,15 @@ class IdeaService {
     static downVoteCount = async({
         ideaId, userId
     }) => {
+
+        const idea = await findIdea({id: ideaId})
         const receiver = await findUserIdByIdeaId({ id: ideaId })
         await HistoryService.createHistory({
             type: 'VI01',
             userId,
             userTargetId: receiver,
-            objectTargetId: ideaId
+            objectTargetId: ideaId,
+            contentIdea: idea.title
         })
         return await decrementVoteCount({
             ideaId,
@@ -277,15 +279,17 @@ class IdeaService {
         })
     }
 
-    static cancelVote = async({
+    static cancelVote = async ({
         ideaId, userId
     }) => {
+        const idea = await findIdea({id: ideaId})
         const receiver = await findUserIdByIdeaId({ id: ideaId })
         await HistoryService.createHistory({
             type: 'VI01',
             userId,
             userTargetId: receiver,
-            objectTargetId: ideaId
+            objectTargetId: ideaId,
+            contentIdea: idea.title
         })
         return await cancelVote({
             ideaId,
@@ -351,7 +355,8 @@ class IdeaService {
             type: 'EI01',
             userId,
             userTargetId: userId,
-            objectTargetId: ideaId
+            objectTargetId: ideaId,
+            contentIdea: ideaHolder.title
         })
 
         return updatedIdea ? 1 : 0
@@ -372,7 +377,8 @@ class IdeaService {
                 type: 'DI01',
                 userId,
                 userTargetId: userId,
-                objectTargetId: ideaId
+                objectTargetId: ideaId,
+                contentIdea: ideaHolder.title
             })
             return 1
         }

@@ -14,10 +14,10 @@ const queryHistory = {
 }
 
 const createHistory = async ({
-    type, userId, userTargetId, objectTargetId
+    type, userId, userTargetId, objectTargetId, objectTargetLv2Id = null, contentIdea = null, contentComment = null
 }) => {
     const history = await History.create({
-        type, userId, userTargetId, objectTargetId
+        type, userId, userTargetId, objectTargetId, objectTargetLv2Id, contentIdea, contentComment
     })
 
     return history

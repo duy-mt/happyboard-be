@@ -25,6 +25,18 @@ module.exports = {
             type: Sequelize.INTEGER,
             allowNull: false,
         },
+        objectTargetLv2Id: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+        },
+        contentIdea: {
+            type: Sequelize.TEXT,
+            allowNull: true,
+        },
+        contentComment: {
+            type: Sequelize.TEXT,
+            allowNull: true,
+        },
         createdAt: {
             allowNull: false,
             type: Sequelize.DATE
