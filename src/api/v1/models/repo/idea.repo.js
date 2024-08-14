@@ -70,12 +70,14 @@ const createIdea = async ({
 }
 
 // FIND
-const findIdea = async ({ id, isPublished = true }) => {  
+const findIdea = async ({ id, isPublished = false, isDrafted = true}) => {  
     let where = {
         id
     }
     
     if(isPublished != null) where.isPublished = isPublished
+
+    if(isDrafted != null) where.isDrafted = isDrafted
 
     const idea = await Idea.findOne({
         where,
