@@ -22,8 +22,10 @@ class CommentService {
         })
         if(!ideaHolder) throw new BadRequest('Idea is not exist! So don\'t create comment')
         let type = 'CC01'
+        let contentComment
         if(parentId) {
             const parentComment = await getCommentById(parentId)
+            contentComment = parentComment.content
             if(parentComment.ideaId != ideaId) throw new BadRequest('Comment Again')
             if(parentComment.parentId) parentId = parentComment.parentId
             type = 'RC01'
@@ -52,7 +54,11 @@ class CommentService {
             type,
             userId,
             userTargetId: receiver,
-            objectTargetId: ideaId // Idea or Comment
+            objectTargetId: ideaId,
+            objectTargetLv2Id: parentId,
+            contentIdea: ideaHolder.title,
+            contentComment: contentComment
+
         })
         return processReturnedData(savedComment)
     }
@@ -121,7 +127,10 @@ class CommentService {
             type: 'RC02',
             userId,
             userTargetId: receiver,
-            objectTargetId: commentId // Idea or Comment or Reaction
+            objectTargetId: cmt.ideaId,
+            objectTargetLv2Id: cmt.id,
+            contentIdea: idea.title,
+            contentComment: cmt.content
         })
 
         return r
