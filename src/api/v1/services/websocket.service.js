@@ -2,7 +2,7 @@ const { updateUserByUserId } = require('../models/repo/user.repo')
 const UserService = require('../services/user.service')
 
 
-class WebSocketService { 
+class WebSocketService {
     static onPong = async (ws) => {
         ws.on('pong', () => {
             console.log('Received pong from client');
@@ -10,11 +10,11 @@ class WebSocketService {
         });
     }
 
-    static onClose = async (ws, userId) => {
+    static onClose = async (ws, user) => {
 
         ws.on('close', async () => {
-            const user = await UserService.updateActivityUser({ userId, isOnline: false } )
-            console.log('Client disconnected');
+            await UserService.updateActivityUser({ userId: user.id, isOnline: false })
+            console.log(`User has username:${user.username} disconnected`);
         });
     }
 }
