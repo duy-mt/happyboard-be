@@ -25,6 +25,16 @@ class IdeaController {
         }).send(res)
     }
 
+    getOwnHidedIdea = async (req, res, next) => {
+        new OK({
+            message: 'Get hided idea successfully',
+            data: await IdeaService.getOwnHidedIdea({
+                id: req.params.ideaId,
+                userId: req.body.userId
+            })
+        }).send(res)
+    }
+
     updateIdea = async (req, res, next) => {
         new OK({
             message: 'Update idea successfully',

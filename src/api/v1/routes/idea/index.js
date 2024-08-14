@@ -20,6 +20,7 @@ router.post('/:ideaId/unpublish', authorize(['IDE07']), asyncHandler(ideaControl
 router.get('/own', asyncHandler(ideaController.getAllOwnIdeas))
 router.get('/own/publish', asyncHandler(ideaController.getAllOwnPublishedIdeas))
 router.get('/own/hide', asyncHandler(ideaController.getAllOwnHidedIdeas))
+router.get('/own/hide/:ideaId', asyncHandler(ideaController.getOwnHidedIdea))
 router.get('/own/draft', asyncHandler(ideaController.getAllOwnDraftedIdeas))
 router.get('/own/draft/:ideaId', asyncHandler(ideaController.getOwnDraftedIdea))
 
