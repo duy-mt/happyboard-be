@@ -24,7 +24,7 @@ module.exports = {
         voteCount: 0,
         commentCount: 0,
         viewCount: 0,
-        isPublished: true,
+        isPublished: false,
         isDrafted: true,
         createdAt: new Date(),
         updatedAt: new Date()
