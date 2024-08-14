@@ -77,6 +77,7 @@ class AccessController {
             maxAge: 10 * 24 * 60 * 60 * 1000
         })
 
+        res.redirect('http://localhost:8888/')
         new Created({
             message: 'Register with google successfully',
             data
