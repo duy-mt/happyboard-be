@@ -98,6 +98,22 @@ class ElasticSearch {
         }
     }
     
+    static deleteDocument = async ({ index, id }) => {
+        try {
+            await this.elasticClient.delete({
+                index,
+                id
+            }, function (err, resp, status) {
+                if (err) {
+                    console.log('Delete document failed');
+                } else {
+                    console.log('Delete document successfully');
+                }
+            });
+        } catch (err) {
+            console.log('Error deleting document:', err);
+        }
+    }    
 }
 
 module.exports = ElasticSearch

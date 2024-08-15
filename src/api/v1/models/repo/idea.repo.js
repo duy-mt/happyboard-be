@@ -98,7 +98,7 @@ const findPublisedIdea = async ({ id }) => {
     return idea && processReturnedData(idea)
 }
 
-const findDraftIdea = async ({ id }) => {
+const findPendingIdea = async ({ id }) => {
     const idea = await Idea.findOne({
         where: {
             id,
@@ -351,7 +351,9 @@ const findIdeasByIds = async (ids = []) => {
     await Promise.all(await ids.map(async (id) => {
         let i = await Idea.findOne({
             where: {
-                id
+                id,
+                isDrafted: false,
+                isPublished: true
             },
             ...optIdeaNoComment,
         })
@@ -368,7 +370,8 @@ const findIdeasByCategoryId = async ({categoryId, limit, ideaId}) => {
                 [Op.not]: ideaId
             },
             categoryId,
-            isPublished: true
+            isPublished: true,
+            isDrafted: false
         },
         ...optIdeaNoComment
     })
@@ -406,7 +409,7 @@ module.exports = {
     cancelVote,
     updateIdea,
     upView,
-    findDraftIdea,
+    findPendingIdea,
     findPublisedIdea,
     findIdeasByIds,
     findIdeasByCategoryId,

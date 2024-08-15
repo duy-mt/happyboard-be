@@ -231,7 +231,8 @@ class IdeaController {
         new OK({
             message: 'Publish successfully',
             data: await IdeaService.publishIdea({
-                ideaId: req.params.ideaId
+                ideaId: req.params.ideaId,
+                adminId: req.body.userId
             })
         }).send(res)
     }
