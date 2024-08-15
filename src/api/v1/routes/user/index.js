@@ -8,6 +8,9 @@ const { authorize } = require('../../middlewares')
 
 const router = express.Router()
 
+router.get('/websocket/:userId', asyncHandler(userController.getUser))
+router.put('/websocket/:userId/online', asyncHandler(userController.updateActivityUser))
+
 router.use(asyncHandler(authentication))
 ////////////////////////////////////////
 router.get('', authorize(['USR01']), asyncHandler(userController.getAllUsers))
