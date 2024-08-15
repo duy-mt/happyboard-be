@@ -6,7 +6,7 @@ const { BadRequest } = require("../core/error.response")
 
 const initializeWebSocket = async () => {
 
-    const wss = new WebSocket.Server({ port: 8003, host: '0.0.0.0' });
+    const wss = new WebSocket.Server({ port: 8003, path: "/ws/", host: '0.0.0.0' });
     console.log('\x1b[42m%s\x1b[0m', `Websocket: Connect access on port ${8003}`)
 
     wss.on('connection', async (ws, req) => {
@@ -41,6 +41,6 @@ const initializeWebSocket = async () => {
     });
 }
 
-initializeWebSocket()
+// initializeWebSocket()
 
 module.exports = initializeWebSocket

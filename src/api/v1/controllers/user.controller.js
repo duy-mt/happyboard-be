@@ -75,6 +75,18 @@ class UserController {
             })
         }).send(res)
     }
+
+    updateActivityUser = async (req, res, next) => {
+        new OK({
+            message: 'Change status user successfully',
+            data: await UserService.updateActivityUser({
+                userId: req.params.userId,
+                isOnline: req.body.isOnline
+            })
+        }).send(res)
+    }
+
+    
 }
 
 module.exports = new UserController()
