@@ -65,6 +65,9 @@ app.use((req, res, next) => {
 })
 
 app.use((err, req, res, next) => {
+    console.log(err) // Log loi
+    const statusCode = err.status || 500
+    const resMessage = `${err.status} - ${Date.now() - err.now}ms - Response: ${JSON.stringify(err)}`
     MyLogger.error(resMessage, [
         req.path,
         {requestId: req.requestId},
@@ -72,8 +75,6 @@ app.use((err, req, res, next) => {
           message: err.message
         }
     ])
-    console.log(err) // Log loi
-    const statusCode = err.status || 500
 
     return res.status(statusCode).json({
         status: 'error',
