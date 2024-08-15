@@ -80,7 +80,7 @@ app.use((err, req, res, next) => {
         status: 'error',
         code: statusCode,
         message: err.message || 'Internal Server Error',
-        ...err
+        // ...err
     })
 })
 
