@@ -34,6 +34,14 @@ module.exports = {
             type: Sequelize.BOOLEAN,
             defaultValue: false
         },
+        jobPosition: {
+            type: Sequelize.TEXT,
+            defaultValue: ''
+        },
+        introduce: {
+            type: Sequelize.TEXT,
+            defaultValue: ''
+        },
         createdAt: {
             allowNull: false,
             type: Sequelize.DATE
