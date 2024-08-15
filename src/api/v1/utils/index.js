@@ -28,6 +28,18 @@ const createRefreshToken = async ({
     return refreshToken
 }
 
+// Shorten
+const generateToken = async ({
+    payload, secretKey, expireTime
+}) => {
+    const token = JWT.sign(payload, secretKey, {
+        algorithm: 'HS256',
+        expiresIn: expireTime
+    })
+
+    return token
+}
+
 const createSecretKey = () => {
     return process.env.DEV_SECRET_KEY ? process.env.DEV_SECRET_KEY : `Happyboard`
 }
@@ -156,6 +168,7 @@ const convetToTimestamp = (time) => {
 }
 
 module.exports = {
+    generateToken,
     createAccessToken,
     createRefreshToken,
     createSecretKey,

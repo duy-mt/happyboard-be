@@ -83,6 +83,37 @@ class AccessController {
             data
         }).send(res)
     }
+
+    sendEmailForgotPW = async (req, res, next) => {
+        new OK({
+            message: 'Send token reset password successfully!',
+            data: await AccessService.forgotPW(req.body)
+        }).send(res)
+    }
+
+    validateToken = async (req, res, next) => {
+        let data = await AccessService.validateToken(req.query)
+        new OK({
+            message: 'Validate token successfully!',
+            data
+        }).send(res)
+    }
+
+    resetPW = async (req, res, next) => {
+        let data = await AccessService.changePW(req.body)
+        new OK({
+            message: 'Update password successfully!',
+            data
+        }).send(res)
+    }
+
+    updatePW = async (req, res, next) => {
+        let data = await AccessService.updatePW(req.body)
+        new OK({
+            message: 'Update password successfully!',
+            data
+        }).send(res)
+    }
 }
 
 module.exports = new AccessController()

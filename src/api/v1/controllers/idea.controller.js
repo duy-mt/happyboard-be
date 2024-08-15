@@ -140,12 +140,12 @@ class IdeaController {
         }
     }
 
-    getAllDraftIdeas = async (req, res, next) => {
+    getAllPendingIdeas = async (req, res, next) => {
         const {q} = req.query
         if(!q) {
             new OK({
                 message: 'Get draft ideas successfully',
-                data: await IdeaService.getAllDraftIdeas({
+                data: await IdeaService.getAllPengindIdeas({
                     limit: req.query?.limit,
                     page: req.query?.page,
                     userId: req.body.userId,

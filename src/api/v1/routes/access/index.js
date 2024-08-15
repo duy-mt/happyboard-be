@@ -25,9 +25,13 @@ router.get('/auth/google/failure', (req, res, next) => {
 router.post('/signup', asyncHandler(accessController.signUp))
 router.post('/signin', asyncHandler(accessController.login))
 router.post('/refresh', asyncHandler(accessController.refreshToken))
+router.post('/forgot-password', asyncHandler(accessController.sendEmailForgotPW))
+router.get('/reset-password', asyncHandler(accessController.validateToken))
+router.post('/reset-password', asyncHandler(accessController.resetPW))
 
 router.use(asyncHandler(authentication))
 
+router.post('/update-password', asyncHandler(accessController.updatePW))
 router.post('/logout', asyncHandler(accessController.logout))
 
 module.exports = router
