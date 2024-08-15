@@ -7,7 +7,8 @@
 		"nodemon": "nodemon server.js",
 		"migrate": "npx sequelize db:migrate",
 		"undo": "npx sequelize db:migrate:undo:all",
-		"seed": "npx sequelize db:seed:all"
+		"seed": "npx sequelize db:seed:all",
+		"reset-db": "npm run undo && npm run migrate && npm run seed"
 	},
 	"keywords": [],
 	"author": "",

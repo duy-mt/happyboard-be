@@ -26,7 +26,7 @@ const findAllUsers = async ({
     offset, limit
 }) => {
     const { count, rows: users } = await User.findAndCountAll({
-        attributes: ['id', 'username', 'email', 'avatar', 'status', 'createdAt', 'updatedAt'],
+        attributes: ['id', 'username', 'email', 'avatar', 'status', 'isOnline', 'createdAt', 'updatedAt'],
         offset,
         limit,
         order: [['id', 'DESC']]     

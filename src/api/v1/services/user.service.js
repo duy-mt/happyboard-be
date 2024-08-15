@@ -5,6 +5,7 @@ const { BadRequest } = require("../core/error.response")
 const { findPermissionsByIds } = require("../models/repo/permission.repo")
 const { findRoleById } = require("../models/repo/role.repo")
 const { findPermissionIdsByRoleIds, findPermissionIdsByRoleId } = require("../models/repo/role_has_permissions.repo")
+const { removeTokenByUserId } = require("../models/repo/token.repo")
 const { findAllUsers, updateUserByUserId, findUserByUserId } = require("../models/repo/user.repo")
 const { findPermissionsByUserId, createPermission, deletePermissionOfUser } = require("../models/repo/user_has_permissions.repo")
 const { findRoleIdByUserId, updateRole } = require("../models/repo/user_has_roles.repo")
@@ -224,6 +225,10 @@ class UserService {
         userId
     }) => {
         let userHolder = await findUserByUserId(userId)
+        // Delete accessToken
+        await removeTokenByUserId({
+            userId
+        })
         console.log(`\x1b[31m...Action when block user ${userHolder.email}\x1b[0m`)
         console.log(`\x1b[31m...May be send email or SMS\x1b[0m`) 
         let email = userHolder.email

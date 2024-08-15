@@ -62,9 +62,9 @@ class IdeaService {
     }
 
     static getIdea = async ({ id, userId}) => {
-        await upView(id)
         const idea = await findIdea({id})
         if(!idea) throw new BadRequest('Idea is not exist')
+        await upView(id)
         const handledComment = sortComment(idea.comments)
         
         let status = await VoteService.getStatusVote({
@@ -77,8 +77,9 @@ class IdeaService {
             ...idea,
             comments: handledComment
         }
+        let key = `user:${userId}:currentIdeas`
         await RedisService.ZADD({
-            key: `currentIdeas:${userId}`,
+            key,
             value: `${idea.id}`,
             score: Date.now()
         })
@@ -175,7 +176,7 @@ class IdeaService {
     }
 
     static getRecentIdeas = async (userId) => {
-        const key = `currentIdeas:${userId}`
+        let key = `user:${userId}:currentIdeas`
         const recentIdeas = await RedisService.ZRANGE({
             key
         })
