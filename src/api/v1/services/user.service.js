@@ -8,7 +8,9 @@ const { findPermissionIdsByRoleIds, findPermissionIdsByRoleId } = require("../mo
 const { findAllUsers, updateUserByUserId, findUserByUserId } = require("../models/repo/user.repo")
 const { findPermissionsByUserId, createPermission, deletePermissionOfUser } = require("../models/repo/user_has_permissions.repo")
 const { findRoleIdByUserId, updateRole } = require("../models/repo/user_has_roles.repo")
+const { htmlBlockUser } = require("../template")
 const { removeField } = require("../utils")
+const MailerService = require("./mailer.service")
 
 class UserService {
     static getAllUsers = async ({
@@ -74,6 +76,15 @@ class UserService {
     static updateStatusUser = async ({
         userId, status, adminId
     }) => {
+
+        let userRoleId = await findRoleIdByUserId(userId)
+        let adminRoleId = await findRoleIdByUserId(adminId)
+
+        let priorityTarget = userRoleId
+        let priorityAdmin = adminRoleId 
+        
+        if (priorityAdmin > priorityTarget)
+            throw new BadRequest('You can\'t assign a status for role higher than your own.')
         // block, pending, block
         if(!Object.keys(STATUS_USER).includes(status)) throw new BadRequest('Missing status to change or status wrong')
         // Check user isAdmin? if admin -> throw err
@@ -193,7 +204,8 @@ class UserService {
         let role = await findRoleById(roleId)
         if(!role) throw new BadRequest('Not found role')
 
-       let { id: adminRoleId } = await findRoleById(adminId)
+        let adminRoleId = await findRoleIdByUserId(adminId)
+    //    let { id: adminRoleId } = await findRoleById(adminId)
 
         let priorityTarget = roleId
         let priorityAdmin = adminRoleId 
@@ -213,7 +225,16 @@ class UserService {
     }) => {
         let userHolder = await findUserByUserId(userId)
         console.log(`\x1b[31m...Action when block user ${userHolder.email}\x1b[0m`)
-        console.log(`\x1b[31m...May be send email or SMS\x1b[0m`)  
+        console.log(`\x1b[31m...May be send email or SMS\x1b[0m`) 
+        let email = userHolder.email
+        await MailerService.sendMail({
+            toEmail: email,
+            subject: '[HappyBoard]: Your account has been blocked',
+            text: 'Account Blocked Notification',
+            html: await htmlBlockUser({
+                email
+            })
+        })
     }
 }
 

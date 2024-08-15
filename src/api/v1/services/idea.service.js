@@ -4,7 +4,7 @@ const { BadRequest, Forbidden } = require("../core/error.response")
 const { 
     createIdea, findAllIdeasByUsedId, findIdeaPage, findIdea, increaseVoteCount, decrementVoteCount, updateIdea, cancelVote,
     upView,
-    findDraftIdea,
+    findPendingIdea,
     findPublisedIdea,
     findIdeasByIds,
     findIdeasByCategoryId,
@@ -39,12 +39,6 @@ class IdeaService {
             objectTargetId: savedIdea.id,
             contentIdea: savedIdea.content
         })
-        // Ingest elastic
-        await ElasticSearch.createDocument({
-            // Using dynamic index getting from db
-            index: 'ideas',
-            body: savedIdea.dataValues
-        })
 
         return 1
     }
@@ -58,11 +52,11 @@ class IdeaService {
             title, content, categoryId, userId, isPublished, isDrafted
         })
         // Ingest elastic
-        await ElasticSearch.createDocument({
-            // Using dynamic index getting from db
-            index: 'ideas',
-            body: savedIdea.dataValues
-        })
+        // await ElasticSearch.createDocument({
+        //     // Using dynamic index getting from db
+        //     index: 'ideas',
+        //     body: savedIdea.dataValues
+        // })
 
         return 1
     }
@@ -138,7 +132,7 @@ class IdeaService {
     }
 
     static getAllIdeas = async ({
-        limit = 5, page = 1, userId, option = Object.keys(OPTION_SHOW_IDEA)[0], isPublished = null, isDrafted = null
+        limit = 5, page = 1, userId, option = Object.keys(OPTION_SHOW_IDEA)[0], isPublished = null, isDrafted = false
     }) => {
         let fieldSort = OPTION_SHOW_IDEA[option]
         let {
@@ -344,15 +338,43 @@ class IdeaService {
     }
 
     static publishIdea = async ({
-        ideaId
+        ideaId, adminId
     }) => {
-        const idea = await findDraftIdea({ id: ideaId })
+        const idea = await findPendingIdea({ id: ideaId })
         if(!idea) throw new BadRequest('Not found idea')
         const updatedIdea = await updateIdea({
             id: ideaId,
             opt: {
                 isPublished: true
             }
+        })
+
+        // Ingest elastic
+        let body = {
+            id: idea.id,
+            title: idea.title,
+            content: idea.content,
+            createdAt: idea.createdAt,
+            updatedAt: idea.updatedAt
+        }
+        await ElasticSearch.createDocument({
+            // Using dynamic index getting from db
+            index: 'ideas',
+            body
+        })
+
+        const data = {
+            sender: adminId,
+            receiver: idea.userId.toString(),
+            target: 'idea',
+            action: 'release',
+            metadata: {
+                targetId: ideaId
+            }
+        }
+        await MessageQueue.send({
+            nameExchange: 'post_notification',
+            message: data
         })
 
         return updatedIdea ? 1 : 0
@@ -369,7 +391,11 @@ class IdeaService {
                 isPublished: false
             }
         })
-
+        if(!updatedIdea) throw new BadRequest('Unpublish idea failed') 
+        await ElasticSearch.deleteDocument({
+            index: 'ideas',
+            id: ideaId
+        })
         return updatedIdea ? 1 : 0
     }
 
@@ -425,6 +451,10 @@ class IdeaService {
                 userTargetId: userId,
                 objectTargetId: ideaId,
                 contentIdea: ideaHolder.title
+            })
+            await ElasticSearch.deleteDocument({
+                index: 'ideas',
+                id: ideaId
             })
             return 1
         }

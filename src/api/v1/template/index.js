@@ -10,6 +10,15 @@ const htmlForgotPW = async ({
     return data;
 }
 
+const htmlBlockUser = async ({
+    email
+}) => {
+    let data = await fs.readFileSync(path.resolve(__dirname, 'blockUser.html'), 'utf8')
+    data = data.replace('@@@email@@@', email)
+    return data
+}
+
 module.exports = {
-    htmlForgotPW
+    htmlForgotPW,
+    htmlBlockUser,
 }
