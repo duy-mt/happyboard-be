@@ -10,6 +10,8 @@ const cors = require('cors')
 const { NotFound } = require('./api/v1/core/error.response')
 const passport = require('passport')
 const session = require('express-session')
+const {v4:uuidv4}= require('uuid')
+const MyLogger = require('./api/v1/loggers/myLogger')
 
 const app = express()
 
@@ -43,6 +45,17 @@ require('./api/v1/dbs/rabbitmq.init')
 require('./api/v1/dbs/websocket.init')
 
 
+// Middleware save log
+app.use((req, res, next) => {
+    req.requestId = uuidv4()
+    MyLogger.log(`input params ::${req.method}`, [
+        req.path,
+        {requestId: req.requestId},
+        req.method === 'POST' ? req.body : req.query
+    ])
+    next()
+})
+
 // INIT ROUTES
 app.use('', require('./api/v1/routes/index'))
 
@@ -52,6 +65,13 @@ app.use((req, res, next) => {
 })
 
 app.use((err, req, res, next) => {
+    MyLogger.error(resMessage, [
+        req.path,
+        {requestId: req.requestId},
+        {
+          message: err.message
+        }
+    ])
     console.log(err) // Log loi
     const statusCode = err.status || 500
 

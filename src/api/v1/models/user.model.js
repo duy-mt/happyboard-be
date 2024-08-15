@@ -18,8 +18,9 @@ module.exports = (sequelize, DataTypes) => {
         username: DataTypes.STRING(50),
         avatar: DataTypes.STRING(50),
         status: DataTypes.ENUM('active', 'pending', 'block'),
-        isOnline: DataTypes.BOOLEAN
-        
+        isOnline: DataTypes.BOOLEAN,
+        jobPosition: DataTypes.STRING(50),
+        introduce: DataTypes.STRING(50)
     }, {
         sequelize,
         modelName: 'User',

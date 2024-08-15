@@ -10,6 +10,8 @@ module.exports = {
         avatar: '',
         status: 'active',
         isOnline: false,
+        jobPosition: 'Intent MyFPT',
+        introduce: 'A dedicated and eager software development intern with a passion for learning and building effective backend systems. Driven by curiosity and a commitment to excellence, they focus on honing their skills and contributing to impactful projects.',
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -20,6 +22,8 @@ module.exports = {
         avatar: '',
         status: 'active',
         isOnline: false,
+        jobPosition: 'Intent MyFPT',
+        introduce: 'A dedicated and eager software development intern with a passion for learning and building effective backend systems. Driven by curiosity and a commitment to excellence, they focus on honing their skills and contributing to impactful projects.',
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -30,6 +34,8 @@ module.exports = {
         avatar: '',
         status: 'active',
         isOnline: false,
+        jobPosition: 'Intent MyFPT',
+        introduce: 'A dedicated and eager software development intern with a passion for learning and building effective backend systems. Driven by curiosity and a commitment to excellence, they focus on honing their skills and contributing to impactful projects.',
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -40,6 +46,8 @@ module.exports = {
         avatar: '',
         status: 'active',
         isOnline: false,
+        jobPosition: 'Intent MyFPT',
+        introduce: 'A dedicated and eager software development intern with a passion for learning and building effective backend systems. Driven by curiosity and a commitment to excellence, they focus on honing their skills and contributing to impactful projects.',
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -50,6 +58,8 @@ module.exports = {
         avatar: '',
         status: 'active',
         isOnline: false,
+        jobPosition: 'Intent MyFPT',
+        introduce: 'A dedicated and eager software development intern with a passion for learning and building effective backend systems. Driven by curiosity and a commitment to excellence, they focus on honing their skills and contributing to impactful projects.',
         createdAt: new Date(),
         updatedAt: new Date()
       }
