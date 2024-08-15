@@ -11,7 +11,6 @@ class ProfileService {
     }) => {
         let url = null
         if(file) {
-            console.log(file);
             let image = await UploadService.uploadFromBuffer({
                 file, folderName: 'user/avatar', filename: userId
             })
