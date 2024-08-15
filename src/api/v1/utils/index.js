@@ -89,6 +89,7 @@ const removeField = ({
 }) => {
     Object.keys(obj).forEach(key => {
         if(obj[key] == null) delete obj[key]
+        if(obj[key].toString().trim() === '') delete obj[key]
         if(field.includes(key)) delete obj[key]
     })
 
