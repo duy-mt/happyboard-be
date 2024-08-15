@@ -2,7 +2,7 @@
 
 const { Conflict, BadRequest, Unauthorized } = require("../core/error.response")
 const { createNewToken, updatePairToken, removeTokenById, findTokenByRefreshToken, removeTokenByAccessToken } = require("../models/repo/token.repo")
-const { findUserByEmail, createUser, updateUserByUserId } = require("../models/repo/user.repo")
+const { findUserByEmail, createUser, updateUserByUserId, findUserByUserId } = require("../models/repo/user.repo")
 const { createRole } = require("../models/repo/user_has_roles.repo")
 const { htmlForgotPW } = require("../template")
 const { 
@@ -290,6 +290,26 @@ class AccessService {
         if(!result) throw new BadRequest('Update password failed') 
         return result
     } 
+
+    static updatePW = async ({ userId, old_password, new_password }) => {
+        new_password = new_password.trim()
+        if(!old_password || !new_password) throw new BadRequest('Old password and new password are required')
+        let userHolder = await findUserByUserId(userId)
+        if(!userHolder) throw new BadRequest('Account is not exist')
+        let foundPW = userHolder.password
+        // Check pw
+        const isPw = await compareHash(old_password, foundPW)
+        if(!isPw) throw new BadRequest('Password is incorrect')
+
+        let result = await updateUserByUserId({
+            userId,
+            payload: {
+                password: createHash(new_password)
+            }
+        })
+        if(!result) throw new BadRequest('Update password failed') 
+        return result
+    }
 }
 
 module.exports = AccessService

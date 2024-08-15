@@ -106,6 +106,14 @@ class AccessController {
             data
         }).send(res)
     }
+
+    updatePW = async (req, res, next) => {
+        let data = await AccessService.updatePW(req.body)
+        new OK({
+            message: 'Update password successfully!',
+            data
+        }).send(res)
+    }
 }
 
 module.exports = new AccessController()

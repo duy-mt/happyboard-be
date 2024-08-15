@@ -31,6 +31,7 @@ router.post('/reset-password', asyncHandler(accessController.resetPW))
 
 router.use(asyncHandler(authentication))
 
+router.post('/update-password', asyncHandler(accessController.updatePW))
 router.post('/logout', asyncHandler(accessController.logout))
 
 module.exports = router
