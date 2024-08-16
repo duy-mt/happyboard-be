@@ -31,6 +31,7 @@ class CategoryService {
     static updateCategory = async ({
         categoryId, title, description, icon
     }) => {
+        if(!categoryId) throw new BadRequest('Category ID is required')
         await this.getCategoryById(categoryId)
         let prePayload = {
             title, description, icon
