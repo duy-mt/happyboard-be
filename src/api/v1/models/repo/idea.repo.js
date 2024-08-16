@@ -16,7 +16,7 @@ const optIdea = {
         include: [
             {
                 model: User,
-                attributes: ['username', 'email']
+                attributes: ['id', 'username', 'email', 'avatar']
             }
         ]
         }, {
@@ -25,7 +25,7 @@ const optIdea = {
         }, 
         {
             model: User,
-            attributes: ['username', 'email']
+            attributes: ['id', 'username', 'email', 'avatar']
         },
     ],
     // attributes: ['id', 'title', 'content', 'voteCount', 'commentCount', 'viewCount', 'createdAt', 'updatedAt']
@@ -42,7 +42,7 @@ const optIdeaNoComment = {
     include: [
         {
             model: User,
-            attributes: ['id', 'username', 'email']
+            attributes: ['id', 'username', 'email', 'avatar']
         },
         {
             model: Category,
@@ -123,7 +123,7 @@ const findAllIdeas = async ({
         include: [
             {
                 model: User,
-                attributes: ['id', 'username', 'email']
+                attributes: ['id', 'username', 'email', 'avatar']
             },
             {
                 model: Category,
@@ -220,7 +220,7 @@ const findAllOwnIdeas = async ({
         include: [
             {
                 model: User,
-                attributes: ['id', 'username', 'email']
+                attributes: ['id', 'username', 'email', 'avatar']
             },
             {
                 model: Category,

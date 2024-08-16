@@ -10,7 +10,7 @@ const queryCommentWithReaction = {
     include: [
         {
             model: User,
-            attributes: ['id', 'username', 'email'],
+            attributes: ['id', 'username', 'email', 'avatar'],
         }
     ],
     attributes: { },
