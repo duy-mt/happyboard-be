@@ -28,7 +28,10 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 app.use(morgan('dev'))
-app.use(cors())
+app.use(cors({
+    origin: process.env.DOMAIN_FRONTEND,
+    credentials: true
+}))
 app.use(helmet())
 app.use(compression())
 app.use(express.json())
