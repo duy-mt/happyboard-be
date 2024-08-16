@@ -73,11 +73,20 @@ const removeTokenByAccessToken = async ({accessToken}) => {
     })
 }
 
+const removeTokenByUserId = async ({ userId }) => {
+    return await Token.destroy({
+        where: {
+            userId
+        },
+    })
+}
+
 module.exports = {
     createNewToken,
     updatePairToken,
     findAccessKeyByUserId,
     removeTokenById,
     findTokenByRefreshToken,
-    removeTokenByAccessToken
+    removeTokenByAccessToken,
+    removeTokenByUserId
 }
