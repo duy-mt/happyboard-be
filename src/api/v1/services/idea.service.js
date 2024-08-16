@@ -438,7 +438,8 @@ class IdeaService {
     static deleteIdea = async ({
         ideaId, userId
     }) => {
-        let ideaHolder = await this.getIdea({ id: ideaId, userId, isPublished: null })
+        // let ideaHolder = await this.getIdea({ id: ideaId, userId, isPublished: null })
+        let ideaHolder = await findIdea({ id: ideaId, isPublished: null, isDrafted: null })
         if(ideaHolder.userId != userId) throw new BadRequest('You don\'t have permission to access resource')
 
         let deleted = await Promise.all([
