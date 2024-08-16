@@ -159,6 +159,7 @@ class AccessService {
         const avatar = user.photos[0].value
 
         const { user: foundUser } = await findUserByEmail(email)
+        if(foundUser.status === 'block') throw new BadRequest('Account is blocked')
         if(foundUser) {
             const payload = {
                 userId: foundUser.id, 
