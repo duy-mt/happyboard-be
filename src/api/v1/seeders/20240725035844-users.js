@@ -16,7 +16,7 @@ module.exports = {
         updatedAt: new Date()
       },
       {
-        email: 'thangvb2@example.com',
+        email: 'bathangvu@gmail.com',
         password: '$2a$10$GyqMakjEG34Jjn76BKQk8eFVwiW1aECKdq4TfVcTZMl6Ph6J0mJEq',
         username: 'Thang Vu Ba',
         avatar: '',
@@ -28,7 +28,7 @@ module.exports = {
         updatedAt: new Date()
       },
       {
-        email: 'khaipn2@example.com',
+        email: 'phanngockhai888@gmail.com',
         password: '$2a$10$GyqMakjEG34Jjn76BKQk8eFVwiW1aECKdq4TfVcTZMl6Ph6J0mJEq',
         username: 'Khai Phan Ngoc',
         avatar: '',
@@ -40,7 +40,7 @@ module.exports = {
         updatedAt: new Date()
       },
       {
-        email: 'duymt3@example.com',
+        email: 'duy.mtdevhust@gmail.com',
         password: '$2a$10$GyqMakjEG34Jjn76BKQk8eFVwiW1aECKdq4TfVcTZMl6Ph6J0mJEq',
         username: 'Duy Mai Tran',
         avatar: '',
@@ -52,7 +52,7 @@ module.exports = {
         updatedAt: new Date()
       },
       {
-        email: 'hungld23@example.com',
+        email: 'laduchung25032005@gmail.com',
         password: '$2a$10$GyqMakjEG34Jjn76BKQk8eFVwiW1aECKdq4TfVcTZMl6Ph6J0mJEq',
         username: 'Hung La Duc',
         avatar: '',
