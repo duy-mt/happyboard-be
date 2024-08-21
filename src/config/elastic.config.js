@@ -1,11 +1,11 @@
 // CLOUD
 const dev = {
     cloud: {
-        id: process.env.DEV_ES_CLOUDID || `355139ffce6342abb1325c087525040e:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJDM0MzE0YTdmMmU5ZDRhYWRiZWE3MWQyZTIzYTk5NmUxJGFmZjk3MmM0OTllMDQ0OWRhNWU0OTE3MWFmOTJhYzNl`
+        id: process.env.DEV_ES_CLOUDID || `355139ffce6342abb1325c087525040e:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvOjQ0MyQzNDMxNGE3ZjJlOWQ0YWFkYmVhNzFkMmUyM2E5OTZlMSRhZmY5NzJjNDk5ZTA0NDlkYTVlNDkxNzFhZjkyYWMzZQ==`
     },
     auth: {
         username: process.env.DEV_ES_USER || `elastic`,
-        password: process.env.DEV_ES_PW || `za9h03ZapB4cicy4bnh4D93A`
+        password: process.env.DEV_ES_PW || `CJHJPBft8P2jp39FpkBzEPgi`
     }
 }
 

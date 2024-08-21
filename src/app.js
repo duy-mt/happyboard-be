@@ -29,7 +29,10 @@ app.use(passport.session())
 
 app.use(morgan('dev'))
 app.use(cors({
-    origin: process.env.DOMAIN_FRONTEND ? process.env.DOMAIN_FRONTEND : 'https://happyboard.io.vn',
+    origin: [
+        "http://localhost:8888", 
+        // process.env.DOMAIN_FRONTEND ? process.env.DOMAIN_FRONTEND : 'https://happyboard.io.vn'
+    ],
     credentials: true
 }))
 app.use(helmet())
