@@ -1,0 +1,68 @@
+version: '3.8'
+services:
+  hp-postgres:
+    image: postgres:latest
+    container_name: hp-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: rootpass
+      POSTGRES_DB: hb
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - hp-network
+
+  hb-elasticsearch:
+    image: elasticsearch:8.14.2
+    container_name: hb-elasticsearch
+    restart: always
+    environment:
+      discovery.type: single-node
+      ELASTIC_PASSWORD: pwelastic
+    ports:
+      - '9200:9200'
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    networks:
+      - hp-network
+    mem_limit: 1g
+
+  hb-redis:
+    image: redis/redis-stack-server:latest
+    container_name: hb-redis
+    restart: always
+    ports:
+      - '6379:6379'
+    volumes:
+      - redisdata:/data
+    networks:
+      - hp-network
+
+  hb-rabbitmq:
+    image: rabbitmq:3-management
+    container_name: hb-rabbitmq
+    restart: always
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    volumes:
+      - rabbitdata:/var/lib/rabbitmq
+    networks:
+      - hp-network
+
+networks:
+  hp-network:
+    driver: bridge
+
+volumes:
+  pgdata:
+    driver: local
+  esdata:
+    driver: local
+  redisdata:
+    driver: local
+  rabbitdata:
+    driver: local
