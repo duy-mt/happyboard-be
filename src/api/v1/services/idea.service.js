@@ -200,7 +200,7 @@ class IdeaService {
     }
 
     static getPopularIdeas = async ({
-        limit = 3
+        limit = 5
     }) => {
         const ideas = await findIdeasByVote({
             limit

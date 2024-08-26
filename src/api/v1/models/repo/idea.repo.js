@@ -7,7 +7,7 @@ const { processReturnedData } = require('../../utils')
 // DEFIND OPTIONS
 const optIdea = {
     order: [
-        ['createdAt', 'DESC'],
+        ['updatedAt', 'DESC'],
         ['id', 'DESC']
     ],
     include: [{
@@ -36,7 +36,7 @@ const optIdea = {
 
 const optIdeaNoComment = {
     order: [
-        ['createdAt', 'DESC'],
+        ['updatedAt', 'DESC'],
         ['id', 'DESC']
     ],
     include: [
@@ -117,7 +117,7 @@ const findAllIdeas = async ({
         limit: 5,
         where: {},
         order: [
-            ['createdAt', 'DESC'],  
+            ['updatedAt', 'DESC'],  
             ['id', 'DESC']
         ],
         include: [
@@ -214,7 +214,7 @@ const findAllOwnIdeas = async ({
         limit: 5,
         where: {},
         order: [
-            ['createdAt', 'DESC'],  
+            ['updatedAt', 'DESC'],  
             ['id', 'DESC']
         ],
         include: [
@@ -365,7 +365,7 @@ const findIdeasByIds = async (ids = []) => {
 const findIdeasByCategoryId = async ({categoryId, limit, ideaId}) => {
     const ideas = await Idea.findAll({
         limit,
-        where: {
+        where: {    
             id: {
                 [Op.not]: ideaId
             },
@@ -381,6 +381,19 @@ const findIdeasByCategoryId = async ({categoryId, limit, ideaId}) => {
 const findIdeasByVote = async ({ limit }) => {
     const ideas = await Idea.findAll({
         limit,
+        where: {
+            [Op.and]: {
+                voteCount: {
+                    [Op.gt]: 5
+                },
+                commentCount: {
+                    [Op.gt]: 5
+                },
+                viewCount: {
+                    [Op.gt]: 10
+                }
+            }
+        },
         ...optIdeaNoComment,
         order: [
             ['voteCount', 'DESC']

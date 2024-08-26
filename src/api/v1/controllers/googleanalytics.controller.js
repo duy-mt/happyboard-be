@@ -3,17 +3,17 @@
 const { OK } = require("../core/success.response")
 const GoogleAnalyticsService = require('../services/google-analytics.service')
 class GoogleAnalyticsController {
-    getViewsByHour = async (req, res, next) => {
+    getViewsByDay = async (req, res, next) => {
         new OK({
             message: 'Get GA views by hour successfully',
-            data: await GoogleAnalyticsService.getViewsByHour()
+            data: await GoogleAnalyticsService.getViewsByDay()
         }).send(res)
     }
 
-    getEventsByHour = async (req, res, next) => {
+    getEventsByDay = async (req, res, next) => {
         new OK({
             message: 'Get GA events by hour successfully',
-            data: await GoogleAnalyticsService.getEventByHour()
+            data: await GoogleAnalyticsService.getEventsByDay()
         }).send(res)
     }
 }
