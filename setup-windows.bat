@@ -61,5 +61,7 @@ docker-compose up -d --build
 
 cd ..
 
+TIMEOUT /T 60
+
 REM Migration db
 npm run reset-db

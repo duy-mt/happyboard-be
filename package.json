@@ -8,7 +8,8 @@
 		"migrate": "npx sequelize db:migrate",
 		"undo": "npx sequelize db:migrate:undo:all",
 		"seed": "npx sequelize db:seed:all",
-		"reset-db": "npm run undo && npm run migrate && npm run seed"
+		"seed-elastic": "node ./setup/migrate-elastic.js",
+		"reset-db": "npm run undo && npm run migrate && npm run seed && npm run seed-elastic"
 	},
 	"keywords": [],
 	"author": "",
