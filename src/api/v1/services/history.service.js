@@ -17,7 +17,7 @@ class HistoryService {
     }
 
     static getAllHistories = async ({
-        userId, limit = 5, page = 1
+        userId, limit = 200, page = 1
     }) => {
         if(!userId) throw new BadRequest('Missing User Id')
         let offset = (page - 1) * limit
