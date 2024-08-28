@@ -81,6 +81,9 @@ class ElasticSearch {
                         }
                     },
                     highlight: {
+                        tags_schema: 'styled',
+                        pre_tags: `<span class='font-semibold'>`,
+                        post_tags: '</span>',
                         fields: {
                             title: {},
                             content: {},

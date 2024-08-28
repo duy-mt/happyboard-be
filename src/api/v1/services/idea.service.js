@@ -223,6 +223,12 @@ class IdeaService {
             
             let ideas = await findIdeasByIds(ideaIds)
 
+            ideas.forEach(idea => {
+                let id = idea.id
+                let highlight = resp.find(e => e._source.id === id).highlight
+                idea.highlight = highlight
+            })
+
             return {
                 totalPage: totalPage,
                 currentPage: page,
