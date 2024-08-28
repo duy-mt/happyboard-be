@@ -61,8 +61,8 @@ class IdeaService {
         return 1
     }
 
-    static getIdea = async ({ id, userId}) => {
-        const idea = await findIdea({id})
+    static getIdea = async ({ id, userId, isPublished = true, isDrafted = false}) => {
+        const idea = await findIdea({id, isPublished, isDrafted})
         if(!idea) throw new BadRequest('Idea is not exist')
         await upView(id)
         const handledComment = sortComment(idea.comments)
