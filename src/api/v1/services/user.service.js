@@ -1,5 +1,6 @@
 'use strict'
 
+const { Op, or } = require('sequelize')
 const { STATUS_USER } = require("../constants")
 const { BadRequest } = require("../core/error.response")
 const { findPermissionsByIds } = require("../models/repo/permission.repo")
@@ -15,32 +16,45 @@ const MailerService = require("./mailer.service")
 
 class UserService {
     static getAllUsers = async ({
-        page = 1, limit = 10 
+        page = 1, limit = 10, email, username, role: roleName, sortBy, orderBy
     }) => {
-        console.log(`page::`, page);
         let offset = (page - 1) * limit
-        let { count, users } = await findAllUsers({
-            offset, limit
-        })
-        console.log(users);
-
+    
+        let query = {
+            offset, limit, where: {}, sortBy, orderBy
+        }
+    
+        if (email) {
+            query.where.email = { [Op.like]: `%${email}%` }
+        }
+        if (username) {
+            query.where.username = { [Op.like]: `%${username}%` }
+        }
+    
+        let { count, users } = await findAllUsers(query)
+    
         users = await Promise.all(
             users.map(async u => {
                 let roleId = u?.id ? await findRoleIdByUserId(u.id) : null
                 let role = roleId ? await findRoleById(roleId) : null
                 u.role = role
+                if(roleName && role?.name !== roleName) return null
                 return u
             })
         )
-        const totalPage = Math.ceil(count / limit)
+    
+        users = users.filter(u => u !== null)
+
+        const totalPage = Math.ceil(count / limit);
         return {
             totalPage,
             currentPage: page,
             pageSize: limit,
             total: count,
             users,
-        }
-    }
+        };
+    };
+    
 
     static getUser = async ({
         userId

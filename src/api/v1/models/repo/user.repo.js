@@ -23,13 +23,21 @@ const createUser = async ({ email, password, username, avatar = '' }) => {
 
 // READ
 const findAllUsers = async ({
-    offset, limit
+    offset, limit, where, sortBy = 'id', orderBy = 'DESC'
 }) => {
+    let attributes = ['id', 'username', 'email', 'avatar', 'status', 'isOnline', 'createdAt', 'updatedAt']
+    let orderBys = ['ASC', 'DESC']
+    let sortBys = ['id', 'createdAt', 'updatedAt']
+
+    if(orderBys.indexOf(orderBy) === -1) orderBy = 'DESC'
+    if(sortBys.indexOf(sortBy) === -1) sortBy = 'id'
+
     const { count, rows: users } = await User.findAndCountAll({
-        attributes: ['id', 'username', 'email', 'avatar', 'status', 'isOnline', 'createdAt', 'updatedAt'],
+        attributes,
         offset,
         limit,
-        order: [['id', 'DESC']]     
+        order: [[sortBy, orderBy]],
+        where  
     })
     
     return {
