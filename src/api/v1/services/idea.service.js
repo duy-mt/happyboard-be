@@ -61,8 +61,8 @@ class IdeaService {
         return 1
     }
 
-    static getIdea = async ({ id, userId, isPublished = true, isDrafted = false}) => {
-        const idea = await findIdea({id, isPublished, isDrafted})
+    static getIdea = async ({ id, userId, isPublished, isDrafted }) => {
+        const idea = await findIdea({ id })
         if(!idea) throw new BadRequest('Idea is not exist')
         await upView(id)
         const handledComment = sortComment(idea.comments)
@@ -412,7 +412,7 @@ class IdeaService {
             obj: prePayload
         })
         // let ideaHolder = await findIdea({ id: ideaId, isPublished: null })
-        let ideaHolder = await this.getIdea({ id: ideaId, userId, isPublished: null })
+        let ideaHolder = await this.getIdea({ id: ideaId, userId })
         if(ideaHolder.userId != userId) throw new BadRequest('[o] You don\'t have permission to execute action')
         let updatedIdea = await updateIdea({
             id: ideaId,
@@ -439,7 +439,7 @@ class IdeaService {
         ideaId, userId
     }) => {
         // let ideaHolder = await this.getIdea({ id: ideaId, userId, isPublished: null })
-        let ideaHolder = await findIdea({ id: ideaId, isPublished: null, isDrafted: null })
+        let ideaHolder = await findIdea({ id: ideaId })
         if(ideaHolder.userId != userId) throw new BadRequest('You don\'t have permission to access resource')
 
         let deleted = await Promise.all([
