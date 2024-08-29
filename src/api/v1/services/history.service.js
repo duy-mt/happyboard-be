@@ -3,6 +3,7 @@
 const { HISTORY_LOGS } = require("../constants")
 const { BadRequest } = require("../core/error.response")
 const { createHistory, findHistoriesByUserId } = require("../models/repo/history.repo")
+const { findUserByUserId } = require("../models/repo/user.repo")
 const { responseHistory } = require('../utils/index')
 
 class HistoryService {
@@ -21,9 +22,18 @@ class HistoryService {
     }) => {
         if(!userId) throw new BadRequest('Missing User Id')
         let offset = (page - 1) * limit
-        const histories = await findHistoriesByUserId({
+        let histories = await findHistoriesByUserId({
             userId, limit, offset
         })
+
+        histories = await Promise.all(histories.map(async item => {
+            let { id, username, email } = await findUserByUserId(item.userTargetId)
+            item.userTarget = {
+                id, username, email
+            }            
+            return item
+        }))
+
         return histories
     }
 }

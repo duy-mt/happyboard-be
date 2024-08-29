@@ -1,5 +1,6 @@
 'use strict'
 
+const { processReturnedData } = require('../../utils')
 const { History } = require('../index')
 
 const queryHistory = {
@@ -30,7 +31,7 @@ const findHistoriesByUserId = async ({
     queryHistory.offset = offset
     queryHistory.where.userId = userId
     const histories = await History.findAll(queryHistory)
-    return histories
+    return processReturnedData(histories)
 }
 
 module.exports = {
