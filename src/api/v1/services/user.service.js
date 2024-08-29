@@ -1,6 +1,6 @@
 'use strict'
 
-const { Op, or } = require('sequelize')
+const { Op, fn, col, where } = require('sequelize')
 const { STATUS_USER } = require("../constants")
 const { BadRequest } = require("../core/error.response")
 const { findPermissionsByIds } = require("../models/repo/permission.repo")
@@ -16,7 +16,7 @@ const MailerService = require("./mailer.service")
 
 class UserService {
     static getAllUsers = async ({
-        page = 1, limit = 10, email, username, role: roleName, sortBy, orderBy
+        page = 1, limit = 10, keyword, role: roleName, sortBy, orderBy
     }) => {
         let offset = (page - 1) * limit
     
@@ -24,11 +24,15 @@ class UserService {
             offset, limit, where: {}, sortBy, orderBy
         }
     
-        if (email) {
-            query.where.email = { [Op.like]: `%${email}%` }
-        }
-        if (username) {
-            query.where.username = { [Op.like]: `%${username}%` }
+        if (keyword) {
+            const lowercaseKeyword = keyword.trim().toLowerCase()
+            query.where = {
+                [Op.or]: [
+                    where(fn('LOWER', col('email')), { [Op.like]: `%${lowercaseKeyword}%` }),
+                    where(fn('LOWER', col('username')), { [Op.like]: `%${lowercaseKeyword}%` }),
+                    where(fn('LOWER', col('phone')), { [Op.like]: `%${lowercaseKeyword}%` }),
+                ],
+            }
         }
     
         let { count, users } = await findAllUsers(query)
