@@ -26,6 +26,10 @@ module.exports = {
             type: Sequelize.STRING,
             defaultValue: ''
         },
+        phone: {
+            type: Sequelize.STRING(10),
+            defaultValue: ''
+        },
         status: {
             type: Sequelize.ENUM('active', 'pending', 'block'),
             defaultValue: 'active'

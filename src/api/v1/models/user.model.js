@@ -16,11 +16,12 @@ module.exports = (sequelize, DataTypes) => {
         email: DataTypes.STRING(50),
         password: DataTypes.STRING(60),
         username: DataTypes.STRING(50),
-        avatar: DataTypes.STRING(50),
+        avatar: DataTypes.STRING,
+        phone: DataTypes.STRING(10),
         status: DataTypes.ENUM('active', 'pending', 'block'),
         isOnline: DataTypes.BOOLEAN,
-        jobPosition: DataTypes.STRING(50),
-        introduce: DataTypes.STRING(50)
+        jobPosition: DataTypes.TEXT,
+        introduce: DataTypes.TEXT
     }, {
         sequelize,
         modelName: 'User',

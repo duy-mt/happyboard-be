@@ -25,7 +25,7 @@ const createUser = async ({ email, password, username, avatar = '' }) => {
 const findAllUsers = async ({
     offset, limit, where, sortBy = 'id', orderBy = 'DESC'
 }) => {
-    let attributes = ['id', 'username', 'email', 'avatar', 'status', 'isOnline', 'createdAt', 'updatedAt']
+    let attributes = ['id', 'username', 'email', 'avatar', 'phone', 'status', 'isOnline', 'createdAt', 'updatedAt']
     let orderBys = ['ASC', 'DESC']
     let sortBys = ['id', 'createdAt', 'updatedAt']
 
