@@ -61,8 +61,8 @@ class IdeaService {
         return 1
     }
 
-    static getIdea = async ({ id, userId}) => {
-        const idea = await findIdea({id})
+    static getIdea = async ({ id, userId, isPublished, isDrafted }) => {
+        const idea = await findIdea({ id, isPublished, isDrafted })
         if(!idea) throw new BadRequest('Idea is not exist')
         await upView(id)
         const handledComment = sortComment(idea.comments)
@@ -160,7 +160,7 @@ class IdeaService {
     }
 
     static getAllPublisedIdeas = async ({
-        limit = 5, page = 1, userId, option = Object.keys(OPTION_SHOW_IDEA)[0], duration
+        limit = 10, page = 1, userId, option = Object.keys(OPTION_SHOW_IDEA)[0], duration
     }) => {
         return await this.getAllIdeas({
             limit, page, userId, option, isPublished: true, duration
@@ -168,7 +168,7 @@ class IdeaService {
     }
 
     static getAllPengindIdeas = async ({
-        limit = 5, page = 1, userId, option = Object.keys(OPTION_SHOW_IDEA)[0], duration
+        limit = 10, page = 1, userId, option = Object.keys(OPTION_SHOW_IDEA)[0], duration
     }) => {
         return await this.getAllIdeas({
             limit, page, userId, option, isPublished: false, isDrafted: false, duration
@@ -186,7 +186,7 @@ class IdeaService {
 
     static getSimilarIdeas = async ({
         ideaId,
-        limit = 3
+        limit = 5
     }) => {
         const idea = await findIdea({ id: ideaId })
         const categoryId = idea?.Category.id
@@ -412,13 +412,15 @@ class IdeaService {
         let userId = payload.userId
         let prePayload = {
             title: payload.title,
-            content: payload.content
+            content: payload.content,
+            isDrafted: payload.isDrafted,
+            isPublished: payload.isPublished
         }
         prePayload = removeField({
             obj: prePayload
         })
         // let ideaHolder = await findIdea({ id: ideaId, isPublished: null })
-        let ideaHolder = await this.getIdea({ id: ideaId, userId, isPublished: null })
+        let ideaHolder = await this.getIdea({ id: ideaId, userId })
         if(ideaHolder.userId != userId) throw new BadRequest('[o] You don\'t have permission to execute action')
         let updatedIdea = await updateIdea({
             id: ideaId,
@@ -445,7 +447,7 @@ class IdeaService {
         ideaId, userId
     }) => {
         // let ideaHolder = await this.getIdea({ id: ideaId, userId, isPublished: null })
-        let ideaHolder = await findIdea({ id: ideaId, isPublished: null, isDrafted: null })
+        let ideaHolder = await findIdea({ id: ideaId })
         if(ideaHolder.userId != userId) throw new BadRequest('You don\'t have permission to access resource')
 
         let deleted = await Promise.all([
@@ -471,7 +473,7 @@ class IdeaService {
 
     // FOR OWN USER
     static getAllOwnIdeas = async ({
-        limit = 5, page = 1, userId, isPublished = null, isDrafted = null
+        limit = 10, page = 1, userId, isPublished = null, isDrafted = null
     }) => {
         let {
             ideas, totalIdea
@@ -503,13 +505,13 @@ class IdeaService {
     }
 
     static getAllOwnHidedIdeas = async ({
-        limit = 5, page = 1, userId,
+        limit = 10, page = 1, userId,
     }) => {
         return await this.getAllOwnIdeas({ limit, page, userId, isPublished: false, isDrafted: false })
     }
 
     static getAllOwnDraftedIdeas = async ({
-        limit = 5, page = 1, userId,
+        limit = 10, page = 1, userId,
     }) => {
         return await this.getAllOwnIdeas({ limit, page, userId, isPublished: false, isDrafted: true })
     }

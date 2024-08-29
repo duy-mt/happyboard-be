@@ -41,7 +41,12 @@ class GoogleAnalyticsService {
                   ...item,
                   date: `${day}/${month}/${year}`
               };
+            }).sort((a, b) => {
+              const [dayA, monthA, yearA] = a.date.split('/');
+              const [dayB, monthB, yearB] = b.date.split('/');
+              return new Date(`${yearA}-${monthA}-${dayA}`) - new Date(`${yearB}-${monthB}-${dayB}`);
             });
+
             return formattedResponse
         } catch (err) {
             console.log(err)
@@ -80,9 +85,12 @@ class GoogleAnalyticsService {
                   ...item,
                   date: `${day}/${month}/${year}`
               };
+            }).sort((a, b) => {
+              const [dayA, monthA, yearA] = a.date.split('/');
+              const [dayB, monthB, yearB] = b.date.split('/');
+              return new Date(`${yearA}-${monthA}-${dayA}`) - new Date(`${yearB}-${monthB}-${dayB}`);
             });
-
-            
+       
             return formattedResponse
         } catch (err) {
             console.log(err)
