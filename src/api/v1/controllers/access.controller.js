@@ -90,7 +90,7 @@ class AccessController {
     }
 
     validateToken = async (req, res, next) => {
-        let data = await AccessService.validateToken(req.query)
+        let data = await AccessService.validateToken(req.params)
         new OK({
             message: 'Validate token successfully!',
             data
