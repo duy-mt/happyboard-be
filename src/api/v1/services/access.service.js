@@ -16,6 +16,7 @@ const {
     generateToken,
 } = require("../utils")
 const MailerService = require("./mailer.service")
+const redisService = require("./redis.service")
 
 class AccessService {
     static login = async ({ email, password, deviceToken }) => {
@@ -248,6 +249,12 @@ class AccessService {
             secretKey: createSecretKey(),
             expireTime: '2h'
         })
+
+        await redisService.setEx({
+            key: `tokenForgotPassword:${user.id}`,
+            duration: 2 * 60 * 60,
+            data: token
+        })
         
         let rs = await MailerService.sendMail({
             toEmail: email, 
@@ -281,6 +288,10 @@ class AccessService {
         let decode = await this.verifyToken({ token, secretKey: createSecretKey() })
         if(!decode) throw new BadRequest('Invalid token')  
         let userId = decode.userId
+
+        let tokenRedisSaved = await redisService.get({ key: `tokenForgotPassword:${userId}` })
+        if(tokenRedisSaved !== token) throw new BadRequest('Invalid token')
+
         if(!new_password) throw new BadRequest('New password is required')
         let result = await updateUserByUserId({
             userId,
@@ -288,7 +299,8 @@ class AccessService {
                 password: createHash(new_password)
             }
         })
-        if(!result) throw new BadRequest('Update password failed') 
+        if(!result) throw new BadRequest('Update password failed')
+        await redisService.delete({ key: `tokenForgotPassword:${userId}` })
         return result
     } 
 

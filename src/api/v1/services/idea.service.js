@@ -37,7 +37,7 @@ class IdeaService {
             userId,
             userTargetId: userId,
             objectTargetId: savedIdea.id,
-            contentIdea: savedIdea.content
+            contentIdea: savedIdea.title
         })
 
         return 1
