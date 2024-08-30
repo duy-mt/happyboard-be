@@ -14,6 +14,7 @@ router.put('/websocket/:userId/online', asyncHandler(userController.updateActivi
 router.use(asyncHandler(authentication))
 ////////////////////////////////////////
 router.get('', authorize(['USR01']), asyncHandler(userController.getAllUsers))
+router.get('/latest-online', authorize(['USR01']), asyncHandler(userController.getLatestUserOnline))
 router.get('/:userId', authorize(['USR01']), asyncHandler(userController.getUser))
 
 router.get('/:userId/role', authorize(['USR01']), asyncHandler(userController.getRole))

@@ -69,6 +69,14 @@ const findUserByUserId = async (userId) => {
     return processReturnedData(user)
 }
 
+const findUsersByUserIds = async (userIds = []) => {
+    let users = await Promise.all(userIds.map(userId => User.findByPk(userId, {
+        attributes: ['id', 'username', 'email', 'avatar', 'phone', 'status', 'isOnline', 'createdAt', 'updatedAt']
+    })))
+
+    return processReturnedData(users)
+}
+
 // UPDATE
 const updateUserByUserId = async ({
     userId, payload = {} 
@@ -96,4 +104,5 @@ module.exports = {
     findUserByEmail,
     findUserByUserId,
     updateUserByUserId,
+    findUsersByUserIds
 }

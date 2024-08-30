@@ -86,7 +86,12 @@ class UserController {
         }).send(res)
     }
 
-    
+    getLatestUserOnline = async (req, res, next) => {
+        new OK({
+            message: 'Get latest user online successfully',
+            data: await UserService.getLatestUserOnline(req.query)
+        }).send(res)
+    }
 }
 
 module.exports = new UserController()

@@ -7,12 +7,13 @@ const { findPermissionsByIds } = require("../models/repo/permission.repo")
 const { findRoleById } = require("../models/repo/role.repo")
 const { findPermissionIdsByRoleIds, findPermissionIdsByRoleId } = require("../models/repo/role_has_permissions.repo")
 const { removeTokenByUserId } = require("../models/repo/token.repo")
-const { findAllUsers, updateUserByUserId, findUserByUserId } = require("../models/repo/user.repo")
+const { findAllUsers, updateUserByUserId, findUserByUserId, findUsersByUserIds } = require("../models/repo/user.repo")
 const { findPermissionsByUserId, createPermission, deletePermissionOfUser } = require("../models/repo/user_has_permissions.repo")
 const { findRoleIdByUserId, updateRole } = require("../models/repo/user_has_roles.repo")
 const { htmlBlockUser } = require("../template")
 const { removeField } = require("../utils")
 const MailerService = require("./mailer.service")
+const RedisService = require('./redis.service')
 
 class UserService {
     static getAllUsers = async ({
@@ -130,6 +131,13 @@ class UserService {
     }) => {
         // Check user isAdmin? if admin -> throw err
         // ...
+
+        await RedisService.ZADD({
+            key: 'latestOnline',
+            value: userId,
+            score: new Date().getTime()
+        })
+
         const usr = await updateUserByUserId({
             userId, payload: { isOnline : isOnline }
         })
@@ -258,6 +266,26 @@ class UserService {
                 email
             })
         })
+    }
+
+    static getLatestUserOnline = async ({
+        page, limit
+    }) => {
+        let latestOnlines = await RedisService.ZRANGE({
+            key: 'latestOnline',
+            page,
+            limit,
+        })
+
+        latestOnlines = latestOnlines.reverse()
+
+        let users = await findUsersByUserIds(latestOnlines)
+        // If user is blocked -> remove
+        users = users.filter(user => {
+            if(user !== null && user.status !== 'block') return user
+        })
+
+        return users
     }
 }
 
