@@ -420,7 +420,7 @@ class IdeaService {
             obj: prePayload
         })
         // let ideaHolder = await findIdea({ id: ideaId, isPublished: null })
-        let ideaHolder = await this.getIdea({ id: ideaId, userId })
+        let ideaHolder = await this.getIdea({ id: ideaId, userId, isPublished: null, isDrafted: null })
         if(ideaHolder.userId != userId) throw new BadRequest('[o] You don\'t have permission to execute action')
         let updatedIdea = await updateIdea({
             id: ideaId,
@@ -428,8 +428,9 @@ class IdeaService {
                 ...prePayload
             }
         })
-        if(ideaHolder.isPublished) {
-            this.unPublishIdea({ ideaId })
+
+        if(updatedIdea.isPublished) {
+            await this.unPublishIdea({ ideaId })
         }
 
         await HistoryService.createHistory({
