@@ -61,7 +61,7 @@ class IdeaService {
         return 1
     }
 
-    static getIdea = async ({ id, userId, isPublished, isDrafted }) => {
+    static getIdea = async ({ id, userId, isPublished = true, isDrafted = false }) => {
         const idea = await findIdea({ id, isPublished, isDrafted })
         if(!idea) throw new BadRequest('Idea is not exist')
         await upView(id)
