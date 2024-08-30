@@ -131,12 +131,13 @@ class UserService {
     }) => {
         // Check user isAdmin? if admin -> throw err
         // ...
-
-        await RedisService.ZADD({
+        if(isOnline) {
+            await RedisService.ZADD({
             key: 'latestOnline',
             value: userId,
-            score: new Date().getTime()
-        })
+                score: new Date().getTime()
+            })
+        }
 
         const usr = await updateUserByUserId({
             userId, payload: { isOnline : isOnline }
