@@ -82,7 +82,7 @@ class ElasticSearch {
                     },
                     highlight: {
                         tags_schema: 'styled',
-                        pre_tags: `<span class='font-semibold'>`,
+                        pre_tags: `<span class='font-extrabold'>`,
                         post_tags: '</span>',
                         fields: {
                             title: {},
