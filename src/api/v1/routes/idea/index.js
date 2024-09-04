@@ -4,34 +4,51 @@ const express = require('express')
 const asyncHandler = require('../../helpers/asyncHandler')
 const ideaController = require('../../controllers/idea.controller')
 const { authentication } = require('../../auth')
+const { authorize } = require('../../middlewares')
 
 const router = express.Router()
 
 router.use(asyncHandler(authentication))
 ////////////////////////////////////////
-router.get('', asyncHandler(ideaController.getAllIdeas))
-router.post('', asyncHandler(ideaController.createIdea))
+// Admin
+router.get('/all', authorize(['IDE02']), asyncHandler(ideaController.getAllIdeas))
+router.get('/pending', authorize(['IDE02']), asyncHandler(ideaController.getAllPendingIdeas))
+router.post('/:ideaId/publish', authorize(['IDE07']), asyncHandler(ideaController.publishIdea))
+router.post('/:ideaId/unpublish', authorize(['IDE07']), asyncHandler(ideaController.unPublishIdea))
+// End Admin
 
-// Publish
-router.get('/published', asyncHandler(ideaController.getAllPublisedIdeas))
-// router.get('/draft/all', asyncHandler(ideaController.getAllDraftIdeas))
+router.get('/own', asyncHandler(ideaController.getAllOwnIdeas))
+router.get('/own/publish', asyncHandler(ideaController.getAllOwnPublishedIdeas))
+router.get('/own/hide', asyncHandler(ideaController.getAllOwnHidedIdeas))
+router.get('/own/hide/:ideaId', asyncHandler(ideaController.getOwnHidedIdea))
+router.get('/own/draft', asyncHandler(ideaController.getAllOwnDraftedIdeas))
+router.get('/own/draft/:ideaId', asyncHandler(ideaController.getOwnDraftedIdea))
+
+
+
+
+router.get('', asyncHandler(ideaController.getAllPublishedIdeas))
+router.post('', authorize(['IDE04']), asyncHandler(ideaController.createIdea))
+router.post('/draft', asyncHandler(ideaController.draftIdea))
+
+
 
 router.get('/popular', asyncHandler(ideaController.getPopularIdeas))
 router.get('/recent', asyncHandler(ideaController.getRecentIdeas))
 router.get('/similar', asyncHandler(ideaController.getSimilarIdeas))
 router.get('/:ideaId', asyncHandler(ideaController.getIdea))
-router.post('/:ideaId/publish', asyncHandler(ideaController.publishIdea))
-router.post('/:ideaId/unpublish', asyncHandler(ideaController.unPublishIdea))
 
 router.get('/:ideaId', asyncHandler(ideaController.getIdea))
+router.put('/:ideaId', asyncHandler(ideaController.updateIdea))
+router.delete('/:ideaId', asyncHandler(ideaController.deleteIdea))
 
 // Comment
 router.get('/:ideaId/comments', asyncHandler(ideaController.getCommentByIdeaId))
-router.post('/:ideaId/comments', asyncHandler(ideaController.createComment))
+router.post('/:ideaId/comments', authorize(['IDE04']), asyncHandler(ideaController.createComment))
 
 // Vote
-router.post('/:ideaId/up', asyncHandler(ideaController.upVoteCount))
-router.post('/:ideaId/down', asyncHandler(ideaController.downVoteCount))
-router.delete('/:ideaId/cancel', asyncHandler(ideaController.cancelVote))
+router.post('/:ideaId/up', authorize(['IDE04']), asyncHandler(ideaController.upVoteCount))
+router.post('/:ideaId/down', authorize(['IDE04']), asyncHandler(ideaController.downVoteCount))
+router.delete('/:ideaId/cancel', authorize(['IDE04']), asyncHandler(ideaController.cancelVote))
 
 module.exports = router

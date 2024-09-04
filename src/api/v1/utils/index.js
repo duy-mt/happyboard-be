@@ -28,8 +28,20 @@ const createRefreshToken = async ({
     return refreshToken
 }
 
+// Shorten
+const generateToken = async ({
+    payload, secretKey, expireTime
+}) => {
+    const token = JWT.sign(payload, secretKey, {
+        algorithm: 'HS256',
+        expiresIn: expireTime
+    })
+
+    return token
+}
+
 const createSecretKey = () => {
-    return process.env.DEV_SECRET_KEY
+    return process.env.DEV_SECRET_KEY ? process.env.DEV_SECRET_KEY : `Happyboard`
 }
 
 const createHash = (input) => {
@@ -73,22 +85,24 @@ const removeUndefinedObject = obj => {
 } 
 
 const removeField = ({
-    obj, field
+    obj, field = []
 }) => {
     Object.keys(obj).forEach(key => {
-        if(obj[key] == null) delete obj[key]
-        if(field.includes(key)) delete obj[key]
+        if(obj[key] == null || obj[key] == undefined) delete obj[key]
+        else if(obj[key].toString().trim() === '') delete obj[key]
+        else if(field.includes(key)) delete obj[key]
     })
 
     return obj
 }
 
 const processReturnedData = (obj) => {
-    obj = obj?.dataValues || obj
+    if(obj == null) return obj
+    obj = JSON.parse(JSON.stringify(obj))
 
     if(Array.isArray(obj)) {
         obj = obj.map(child => {
-            return processReturnedData(child?.dataValues || child)
+            return processReturnedData(child)
         })
     }
 
@@ -96,13 +110,13 @@ const processReturnedData = (obj) => {
         if(obj[key] == null) {
             delete obj[key]
         } else if(Array.isArray(obj[key])) {
-            obj[key] = processReturnedData(obj[key]?.dataValues || obj[key])
+            obj[key] = processReturnedData(obj[key])
         }
     })
 
-    // Convert time
-    if(obj?.createdAt) obj.createdAt = convertTime(obj.createdAt)
-    if(obj?.updatedAt) obj.updatedAt = convertTime(obj.updatedAt)
+    // // Convert time
+    // if(obj?.createdAt) obj.createdAt = convertTime(obj.createdAt)
+    // if(obj?.updatedAt) obj.updatedAt = convertTime(obj.updatedAt)
 
     return obj
 }
@@ -128,7 +142,34 @@ const sortComment = (comments) => {
     return rootComments
 }
 
+const heartbeatSocket = (wss) => {
+    setInterval(() => {
+        wss.clients.forEach((ws) => {
+            if (!ws.isAlive) {
+              console.log('Client is not alive, terminating connection');
+              ws.terminate(); 
+            }
+            ws.isAlive = false;
+            ws.ping(); 
+        });
+    }, 5000)
+}
+
+const convetToTimestamp = (time) => {
+    let types = {
+        m: 60*1000,
+        h: 60*60*1000,
+        d: 24*60*60*1000,
+        M: 30*24*60*60*1000,
+        y: 365*24*60*60*1000
+    }
+    let type = time.slice(-1)
+    let amount = parseInt(time.slice(0, -1))
+    return types[type] * amount
+}
+
 module.exports = {
+    generateToken,
     createAccessToken,
     createRefreshToken,
     createSecretKey,
@@ -140,5 +181,7 @@ module.exports = {
     removeUndefinedObject,
     removeField,
     processReturnedData,
-    sortComment
+    sortComment,
+    heartbeatSocket,
+    convetToTimestamp,
 }

@@ -6,4 +6,5 @@ module.exports = {
     rabbitmq: require('./rabbitmq.config'),
     googleCloud: require('./googleCloud.config'),
     cloudinary: require('./cloudinary.config'),
+    googleAnalytics: require('./google-analytics.config')
 }

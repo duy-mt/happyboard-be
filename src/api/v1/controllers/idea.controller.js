@@ -15,6 +15,80 @@ class IdeaController {
         }).send(res)
     }
 
+    getOwnDraftedIdea = async (req, res, next) => {
+        new OK({
+            message: 'Get drafted idea successfully',
+            data: await IdeaService.getOwnDraftedIdea({
+                id: req.params.ideaId,
+                userId: req.body.userId
+            })
+        }).send(res)
+    }
+
+    getOwnHidedIdea = async (req, res, next) => {
+        new OK({
+            message: 'Get hided idea successfully',
+            data: await IdeaService.getOwnHidedIdea({
+                id: req.params.ideaId,
+                userId: req.body.userId
+            })
+        }).send(res)
+    }
+
+    updateIdea = async (req, res, next) => {
+        new OK({
+            message: 'Update idea successfully',
+            data: await IdeaService.updateIdea({
+                ideaId: req.params.ideaId,
+                payload: req.body
+            })
+        }).send(res)
+    }
+
+    getAllOwnIdeas = async (req, res, next) => {
+        new OK({
+            message: 'Get own ideas successfully',
+            data: await IdeaService.getAllOwnIdeas({
+                limit: req.query?.limit,
+                page: req.query?.page,
+                userId: req.body.userId
+            })
+        }).send(res)
+    }
+
+    getAllOwnPublishedIdeas = async (req, res, next) => {
+        new OK({
+            message: 'Get own published ideas successfully',
+            data: await IdeaService.getAllOwnPublishedIdeas({
+                limit: req.query?.limit,
+                page: req.query?.page,
+                userId: req.body.userId
+            })
+        }).send(res)
+    }
+
+    getAllOwnHidedIdeas = async (req, res, next) => {
+        new OK({
+            message: 'Get own hided ideas successfully',
+            data: await IdeaService.getAllOwnHidedIdeas({
+                limit: req.query?.limit,
+                page: req.query?.page,
+                userId: req.body.userId
+            })
+        }).send(res)
+    }
+
+    getAllOwnDraftedIdeas = async (req, res, next) => {
+        new OK({
+            message: 'Get own drafted ideas successfully',
+            data: await IdeaService.getAllOwnDraftedIdeas({
+                limit: req.query?.limit,
+                page: req.query?.page,
+                userId: req.body.userId
+            })
+        }).send(res)
+    }
+
     getAllIdeas = async (req, res, next) => {
         const {q} = req.query
         if(!q) {
@@ -40,17 +114,68 @@ class IdeaController {
         }
     }
 
-    getAllPublisedIdeas = async (req, res, next) => {
-        new OK({
-            message: 'Get idea successfully',
-            data: await IdeaService.getAllPublisedIdeas(req.body.userId)
-        }).send(res)
+    getAllPublishedIdeas = async (req, res, next) => {
+        console.log(`getAllPublishedIdeas`);
+        const {q} = req.query
+        if(!q) {
+            new OK({
+                message: 'Get publish ideas successfully',
+                data: await IdeaService.getAllPublisedIdeas({
+                    limit: req.query?.limit,
+                    page: req.query?.page,
+                    userId: req.body.userId,
+                    option: req.query?.option
+                })
+            }).send(res)
+        } else {
+            new OK({
+                message: 'Get ideas successfully',
+                data: await IdeaService.searchIdea({
+                    q: req.query.q,
+                    limit: req.query.limit,
+                    page: req.query.page,
+                    userId: req.body.userId,
+                })
+            }).send(res)
+        }
+    }
+
+    getAllPendingIdeas = async (req, res, next) => {
+        const {q} = req.query
+        if(!q) {
+            new OK({
+                message: 'Get draft ideas successfully',
+                data: await IdeaService.getAllPengindIdeas({
+                    limit: req.query?.limit,
+                    page: req.query?.page,
+                    userId: req.body.userId,
+                    option: req.query?.option
+                })
+            }).send(res)
+        } else {
+            new OK({
+                message: 'Get ideas successfully',
+                data: await IdeaService.searchIdea({
+                    q: req.query.q,
+                    limit: req.query.limit,
+                    page: req.query.page,
+                    userId: req.body.userId,
+                })
+            }).send(res)
+        }
     }
 
     createIdea = async (req, res, next) => {
         new Created({
             message: 'Created idea successfully!',
             data: await IdeaService.createIdea(req.body)
+        }).send(res)
+    }
+
+    draftIdea = async (req, res, next) => {
+        new Created({
+            message: 'Drafted idea successfully!',
+            data: await IdeaService.draftIdea(req.body)
         }).send(res)
     }
 
@@ -107,7 +232,7 @@ class IdeaController {
             message: 'Publish successfully',
             data: await IdeaService.publishIdea({
                 ideaId: req.params.ideaId,
-                userId: req.body.userId
+                adminId: req.body.userId
             })
         }).send(res)
     }
@@ -144,6 +269,16 @@ class IdeaController {
             message: 'Get popular ideas successfully',
             data: await IdeaService.getPopularIdeas({
                 limit: req.query.limit
+            })
+        }).send(res)
+    }
+
+    deleteIdea = async (req, res, next) => {
+        new OK({
+            message: 'Delete idea successfully',
+            data: await IdeaService.deleteIdea({
+                ideaId: req.params.ideaId,
+                userId: req.body.userId
             })
         }).send(res)
     }

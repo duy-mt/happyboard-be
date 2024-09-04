@@ -10,7 +10,8 @@ const createUser = async ({ email, password, username, avatar = '' }) => {
             email,
             password,
             username,
-            avatar
+            avatar,
+            status: 'active'
         })
         
         return user.get({ plain: true });
@@ -21,20 +22,36 @@ const createUser = async ({ email, password, username, avatar = '' }) => {
 }
 
 // READ
-const findAllUsers = async () => {
-    const users = await User.findAll({
-        attributes: ['username', 'email', 'avatar', 'status', 'createdAt', 'updatedAt'],
-        raw: true
+const findAllUsers = async ({
+    offset, limit, where, sortBy = 'id', orderBy = 'DESC'
+}) => {
+    let attributes = ['id', 'username', 'email', 'avatar', 'phone', 'status', 'isOnline', 'createdAt', 'updatedAt']
+    let orderBys = ['ASC', 'DESC']
+    let sortBys = ['id', 'createdAt', 'updatedAt']
+
+    if(orderBys.indexOf(orderBy) === -1) orderBy = 'DESC'
+    if(sortBys.indexOf(sortBy) === -1) sortBy = 'id'
+
+    const { count, rows: users } = await User.findAndCountAll({
+        attributes,
+        offset,
+        limit,
+        order: [[sortBy, orderBy]],
+        where  
     })
-    return processReturnedData(users)
+    
+    return {
+        users: processReturnedData(users),
+        count
+    }
 }
 
 const findUserByEmail = async (email) => {
     const user = await User.findOne({ 
-        where: { 
+        where: {    
             email 
         },
-        attributes: ['id', 'email', 'username', 'password', 'avatar', 'status'],
+        attributes: ['id', 'email', 'username', 'password', 'avatar', 'status', 'isOnline'],
         raw: true,
     })
 
@@ -48,23 +65,30 @@ const findUserByEmail = async (email) => {
 }
 
 const findUserByUserId = async (userId) => {
-    const user = await User.findByPk(userId, {
-        raw: true
-    })
-    return user
+    const user = await User.findByPk(userId)
+    return processReturnedData(user)
+}
+
+const findUsersByUserIds = async (userIds = []) => {
+    let users = await Promise.all(userIds.map(userId => User.findByPk(userId, {
+        attributes: ['id', 'username', 'email', 'avatar', 'phone', 'status', 'isOnline', 'createdAt', 'updatedAt']
+    })))
+
+    return processReturnedData(users)
 }
 
 // UPDATE
 const updateUserByUserId = async ({
     userId, payload = {} 
 }) => {
-    const updatedUser = await User.update(
+    if(Object.keys(payload).length === 0) return 1
+    const [updatedUser] = await User.update(
         payload,
         {
             where: {
                 id: userId
             },
-            attributes: ['id', 'email', 'username', 'password', 'avatar', 'status'],
+            attributes: ['id', 'email', 'username', 'password', 'avatar', 'status', 'isOnline'],
             raw: true,
         }
     )
@@ -80,4 +104,5 @@ module.exports = {
     findUserByEmail,
     findUserByUserId,
     updateUserByUserId,
+    findUsersByUserIds
 }

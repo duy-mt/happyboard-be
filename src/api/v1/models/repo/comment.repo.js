@@ -10,7 +10,7 @@ const queryCommentWithReaction = {
     include: [
         {
             model: User,
-            attributes: ['id', 'username', 'email'],
+            attributes: ['id', 'username', 'email', 'avatar'],
         }
     ],
     attributes: { },
@@ -58,9 +58,20 @@ const getCommentById = async (id) => {
         raw: true
     })
 }
+
+const deleteCommentByIdeaId = async (ideaId) => {
+    const deleted = await Comment.destroy({
+        where: {
+            ideaId
+        }
+    })
+    return deleted
+}
+
 module.exports = {
     createComment,
     getCommentsByIdeaId,
     getCommentsByParentId,
-    getCommentById
+    getCommentById,
+    deleteCommentByIdeaId,
 }

@@ -75,10 +75,40 @@ class AccessController {
             maxAge: 10 * 24 * 60 * 60 * 1000
         }).cookie('userId', data.user.id, {
             maxAge: 10 * 24 * 60 * 60 * 1000
-        })
-
+        }).redirect(process.env.DOMAIN_CLIENT ? process.env.DOMAIN_CLIENT : 'https://happyboard.io.vn')
         new Created({
             message: 'Register with google successfully',
+            data
+        }).send(res)
+    }
+
+    sendEmailForgotPW = async (req, res, next) => {
+        new OK({
+            message: 'Send token reset password successfully!',
+            data: await AccessService.forgotPW(req.body)
+        }).send(res)
+    }
+
+    validateToken = async (req, res, next) => {
+        let data = await AccessService.validateToken(req.params)
+        new OK({
+            message: 'Validate token successfully!',
+            data
+        }).send(res)
+    }
+
+    resetPW = async (req, res, next) => {
+        let data = await AccessService.changePW(req.body)
+        new OK({
+            message: 'Update password successfully!',
+            data
+        }).send(res)
+    }
+
+    updatePW = async (req, res, next) => {
+        let data = await AccessService.updatePW(req.body)
+        new OK({
+            message: 'Update password successfully!',
             data
         }).send(res)
     }

@@ -35,6 +35,7 @@ module.exports = (sequelize, DataTypes) => {
         userId: DataTypes.INTEGER,
         categoryId: DataTypes.INTEGER,
         isPublished: DataTypes.BOOLEAN,
+        isDrafted: DataTypes.BOOLEAN,
         voteCount: DataTypes.INTEGER,
         commentCount: DataTypes.INTEGER,
         viewCount: DataTypes.INTEGER,
@@ -42,7 +43,8 @@ module.exports = (sequelize, DataTypes) => {
         sequelize,
         modelName: 'Idea',
         tableName: 'ideas',
-        timestamps: true,
+        // timestamps: true,
+        paranoid: true,
     })
     return Idea
 }

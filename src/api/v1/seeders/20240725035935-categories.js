@@ -4,30 +4,37 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.bulkInsert('categories', [
       {
-        title: 'Công nghệ',
-        description: 'Những ý tưởng liên quan đến công nghệ',
-        icon: 'icon',
+        title: 'Work',
+        description: 'Ideas related to work',
+        icon: 'fa-laptop',
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
-        title: 'Giáo dục',
-        description: 'Những ý tưởng liên quan đến giáo dục',
-        icon: 'icon',
+        title: 'Entertainment',
+        description: 'Ideas related to entertainment',
+        icon: 'fa-icons',
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
-        title: 'Y tế',
-        description: 'Những ý tưởng liên quan đến y tế',
-        icon: 'icon',
+        title: 'Food',
+        description: 'Ideas related to cuisine',
+        icon: 'fa-burger',
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
-        title: 'Môi trường',
-        description: 'Những ý tưởng liên quan đến môi trường',
-        icon: 'icon',
+        title: 'Sport',
+        description: 'Ideas related to sports',
+        icon: 'fa-futbol',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        title: 'Technique',
+        description: 'Ideas related to technology',
+        icon: 'fa-compass-drafting',
         createdAt: new Date(),
         updatedAt: new Date()
       }

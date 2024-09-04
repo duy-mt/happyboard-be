@@ -20,7 +20,8 @@ module.exports = (sequelize, DataTypes) => {
         sequelize,
         modelName: 'Reaction',
         tableName: 'reactions',
-        timestamps: true,
+        // timestamps: true,
+        paranoid: true,
     })
     return Reaction
 }

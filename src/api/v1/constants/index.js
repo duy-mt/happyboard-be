@@ -35,9 +35,38 @@ const OPTION_SHOW_IDEA = {
     'highcomment': 'commentCount'
 }
 
+const STATUS_USER = {
+    block: {
+        roleId: 4,
+        role: 'Pending-User'
+    },
+    pending: {
+        roleId: 4,
+        role: 'Pending-User'
+    },
+    active: {
+        roleId: 3,
+        role: 'User'
+    }
+}
+
+const HISTORY_LOGS = {
+    CI01: 'Create Idea Log',
+    EI01: 'Edit Idea Log',
+    DI01: 'Delete Idea Log',
+    VI01: 'Vote Idea Log',
+    CC01: 'Create Comment Log',
+    EC01: 'Edit Comment Log',
+    DC01: 'Delete Comment Log',
+    RC01: 'Reply Comment Log',
+    RC02: 'Reaction Comment Log',
+}
+
 module.exports = {
     HEADER,
     ROLE_USER,
     REDIS,
     OPTION_SHOW_IDEA,
+    STATUS_USER,
+    HISTORY_LOGS,
 }

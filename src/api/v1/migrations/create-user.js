@@ -26,9 +26,25 @@ module.exports = {
             type: Sequelize.STRING,
             defaultValue: ''
         },
+        phone: {
+            type: Sequelize.STRING(10),
+            defaultValue: ''
+        },
         status: {
             type: Sequelize.ENUM('active', 'pending', 'block'),
-            defaultValue: 'pending'
+            defaultValue: 'active'
+        },
+        isOnline: {
+            type: Sequelize.BOOLEAN,
+            defaultValue: false
+        },
+        jobPosition: {
+            type: Sequelize.TEXT,
+            defaultValue: ''
+        },
+        introduce: {
+            type: Sequelize.TEXT,
+            defaultValue: ''
         },
         createdAt: {
             allowNull: false,
@@ -36,6 +52,10 @@ module.exports = {
         },
         updatedAt: {
             allowNull: false,
+            type: Sequelize.DATE
+        },
+        deletedAt: {
+            allowNull: true,
             type: Sequelize.DATE
         }
         });

@@ -8,5 +8,5 @@ const { cloudinary: config } = require('../../../config')
 cloudinary.config(config)
 
 // Log the configuration
-console.log(cloudinary.config());
+// console.log(cloudinary.config());
 module.exports = cloudinary

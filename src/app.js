@@ -10,6 +10,8 @@ const cors = require('cors')
 const { NotFound } = require('./api/v1/core/error.response')
 const passport = require('passport')
 const session = require('express-session')
+const {v4:uuidv4}= require('uuid')
+const MyLogger = require('./api/v1/loggers/myLogger')
 
 const app = express()
 
@@ -26,7 +28,14 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 app.use(morgan('dev'))
-app.use(cors())
+app.use(cors({
+    origin: [
+        process.env.DOMAIN_CLIENT || "http://localhost:8888",
+        process.env.DOMAIN_ADMIN || "http://localhost:3000"
+        // process.env.DOMAIN_FRONTEND ? process.env.DOMAIN_FRONTEND : 'https://happyboard.io.vn'
+    ],
+    credentials: true
+}))
 app.use(helmet())
 app.use(compression())
 app.use(express.json())
@@ -40,7 +49,19 @@ app.use(cookieParser())
 require('./api/v1/dbs/postgres.init')
 require('./api/v1/dbs/es.init')
 require('./api/v1/dbs/rabbitmq.init')
+require('./api/v1/dbs/websocket.init')
 
+
+// Middleware save log
+app.use((req, res, next) => {
+    req.requestId = uuidv4()
+    MyLogger.log(`input params ::${req.method}`, [
+        req.path,
+        {requestId: req.requestId},
+        req.method === 'POST' ? req.body : req.query
+    ])
+    next()
+})
 
 // INIT ROUTES
 app.use('', require('./api/v1/routes/index'))
@@ -53,12 +74,20 @@ app.use((req, res, next) => {
 app.use((err, req, res, next) => {
     console.log(err) // Log loi
     const statusCode = err.status || 500
+    const resMessage = `${err.status} - ${Date.now() - err.now}ms - Response: ${JSON.stringify(err)}`
+    MyLogger.error(resMessage, [
+        req.path,
+        {requestId: req.requestId},
+        {
+          message: err.message
+        }
+    ])
 
     return res.status(statusCode).json({
         status: 'error',
         code: statusCode,
         message: err.message || 'Internal Server Error',
-        ...err
+        // ...err
     })
 })
 

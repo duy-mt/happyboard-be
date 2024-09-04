@@ -2,7 +2,9 @@
 
 const { Conflict, BadRequest, Unauthorized } = require("../core/error.response")
 const { createNewToken, updatePairToken, removeTokenById, findTokenByRefreshToken, removeTokenByAccessToken } = require("../models/repo/token.repo")
-const { findUserByEmail, createUser } = require("../models/repo/user.repo")
+const { findUserByEmail, createUser, updateUserByUserId, findUserByUserId } = require("../models/repo/user.repo")
+const { createRole } = require("../models/repo/user_has_roles.repo")
+const { htmlForgotPW } = require("../template")
 const { 
     createAccessToken, 
     createSecretKey, 
@@ -11,7 +13,10 @@ const {
     compareHash,
     verifyJWT,
     removeField,
+    generateToken,
 } = require("../utils")
+const MailerService = require("./mailer.service")
+const redisService = require("./redis.service")
 
 class AccessService {
     static login = async ({ email, password, deviceToken }) => {
@@ -19,7 +24,10 @@ class AccessService {
         if(!email || !password) throw new BadRequest('Email and password are required')
         const { password: foundPW, user: foundUser } = await findUserByEmail(email)
         if(!foundUser) throw new Conflict('Account does not exist')
-        // 2.Match pw
+        // 2.Match status pw
+
+        if(foundUser.status === 'block') throw new BadRequest('Account is blocked')
+
         const isPw = await compareHash(password, foundPW)
         if(!isPw) throw new BadRequest('Password is incorrect')
 
@@ -55,6 +63,7 @@ class AccessService {
     static signUp = async ({
         email, password, username
     }) => {
+        if(!email || !password) throw new BadRequest('Missing Email Or Password')
         const holderUser = await findUserByEmail(email)
         console.log(holderUser);
         if(holderUser.user) throw new Conflict('Account already exists')
@@ -64,6 +73,11 @@ class AccessService {
         })
 
         if(newUser) {
+            // Add role user
+            await createRole({
+                userId: newUser.id
+            })
+            
             const payload = {
                 userId: newUser.id, 
                 email,
@@ -146,6 +160,7 @@ class AccessService {
         const avatar = user.photos[0].value
 
         const { user: foundUser } = await findUserByEmail(email)
+        if(foundUser?.status === 'block') throw new BadRequest('Account is blocked')
         if(foundUser) {
             const payload = {
                 userId: foundUser.id, 
@@ -180,6 +195,10 @@ class AccessService {
             })
 
             if(newUser) {
+                await createRole({
+                    userId: newUser.id
+                })
+
                 const payload = {
                     userId: newUser.id, 
                     email,
@@ -209,6 +228,100 @@ class AccessService {
                 }
             }   
         }
+    }
+
+    static forgotPW = async ({email}) => {
+        if(!email) throw new BadRequest('Email is required!') 
+        let { user } = await findUserByEmail(email)
+        if(!user) throw new BadRequest('Account is not exist!')
+
+        let info = {
+            email,
+            userId: user.id,
+            time: Date.now()
+        }
+
+        // Save info in redis (expireTime: 1d)
+        
+        // Gen token
+        let token = await generateToken({
+            payload: info,
+            secretKey: createSecretKey(),
+            expireTime: '2h'
+        })
+
+        await redisService.setEx({
+            key: `tokenForgotPassword:${user.id}`,
+            duration: 2 * 60 * 60,
+            data: token
+        })
+        
+        let rs = await MailerService.sendMail({
+            toEmail: email, 
+            subject: '[HappyBoard]: Reset your password at HappyBoard', 
+            text: 'Email Verification',
+            html: await htmlForgotPW({
+                email, token
+            })
+        })
+
+        return rs
+    }
+
+    static verifyToken = async ({ token, secretKey }) => {
+        try {
+            const decode = await verifyJWT({token, secretKey})
+            return decode
+        } catch (error) {
+            return null
+        }
+    }
+
+    static validateToken = async ({ token }) => {
+        let decode = await this.verifyToken({ token, secretKey: createSecretKey() })
+        if(!decode) throw new BadRequest('Invalid token')
+        return 1
+    }
+
+    static changePW = async ({ new_password, token }) => {
+        // 1. Validate Token
+        let decode = await this.verifyToken({ token, secretKey: createSecretKey() })
+        if(!decode) throw new BadRequest('Invalid token')  
+        let userId = decode.userId
+
+        let tokenRedisSaved = await redisService.get({ key: `tokenForgotPassword:${userId}` })
+        if(tokenRedisSaved !== token) throw new BadRequest('Invalid token')
+
+        if(!new_password) throw new BadRequest('New password is required')
+        let result = await updateUserByUserId({
+            userId,
+            payload: {
+                password: createHash(new_password)
+            }
+        })
+        if(!result) throw new BadRequest('Update password failed')
+        await redisService.delete({ key: `tokenForgotPassword:${userId}` })
+        return result
+    } 
+
+    static updatePW = async ({ userId, old_password, new_password }) => {
+        new_password = new_password.trim()
+        if(!old_password || !new_password) throw new BadRequest('Old password and new password are required')
+        let userHolder = await findUserByUserId(userId)
+        if(!userHolder) throw new BadRequest('Account is not exist')
+        let foundPW = userHolder.password
+        // Check pw
+        const isPw = await compareHash(old_password, foundPW)
+        if(!isPw) throw new BadRequest('Password is incorrect')
+
+        let result = await updateUserByUserId({
+            userId,
+            payload: {
+                password: createHash(new_password)
+            }
+        })
+        if(!result) throw new BadRequest('Update password failed') 
+        return result
     }
 }
 
