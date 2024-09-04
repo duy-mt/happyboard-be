@@ -16,11 +16,11 @@ const dev = {
 // LOCAL
 const prod = {
     cloud: {
-        id: process.env.CLOUD_ES_CLOUDID || "7d1b9e121d9b4841ad13ad91aa294073:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvOjQ0MyQ2MTM2YWE3ZmFjOTU0MzBmYjY3YzBiYTBmMzVlNTk0YiRjMjA0YTkzYzAxYmI0OWRmYmY3YWIxYjJlNTkwOWU1Yg=="
+        id: process.env.CLOUD_ES_CLOUDID || "Happyboard_ES:YXNpYS1zb3V0aGVhc3QxLmdjcC5lbGFzdGljLWNsb3VkLmNvbTo0NDMkZmI1ZGNkYjNiNTZkNDQzZWI5ODRmY2NiM2Y1ZGVmMDMkMmJmYjhlZDFjMGZjNDJkNTkzODljYTM3NGRhMDFhOTM="
     },
     auth: {
         username: process.env.CLOUD_ES_USER ||  "elastic",
-        password: process.env.CLOUD_ES_PW || "GB2IoSw4Ct9bQWdCrHjqexr7"
+        password: process.env.CLOUD_ES_PW || "kaa1nhPE4WhMtHHyOStCXDVu"
     }
 }
 
@@ -28,6 +28,6 @@ const config = {
     dev, prod
 }
 
-const env = process.env.NODE_ENV || 'dev'
+const env = process.env.NODE_ENV || 'prod'
 
 module.exports = config[env]
