@@ -61,7 +61,7 @@ class IdeaService {
         return 1
     }
 
-    static getIdea = async ({ id, userId, isPublished = true, isDrafted = false }) => {
+    static getIdea = async ({ id, userId, isPublished = null, isDrafted = null }) => {
         const idea = await findIdea({ id, isPublished, isDrafted })
         if(!idea) throw new BadRequest('Idea is not exist')
         await upView(id)
@@ -133,12 +133,12 @@ class IdeaService {
     }
 
     static getAllIdeas = async ({
-        limit = 5, page = 1, userId, option = Object.keys(OPTION_SHOW_IDEA)[0], isPublished = null, isDrafted = false
+        limit = 5, page = 1, userId, option = Object.keys(OPTION_SHOW_IDEA)[0], categories = null, isPublished = null, isDrafted = false
     }) => {
         let fieldSort = OPTION_SHOW_IDEA[option]
         let {
             ideas, totalIdea
-        } = await findAllIdeas({ limit, page, fieldSort, isPublished, isDrafted })
+        } = await findAllIdeas({ limit, page, fieldSort, categories, isPublished, isDrafted })
 
         for(let i = 0; i < ideas.length; i++) {
             let status = await VoteService.getStatusVote({
@@ -160,10 +160,10 @@ class IdeaService {
     }
 
     static getAllPublisedIdeas = async ({
-        limit = 10, page = 1, userId, option = Object.keys(OPTION_SHOW_IDEA)[0], duration
+        limit = 10, page = 1, userId, option = Object.keys(OPTION_SHOW_IDEA)[0], categories = null, duration
     }) => {
         return await this.getAllIdeas({
-            limit, page, userId, option, isPublished: true, duration
+            limit, page, userId, option, isPublished: true, categories, duration
         })
     }
 
@@ -287,19 +287,21 @@ class IdeaService {
                     targetId: ideaId
                 }
             }
-            await MessageQueue.send({
-                nameExchange: 'post_notification',
-                message: data
-            })
+            if (idea.userId  != receiver){ 
 
-            await HistoryService.createHistory({
-                type: 'VI01',
-                userId,
-                userTargetId: receiver,
-                objectTargetId: ideaId,
-                contentIdea: idea.title
-            })
-            console.log(`Send msg`);
+                await MessageQueue.send({
+                    nameExchange: 'post_notification',
+                    message: data
+                })
+    
+                await HistoryService.createHistory({
+                    type: 'VI01',
+                    userId,
+                    userTargetId: receiver,
+                    objectTargetId: ideaId,
+                    contentIdea: idea.title
+                })
+            }
         }
 
         return {
@@ -313,17 +315,20 @@ class IdeaService {
 
         const idea = await findIdea({id: ideaId})
         const receiver = await findUserIdByIdeaId({ id: ideaId })
-        await HistoryService.createHistory({
-            type: 'VI01',
-            userId,
-            userTargetId: receiver,
-            objectTargetId: ideaId,
-            contentIdea: idea.title
-        })
-        return await decrementVoteCount({
-            ideaId,
-            userId
-        })
+        if (idea.userId != receiver){
+
+            await HistoryService.createHistory({
+                type: 'VI01',
+                userId,
+                userTargetId: receiver,
+                objectTargetId: ideaId,
+                contentIdea: idea.title
+            })
+            return await decrementVoteCount({
+                ideaId,
+                userId
+            })
+        }
     }
 
     static cancelVote = async ({

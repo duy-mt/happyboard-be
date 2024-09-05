@@ -33,19 +33,22 @@ class CommentService {
 
         const receiver = await findUserIdByIdeaId({ id: ideaId })
 
-        const data = {
-            sender: userId,
-            receiver: receiver.toString(),
-            target: 'idea',
-            action: 'comment',
-            metadata: {
-                targetId: ideaId
+        if (ideaHolder.userId != receiver) {
+
+            const data = {
+                sender: userId,
+                receiver: receiver.toString(),
+                target: 'idea',
+                action: 'comment',
+                metadata: {
+                    targetId: ideaId
+                }
             }
+            await MessageQueue.send({
+                nameExchange: 'post_notification',
+                message: data
+            })
         }
-        await MessageQueue.send({
-            nameExchange: 'post_notification',
-            message: data
-        })
 
         const savedComment = await createComment({
             content, userId, ideaId, parentId
@@ -108,20 +111,24 @@ class CommentService {
 
         const receiver = cmt.userId
 
-        const data = {
-            sender: userId,
-            receiver: receiver.toString(),
-            target: 'comment',
-            action: 'reaction',
-            metadata: {
-                targetId: commentId
+        if (idea.userId != receiver) {
+
+            const data = {
+                sender: userId,
+                receiver: receiver.toString(),
+                target: 'comment',
+                action: 'reaction',
+                metadata: {
+                    targetId: commentId
+                }
             }
+            
+            await MessageQueue.send({
+                nameExchange: 'post_notification',
+                message: data
+            })
         }
-        
-        await MessageQueue.send({
-            nameExchange: 'post_notification',
-            message: data
-        })
+
 
         await HistoryService.createHistory({
             type: 'RC02',
