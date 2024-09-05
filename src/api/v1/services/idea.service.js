@@ -133,12 +133,12 @@ class IdeaService {
     }
 
     static getAllIdeas = async ({
-        limit = 5, page = 1, userId, option = Object.keys(OPTION_SHOW_IDEA)[0], isPublished = null, isDrafted = false
+        limit = 5, page = 1, userId, option = Object.keys(OPTION_SHOW_IDEA)[0], categories = null, isPublished = null, isDrafted = false
     }) => {
         let fieldSort = OPTION_SHOW_IDEA[option]
         let {
             ideas, totalIdea
-        } = await findAllIdeas({ limit, page, fieldSort, isPublished, isDrafted })
+        } = await findAllIdeas({ limit, page, fieldSort, categories, isPublished, isDrafted })
 
         for(let i = 0; i < ideas.length; i++) {
             let status = await VoteService.getStatusVote({
@@ -160,10 +160,10 @@ class IdeaService {
     }
 
     static getAllPublisedIdeas = async ({
-        limit = 10, page = 1, userId, option = Object.keys(OPTION_SHOW_IDEA)[0], duration
+        limit = 10, page = 1, userId, option = Object.keys(OPTION_SHOW_IDEA)[0], categories = null, duration
     }) => {
         return await this.getAllIdeas({
-            limit, page, userId, option, isPublished: true, duration
+            limit, page, userId, option, isPublished: true, categories, duration
         })
     }
 

@@ -110,28 +110,62 @@ const findPendingIdea = async ({ id }) => {
 }
 
 const findAllIdeas = async ({
-    limit, page, fieldSort, isPublished = true, isDrafted = false
+    limit, page, fieldSort, categories = null, isPublished = true, isDrafted = false
 }) => {
-    let queryFindIdeas = {
-        offset: 0,
-        limit: 5,
-        where: {},
-        order: [
-            ['updatedAt', 'DESC'],  
-            ['id', 'DESC']
-        ],
-        include: [
-            {
-                model: User,
-                attributes: ['id', 'username', 'email', 'avatar']
+    let queryFindIdeas;
+    if (!categories){
+
+        queryFindIdeas = {
+            offset: 0,
+            limit: 5,
+            where: {
             },
-            {
-                model: Category,
-                attributes: ['id', 'title', 'icon']
+            order: [
+                ['updatedAt', 'DESC'],  
+                ['id', 'DESC']
+            ],
+            include: [
+                {
+                    model: User,
+                    attributes: ['id', 'username', 'email', 'avatar']
+                },
+                {
+                    model: Category,
+                    attributes: ['id', 'title', 'icon'],
+                }
+            ],
+            attributes: {
+                exclude: ['categoryId', 'userId'],
             }
-        ],
-        attributes: {
-            exclude: ['categoryId', 'userId'],
+        }
+    } else {
+        queryFindIdeas = {
+            offset: 0,
+            limit: 5,
+            where: {
+            },
+            order: [
+                ['updatedAt', 'DESC'],  
+                ['id', 'DESC']
+            ],
+            include: [
+                {
+                    model: User,
+                    attributes: ['id', 'username', 'email', 'avatar']
+                },
+                {
+                    model: Category,
+                    attributes: ['id', 'title', 'icon'],
+                    where: {
+                        title: {
+                            [Op.in]: categories.split(',').map(cat => cat.trim())
+                        }
+                    }
+                }
+            ],
+            attributes: {
+                exclude: ['categoryId', 'userId'],
+            }
         }
     }
     let offset = (page - 1) * limit
