@@ -61,7 +61,7 @@ class IdeaService {
         return 1
     }
 
-    static getIdea = async ({ id, userId, isPublished = true, isDrafted = false }) => {
+    static getIdea = async ({ id, userId, isPublished = null, isDrafted = null }) => {
         const idea = await findIdea({ id, isPublished, isDrafted })
         if(!idea) throw new BadRequest('Idea is not exist')
         await upView(id)
@@ -287,19 +287,21 @@ class IdeaService {
                     targetId: ideaId
                 }
             }
-            await MessageQueue.send({
-                nameExchange: 'post_notification',
-                message: data
-            })
+            if (idea.userId  != receiver){ 
 
-            await HistoryService.createHistory({
-                type: 'VI01',
-                userId,
-                userTargetId: receiver,
-                objectTargetId: ideaId,
-                contentIdea: idea.title
-            })
-            console.log(`Send msg`);
+                await MessageQueue.send({
+                    nameExchange: 'post_notification',
+                    message: data
+                })
+    
+                await HistoryService.createHistory({
+                    type: 'VI01',
+                    userId,
+                    userTargetId: receiver,
+                    objectTargetId: ideaId,
+                    contentIdea: idea.title
+                })
+            }
         }
 
         return {
@@ -313,17 +315,20 @@ class IdeaService {
 
         const idea = await findIdea({id: ideaId})
         const receiver = await findUserIdByIdeaId({ id: ideaId })
-        await HistoryService.createHistory({
-            type: 'VI01',
-            userId,
-            userTargetId: receiver,
-            objectTargetId: ideaId,
-            contentIdea: idea.title
-        })
-        return await decrementVoteCount({
-            ideaId,
-            userId
-        })
+        if (idea.userId != receiver){
+
+            await HistoryService.createHistory({
+                type: 'VI01',
+                userId,
+                userTargetId: receiver,
+                objectTargetId: ideaId,
+                contentIdea: idea.title
+            })
+            return await decrementVoteCount({
+                ideaId,
+                userId
+            })
+        }
     }
 
     static cancelVote = async ({

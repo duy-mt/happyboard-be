@@ -416,7 +416,7 @@ const findIdeasByVote = async ({ limit }) => {
     const ideas = await Idea.findAll({
         limit,
         where: {
-            [Op.and]: {
+            [Op.or]: {
                 voteCount: {
                     [Op.gt]: 5
                 },
@@ -424,7 +424,7 @@ const findIdeasByVote = async ({ limit }) => {
                     [Op.gt]: 5
                 },
                 viewCount: {
-                    [Op.gt]: 10
+                    [Op.gt]: 5
                 }
             }
         },
