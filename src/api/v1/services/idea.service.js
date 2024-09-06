@@ -335,6 +335,10 @@ class IdeaService {
     static upVoteCount = async ({ ideaId, userId }) => {
         // 0. find idea
         const idea = await findIdea({ id: ideaId })
+        if (idea.isDrafted == true || idea.isPublished == false) {
+            throw new BadRequest(`Idea is pending or draft, you can't vote this`)
+        }
+
         // 1. Up vote
         let { voteCount, updated } = await increaseVoteCount({
             ideaId,
@@ -375,6 +379,9 @@ class IdeaService {
 
     static downVoteCount = async ({ ideaId, userId }) => {
         const idea = await findIdea({ id: ideaId })
+        if (idea.isDrafted == true || idea.isPublished == false) {
+            throw new BadRequest(`Idea is pending or draft, you can't vote this`)
+        }
         const receiver = await findUserIdByIdeaId({ id: ideaId })
         if (idea.userId != receiver) {
             await HistoryService.createHistory({
@@ -393,6 +400,9 @@ class IdeaService {
 
     static cancelVote = async ({ ideaId, userId }) => {
         const idea = await findIdea({ id: ideaId })
+        if (idea.isDrafted == true || idea.isPublished == false) {
+            throw new BadRequest(`Idea is pending or draft, you can't vote this`)
+        }
         const receiver = await findUserIdByIdeaId({ id: ideaId })
         await HistoryService.createHistory({
             type: 'VI01',
