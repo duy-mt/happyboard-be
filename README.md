@@ -19,14 +19,16 @@ This is a backend system designed to support a web application that allows users
 - npm
 - PostgreSQL database
 - AWS CLI
+- Docker 
 
-## Installation
+## Install & Run (Window)
 
 1. Clone the repository:
 git clone https://github.com/duy-mt/happyboard-be.git
 Build and develop code on dev branch, then push it to production, final version
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
@@ -34,15 +36,13 @@ npm install
 3. Set up environment variables:
 Copy the `.env.example` file to `.env` and fill in the required values.
 
-4. Run database migrations
-
-5. Seed the database
-
-6. Start the server
-
-## API Documentation
-
-## Deployment Guide
+4. Run file setup-windows.bat
+```bash
+cd happyboard-be
+```
+```bash
+setup-windows.bat
+```
 
 
 
