@@ -31,6 +31,8 @@ const CommentService = require('./comment.service')
 const HistoryService = require('./history.service')
 
 class IdeaService {
+    // CREATE IDEA
+
     static createIdea = async ({
         title,
         content,
@@ -90,66 +92,66 @@ class IdeaService {
         return 1
     }
 
-    static getIdea = async ({
-        id,
-        userId,
-        isPublished = null,
-        isDrafted = null,
-    }) => {
-        const idea = await findIdea({ id, isPublished, isDrafted })
-        if (!idea) throw new BadRequest('Idea is not exist')
-        if (idea.isDrafted === false || idea.isPublished === false) await upView(id)
-        const handledComment = sortComment(idea.comments)
+    // GET AN IDEA
 
-        let status = await VoteService.getStatusVote({
-            ideaId: idea.id,
+    static getPublishIdea = async ({ id, userId }) => {
+        let idea = await this.getIdea({
+            id,
             userId,
+            isPublished: true,
+            isDrafted: false,
         })
-        idea.vote = status
 
-        const handledIdea = {
-            ...idea,
-            comments: handledComment,
-        }
-        let key = `user:${userId}:currentIdeas`
+        await upView(id)
+
+        let key = `user:${userId}:recentIdeas`
         await RedisService.ZADD({
             key,
             value: `${idea.id}`,
             score: Date.now(),
         })
-        return handledIdea
+
+        return idea
     }
 
     static getOwnDraftedIdea = async ({ id, userId }) => {
-        const idea = await findIdea({ id, isPublished: false, isDrafted: true })
-        if (!idea) throw new BadRequest('Idea is not exist')
-        const handledComment = sortComment(idea.comments)
-
-        let status = await VoteService.getStatusVote({
-            ideaId: idea.id,
+        let idea = await this.getIdea({
+            id,
             userId,
+            isPublished: false,
+            isDrafted: true,
         })
-        idea.vote = status
 
-        const handledIdea = {
-            ...idea,
-            comments: handledComment,
-        }
-        // await RedisService.ZADD({
-        //     key: `currentIdeas:${userId}`,
-        //     value: `${idea.id}`,
-        //     score: Date.now()
-        // })
-        return handledIdea
+        // Prevent other user read pending idea
+        if (idea.userId != userId)
+            throw new Forbidden(
+                'You do not have permission to access this resource',
+            )
+
+        return idea
     }
 
     static getOwnHidedIdea = async ({ id, userId }) => {
-        const idea = await findIdea({
+        let idea = await this.getIdea({
             id,
+            userId,
             isPublished: false,
             isDrafted: false,
         })
+
+        // Prevent other user read pending idea
+        if (idea.userId != userId)
+            throw new Forbidden(
+                'You do not have permission to access this resource',
+            )
+
+        return idea
+    }
+
+    static getIdea = async ({ id, userId, isPublished, isDrafted }) => {
+        const idea = await findIdea({ id, isPublished, isDrafted })
         if (!idea) throw new BadRequest('Idea is not exist')
+
         const handledComment = sortComment(idea.comments)
 
         let status = await VoteService.getStatusVote({
@@ -162,13 +164,11 @@ class IdeaService {
             ...idea,
             comments: handledComment,
         }
-        // await RedisService.ZADD({
-        //     key: `currentIdeas:${userId}`,
-        //     value: `${idea.id}`,
-        //     score: Date.now()
-        // })
+
         return handledIdea
     }
+
+    // GET MANY IDEA
 
     static getAllIdeas = async ({
         limit = 5,
@@ -255,9 +255,17 @@ class IdeaService {
     }
 
     static getSimilarIdeas = async ({ ideaId, limit = 5 }) => {
-        const idea = await findIdea({ id: ideaId })
+        const idea = await findIdea({
+            id: ideaId,
+            isPublished: true,
+            isDrafted: false,
+        })
+
+        if (!idea) throw new BadRequest('Not found idea')
+
         const categoryId = idea?.Category.id
-        if (!categoryId) throw new BadRequest('Not found category')
+        if (!categoryId) throw new BadRequest('Not found category of idea')
+
         const ideas = await findIdeasByCategoryId({
             categoryId,
             limit,
@@ -273,6 +281,7 @@ class IdeaService {
         return ideas
     }
 
+    // VOTE
     static searchIdea = async ({
         q,
         limit = 5,
@@ -333,57 +342,59 @@ class IdeaService {
     }
 
     static upVoteCount = async ({ ideaId, userId }) => {
-        // 0. find idea
-        const idea = await findIdea({ id: ideaId })
-        if (idea.isDrafted == true || idea.isPublished == false) {
-            throw new BadRequest(`Idea is pending or draft, you can't vote this`)
-        }
+        // 0. Find idea
+        const idea = await this.getPublishIdea({ id: ideaId, userId })
+        if (idea.vote !== 'up') {
+            // 1. UP VOTE
+            let { voteCount, updated } = await increaseVoteCount({
+                ideaId,
+                userId,
+            })
 
-        // 1. Up vote
-        let { voteCount, updated } = await increaseVoteCount({
-            ideaId,
-            userId,
-        })
-        // 2. Send notification
-        if (updated) {
-            const receiver = await findUserIdByIdeaId({ id: ideaId })
-            const data = {
-                sender: userId,
-                receiver: receiver.toString(),
-                target: 'idea',
-                action: 'up',
-                metadata: {
-                    targetId: ideaId,
-                },
+            // 2. Send notification
+            if (updated) {
+                const receiver = idea.User.id
+                const data = {
+                    sender: userId,
+                    receiver: receiver.toString(),
+                    target: 'idea',
+                    action: 'up',
+                    metadata: {
+                        targetId: ideaId,
+                    },
+                }
+                if (idea.userId != receiver) {
+                    await MessageQueue.send({
+                        nameExchange: 'post_notification',
+                        message: data,
+                    })
+
+                    await HistoryService.createHistory({
+                        type: 'VI01',
+                        userId,
+                        userTargetId: receiver,
+                        objectTargetId: ideaId,
+                        contentIdea: idea.title,
+                    })
+                }
             }
-            if (parseInt(userId) !== receiver) {
-                await MessageQueue.send({
-                    nameExchange: 'post_notification',
-                    message: data,
-                })
 
-                await HistoryService.createHistory({
-                    type: 'VI01',
-                    userId,
-                    userTargetId: receiver,
-                    objectTargetId: ideaId,
-                    contentIdea: idea.title,
-                })
+            return {
+                voteCount,
             }
-        }
-
-        return {
-            voteCount,
+        } else {
+            return {
+                voteCount: idea.voteCount,
+            }
         }
     }
 
     static downVoteCount = async ({ ideaId, userId }) => {
-        const idea = await findIdea({ id: ideaId })
-        if (idea.isDrafted == true || idea.isPublished == false) {
-            throw new BadRequest(`Idea is pending or draft, you can't vote this`)
-        }
-        const receiver = await findUserIdByIdeaId({ id: ideaId })
-        if (parseInt(userId) !== receiver) {
+        const idea = await this.getPublishIdea({ id: ideaId, userId })
+        // SAVE HISTORY
+
+        if (idea.vote !== 'down') {
+            let receiver = idea.User.id
             await HistoryService.createHistory({
                 type: 'VI01',
                 userId,
@@ -391,30 +402,39 @@ class IdeaService {
                 objectTargetId: ideaId,
                 contentIdea: idea.title,
             })
+
             return await decrementVoteCount({
                 ideaId,
                 userId,
             })
+        } else {
+            return {
+                voteCount: idea.voteCount,
+            }
         }
     }
 
     static cancelVote = async ({ ideaId, userId }) => {
-        const idea = await findIdea({ id: ideaId })
-        if (idea.isDrafted == true || idea.isPublished == false) {
-            throw new BadRequest(`Idea is pending or draft, you can't vote this`)
+        const idea = await this.getPublishIdea({ id: ideaId, userId })
+
+        if (idea.vote !== null) {
+            const receiver = await idea.User.id
+            await HistoryService.createHistory({
+                type: 'VI01',
+                userId,
+                userTargetId: receiver,
+                objectTargetId: ideaId,
+                contentIdea: idea.title,
+            })
+            return await cancelVote({
+                ideaId,
+                userId,
+            })
+        } else {
+            return {
+                voteCount: idea.voteCount,
+            }
         }
-        const receiver = await findUserIdByIdeaId({ id: ideaId })
-        await HistoryService.createHistory({
-            type: 'VI01',
-            userId,
-            userTargetId: receiver,
-            objectTargetId: ideaId,
-            contentIdea: idea.title,
-        })
-        return await cancelVote({
-            ideaId,
-            userId,
-        })
     }
 
     static publishIdea = async ({ ideaId, adminId }) => {
@@ -490,8 +510,6 @@ class IdeaService {
         let ideaHolder = await this.getIdea({
             id: ideaId,
             userId,
-            isPublished: null,
-            isDrafted: null,
         })
         if (ideaHolder.userId != userId)
             throw new BadRequest(
