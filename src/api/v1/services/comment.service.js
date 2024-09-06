@@ -30,6 +30,9 @@ class CommentService {
         let ideaHolder = await findIdea({
             id: ideaId,
         })
+        if (ideaHolder.isDrafted == true || ideaHolder.isPublished == false) {
+            throw new BadRequest(`Idea is pending or draft, you can't vote this`)
+        }
         if (!ideaHolder)
             throw new BadRequest("Idea is not exist! So don't create comment")
         let type = 'CC01'
@@ -116,7 +119,10 @@ class CommentService {
         let cmt = await getCommentById(commentId)
         if (!cmt) throw new BadRequest('Comment is not exist!')
         let idea = await findIdea({ id: cmt.ideaId })
-        if (!idea) throw new BadRequest('Comment is not exist!')
+        if (!idea) throw new BadRequest('Idea is not exist!')
+        if (idea.isDrafted == true || idea.isPublished == false) {
+            throw new BadRequest(`Idea is pending or draft, you can't vote this`)
+        }
         const r = await updateReaction({
             commentId,
             userId,
