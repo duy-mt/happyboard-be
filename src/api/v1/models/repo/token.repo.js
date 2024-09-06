@@ -1,7 +1,9 @@
 'use strict'
 
-const { Token } = require('../index')
+const { processReturnedData } = require('../../utils')
+const { Token, sequelize } = require('../index')
 
+// UPDATE
 const createNewToken = async ({ userId, accessToken, refreshToken }) => {
     const token = await Token.create({
         userId,
@@ -9,29 +11,45 @@ const createNewToken = async ({ userId, accessToken, refreshToken }) => {
         refreshToken,
     })
 
-    return token?.dataValues
+    return processReturnedData(token)
 }
 
-const updatePairToken = async ({
-    userId,
-    accessToken,
-    refreshToken,
-    deviceToken,
-}) => {
-    const [token, isCreated] = await Token.findOrCreate({
-        where: { userId, refreshToken },
-        defaults: {
-            accessToken,
-            deviceToken,
-        },
-    })
-
-    if (!isCreated)
-        token.update({
-            accessToken,
+const updatePairToken = async ({ userId, accessToken, refreshToken }) => {
+    const result = await sequelize.transaction(async (t) => {
+        const [token, isCreated] = await Token.findOrCreate({
+            where: { userId, refreshToken },
+            defaults: {
+                accessToken,
+            },
+            transaction: t,
         })
 
-    return token?.dataValues
+        if (!isCreated) {
+            await token.update(
+                {
+                    accessToken,
+                },
+                { transaction: t },
+            )
+        }
+
+        return processReturnedData(token)
+    })
+    return result
+}
+
+const updateDeviceToken = async ({ accessToken, deviceToken }) => {
+    let updated = await Token.update(
+        {
+            deviceToken,
+        },
+        {
+            where: {
+                accessToken,
+            },
+        },
+    )
+    return updated ? true : false
 }
 
 // FIND
@@ -41,9 +59,8 @@ const findAccessKeyByUserId = async (userId) => {
             userId,
         },
         attributes: ['accessToken'],
-        raw: true,
     })
-    return tokens
+    return processReturnedData(tokens)
 }
 
 const findTokenByRefreshToken = async (refreshToken) => {
@@ -53,40 +70,35 @@ const findTokenByRefreshToken = async (refreshToken) => {
         },
     })
 
-    return token?.dataValues
+    return processReturnedData(token)
 }
 
 // DELETE
-const removeTokenById = async (id) => {
-    return await Token.destroy({
-        where: {
-            id,
-        },
-    })
-}
-
 const removeTokenByAccessToken = async ({ accessToken }) => {
-    return await Token.destroy({
+    let res = await Token.destroy({
         where: {
             accessToken,
         },
     })
+
+    return res == 1
 }
 
 const removeTokenByUserId = async ({ userId }) => {
-    return await Token.destroy({
+    let res = await Token.destroy({
         where: {
             userId,
         },
     })
+    return res == 1
 }
 
 module.exports = {
     createNewToken,
     updatePairToken,
     findAccessKeyByUserId,
-    removeTokenById,
     findTokenByRefreshToken,
     removeTokenByAccessToken,
     removeTokenByUserId,
+    updateDeviceToken,
 }
