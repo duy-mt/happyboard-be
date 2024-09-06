@@ -25,7 +25,7 @@ This is a backend system designed to support a web application that allows users
 
 1. Clone the repository:
 git clone https://github.com/duy-mt/happyboard-be.git
-Build and develop code on dev branch, then push it to production, final version
+build and develop code on dev branch, then push it to production, final version
 
 2. Install dependencies:
 
@@ -38,10 +38,7 @@ Copy the `.env.example` file to `.env` and fill in the required values.
 
 4. Run file setup-windows.bat
 ```bash
-cd happyboard-be
-```
-```bash
-setup-windows.bat
+cd happyboard-be && setup-windows.bat
 ```
 
 
