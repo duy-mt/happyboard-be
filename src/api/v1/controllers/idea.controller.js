@@ -124,7 +124,8 @@ class IdeaController {
                     limit: req.query?.limit,
                     page: req.query?.page,
                     userId: req.body.userId,
-                    option: req.query?.option
+                    option: req.query?.option,
+                    categories: req.query?.categories
                 })
             }).send(res)
         } else {
