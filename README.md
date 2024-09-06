@@ -9,6 +9,8 @@ This is a backend system designed to support a web application that allows users
 - Sequelize
 - Redis
 - Elastic Search
+- Firebase
+- Cloudinary
 - WebSocket
 - Docker
 - GCP (VM instance) 
