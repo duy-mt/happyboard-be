@@ -11,7 +11,10 @@ const router = express.Router()
 router.use(asyncHandler(authentication))
 ////////////////////////////////////////
 router.get('', asyncHandler(profileController.getProfile))
-router.put('', uploadMemory.single('file'), asyncHandler(profileController.updateProfile))
-
+router.put(
+    '',
+    uploadMemory.single('file'),
+    asyncHandler(profileController.updateProfile),
+)
 
 module.exports = router

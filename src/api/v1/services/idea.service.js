@@ -1,8 +1,15 @@
 'use strict'
 
-const { BadRequest, Forbidden } = require("../core/error.response")
-const { 
-    createIdea, findAllIdeasByUsedId, findIdeaPage, findIdea, increaseVoteCount, decrementVoteCount, updateIdea, cancelVote,
+const { BadRequest, Forbidden } = require('../core/error.response')
+const {
+    createIdea,
+    findAllIdeasByUsedId,
+    findIdeaPage,
+    findIdea,
+    increaseVoteCount,
+    decrementVoteCount,
+    updateIdea,
+    cancelVote,
     upView,
     findPendingIdea,
     findPublisedIdea,
@@ -13,43 +20,65 @@ const {
     findAllIdeas,
     deleteIdea,
     findAllOwnIdeas,
-} = require("../models/repo/idea.repo")
-const { sortComment, removeField } = require("../utils")
-const VoteService = require("./vote.service")
-const RedisService = require("./redis.service")
-const { OPTION_SHOW_IDEA } = require("../constants")
-const ElasticSearch = require("./es.service")
+} = require('../models/repo/idea.repo')
+const { sortComment, removeField } = require('../utils')
+const VoteService = require('./vote.service')
+const RedisService = require('./redis.service')
+const { OPTION_SHOW_IDEA } = require('../constants')
+const ElasticSearch = require('./es.service')
 const MessageQueue = require('./rabbitmq.service')
-const CommentService = require("./comment.service")
-const HistoryService = require("./history.service")
+const CommentService = require('./comment.service')
+const HistoryService = require('./history.service')
 
 class IdeaService {
     static createIdea = async ({
-        title, content, categoryId, userId, isPublished = false, isDrafted = false
+        title,
+        content,
+        categoryId,
+        userId,
+        isPublished = false,
+        isDrafted = false,
     }) => {
-        if(!content || !title || !categoryId) throw new BadRequest('Title, content and category are required')
+        if (!content || !title || !categoryId)
+            throw new BadRequest('Title, content and category are required')
 
         const savedIdea = await createIdea({
-            title, content, categoryId, userId, isPublished, isDrafted
+            title,
+            content,
+            categoryId,
+            userId,
+            isPublished,
+            isDrafted,
         })
         await HistoryService.createHistory({
             type: 'CI01',
             userId,
             userTargetId: userId,
             objectTargetId: savedIdea.id,
-            contentIdea: savedIdea.title
+            contentIdea: savedIdea.title,
         })
 
         return 1
     }
 
     static draftIdea = async ({
-        title, content, categoryId, userId, isPublished = false, isDrafted = true
+        title,
+        content,
+        categoryId,
+        userId,
+        isPublished = false,
+        isDrafted = true,
     }) => {
-        if(!content || !title || !categoryId) throw new BadRequest('Title, content and category are required')
+        if (!content || !title || !categoryId)
+            throw new BadRequest('Title, content and category are required')
 
         const savedIdea = await createIdea({
-            title, content, categoryId, userId, isPublished, isDrafted
+            title,
+            content,
+            categoryId,
+            userId,
+            isPublished,
+            isDrafted,
         })
         // Ingest elastic
         // await ElasticSearch.createDocument({
@@ -61,45 +90,50 @@ class IdeaService {
         return 1
     }
 
-    static getIdea = async ({ id, userId, isPublished = null, isDrafted = null }) => {
+    static getIdea = async ({
+        id,
+        userId,
+        isPublished = null,
+        isDrafted = null,
+    }) => {
         const idea = await findIdea({ id, isPublished, isDrafted })
-        if(!idea) throw new BadRequest('Idea is not exist')
+        if (!idea) throw new BadRequest('Idea is not exist')
         await upView(id)
         const handledComment = sortComment(idea.comments)
-        
+
         let status = await VoteService.getStatusVote({
             ideaId: idea.id,
-            userId
+            userId,
         })
         idea.vote = status
 
         const handledIdea = {
             ...idea,
-            comments: handledComment
+            comments: handledComment,
         }
         let key = `user:${userId}:currentIdeas`
         await RedisService.ZADD({
             key,
             value: `${idea.id}`,
-            score: Date.now()
+            score: Date.now(),
         })
         return handledIdea
     }
 
-    static getOwnDraftedIdea = async ({ id, userId}) => {
-        const idea = await findIdea({id, isPublished: false, isDrafted: true})
-        if(!idea) throw new BadRequest('Idea is not exist')
+    static getOwnDraftedIdea = async ({ id, userId }) => {
+        const idea = await findIdea({ id, isPublished: false, isDrafted: true })
+        if (!idea) throw new BadRequest('Idea is not exist')
         const handledComment = sortComment(idea.comments)
-        
+
         let status = await VoteService.getStatusVote({
             ideaId: idea.id,
-            userId
+            userId,
         })
         idea.vote = status
 
         const handledIdea = {
             ...idea,
-            comments: handledComment
+            comments: handledComment,
         }
         // await RedisService.ZADD({
         //     key: `currentIdeas:${userId}`,
@@ -109,20 +143,24 @@ class IdeaService {
         return handledIdea
     }
 
-    static getOwnHidedIdea = async ({ id, userId}) => {
-        const idea = await findIdea({id, isPublished: false, isDrafted: false})
-        if(!idea) throw new BadRequest('Idea is not exist')
+    static getOwnHidedIdea = async ({ id, userId }) => {
+        const idea = await findIdea({
+            id,
+            isPublished: false,
+            isDrafted: false,
+        })
+        if (!idea) throw new BadRequest('Idea is not exist')
         const handledComment = sortComment(idea.comments)
-        
+
         let status = await VoteService.getStatusVote({
             ideaId: idea.id,
-            userId
+            userId,
         })
         idea.vote = status
 
         const handledIdea = {
             ...idea,
-            comments: handledComment
+            comments: handledComment,
         }
         // await RedisService.ZADD({
         //     key: `currentIdeas:${userId}`,
@@ -133,17 +171,28 @@ class IdeaService {
     }
 
     static getAllIdeas = async ({
-        limit = 5, page = 1, userId, option = Object.keys(OPTION_SHOW_IDEA)[0], categories = null, isPublished = null, isDrafted = false
+        limit = 5,
+        page = 1,
+        userId,
+        option = Object.keys(OPTION_SHOW_IDEA)[0],
+        categories = null,
+        isPublished = null,
+        isDrafted = false,
     }) => {
         let fieldSort = OPTION_SHOW_IDEA[option]
-        let {
-            ideas, totalIdea
-        } = await findAllIdeas({ limit, page, fieldSort, categories, isPublished, isDrafted })
+        let { ideas, totalIdea } = await findAllIdeas({
+            limit,
+            page,
+            fieldSort,
+            categories,
+            isPublished,
+            isDrafted,
+        })
 
-        for(let i = 0; i < ideas.length; i++) {
+        for (let i = 0; i < ideas.length; i++) {
             let status = await VoteService.getStatusVote({
                 ideaId: ideas[i].id,
-                userId
+                userId,
             })
             ideas[i].vote = status
         }
@@ -160,72 +209,94 @@ class IdeaService {
     }
 
     static getAllPublisedIdeas = async ({
-        limit = 10, page = 1, userId, option = Object.keys(OPTION_SHOW_IDEA)[0], categories = null, duration
+        limit = 10,
+        page = 1,
+        userId,
+        option = Object.keys(OPTION_SHOW_IDEA)[0],
+        categories = null,
+        duration,
     }) => {
         return await this.getAllIdeas({
-            limit, page, userId, option, isPublished: true, categories, duration
+            limit,
+            page,
+            userId,
+            option,
+            isPublished: true,
+            categories,
+            duration,
         })
     }
 
     static getAllPengindIdeas = async ({
-        limit = 10, page = 1, userId, option = Object.keys(OPTION_SHOW_IDEA)[0], duration
+        limit = 10,
+        page = 1,
+        userId,
+        option = Object.keys(OPTION_SHOW_IDEA)[0],
+        duration,
     }) => {
         return await this.getAllIdeas({
-            limit, page, userId, option, isPublished: false, isDrafted: false, duration
+            limit,
+            page,
+            userId,
+            option,
+            isPublished: false,
+            isDrafted: false,
+            duration,
         })
     }
 
     static getRecentIdeas = async (userId) => {
         let key = `user:${userId}:currentIdeas`
         const recentIdeas = await RedisService.ZRANGE({
-            key
+            key,
         })
         const ideas = await findIdeasByIds(recentIdeas)
         return ideas
     }
 
-    static getSimilarIdeas = async ({
-        ideaId,
-        limit = 5
-    }) => {
+    static getSimilarIdeas = async ({ ideaId, limit = 5 }) => {
         const idea = await findIdea({ id: ideaId })
         const categoryId = idea?.Category.id
-        if(!categoryId) throw new BadRequest('Not found category')
+        if (!categoryId) throw new BadRequest('Not found category')
         const ideas = await findIdeasByCategoryId({
             categoryId,
             limit,
-            ideaId
+            ideaId,
         })
         return ideas
     }
 
-    static getPopularIdeas = async ({
-        limit = 5
-    }) => {
+    static getPopularIdeas = async ({ limit = 5 }) => {
         const ideas = await findIdeasByVote({
-            limit
+            limit,
         })
         return ideas
     }
 
-    static searchIdea = async ({q, limit = 5, page = 1, userId, duration }) => {
+    static searchIdea = async ({
+        q,
+        limit = 5,
+        page = 1,
+        userId,
+        duration,
+    }) => {
         try {
             const resp = await ElasticSearch.searchDocument({
                 // Using dynamic
                 index: 'ideas',
                 queryString: q,
-                duration
+                duration,
             })
             let totalPage = 1
-            const ideaIds = resp.map(i => i._source.id)
-            console.log(ideaIds);
-            let totalIdea = ideaIds.length > 5 ? 5 :  ideaIds.length
-            
+            const ideaIds = resp.map((i) => i._source.id)
+            console.log(ideaIds)
+            let totalIdea = ideaIds.length > 5 ? 5 : ideaIds.length
+
             let ideas = await findIdeasByIds(ideaIds)
 
-            ideas.forEach(idea => {
+            ideas.forEach((idea) => {
                 let id = idea.id
-                let highlight = resp.find(e => e._source.id === id).highlight
+                let highlight = resp.find((e) => e._source.id === id).highlight
                 idea.highlight = highlight
             })
 
@@ -240,7 +311,7 @@ class IdeaService {
             console.log(`Search Elastic Error:`, error)
             throw new BadRequest(error.message)
         }
-        
+
         // const {ideas, totalIdea} = await findIdeaPage({
         //     q, page, limit, fieldSort: 'createdAt'
         // })
@@ -261,22 +332,16 @@ class IdeaService {
         // }
     }
 
-    static upVoteCount = async({
-        ideaId, userId
-    }) => {
-
+    static upVoteCount = async ({ ideaId, userId }) => {
         // 0. find idea
-        const idea = await findIdea({id: ideaId})
+        const idea = await findIdea({ id: ideaId })
         // 1. Up vote
-        let {
-            voteCount,
-            updated
-        } = await increaseVoteCount({
+        let { voteCount, updated } = await increaseVoteCount({
             ideaId,
-            userId
+            userId,
         })
         // 2. Send notification
-        if(updated) {
+        if (updated) {
             const receiver = await findUserIdByIdeaId({ id: ideaId })
             const data = {
                 sender: userId,
@@ -284,81 +349,72 @@ class IdeaService {
                 target: 'idea',
                 action: 'up',
                 metadata: {
-                    targetId: ideaId
-                }
+                    targetId: ideaId,
+                },
             }
-            if (idea.userId  != receiver){ 
-
+            if (idea.userId != receiver) {
                 await MessageQueue.send({
                     nameExchange: 'post_notification',
-                    message: data
+                    message: data,
                 })
-    
+
                 await HistoryService.createHistory({
                     type: 'VI01',
                     userId,
                     userTargetId: receiver,
                     objectTargetId: ideaId,
-                    contentIdea: idea.title
+                    contentIdea: idea.title,
                 })
             }
         }
 
         return {
-            voteCount
+            voteCount,
         }
     }
 
-    static downVoteCount = async({
-        ideaId, userId
-    }) => {
-
-        const idea = await findIdea({id: ideaId})
+    static downVoteCount = async ({ ideaId, userId }) => {
+        const idea = await findIdea({ id: ideaId })
         const receiver = await findUserIdByIdeaId({ id: ideaId })
-        if (idea.userId != receiver){
-
+        if (idea.userId != receiver) {
             await HistoryService.createHistory({
                 type: 'VI01',
                 userId,
                 userTargetId: receiver,
                 objectTargetId: ideaId,
-                contentIdea: idea.title
+                contentIdea: idea.title,
             })
             return await decrementVoteCount({
                 ideaId,
-                userId
+                userId,
             })
         }
     }
 
-    static cancelVote = async ({
-        ideaId, userId
-    }) => {
-        const idea = await findIdea({id: ideaId})
+    static cancelVote = async ({ ideaId, userId }) => {
+        const idea = await findIdea({ id: ideaId })
         const receiver = await findUserIdByIdeaId({ id: ideaId })
         await HistoryService.createHistory({
             type: 'VI01',
             userId,
             userTargetId: receiver,
             objectTargetId: ideaId,
-            contentIdea: idea.title
+            contentIdea: idea.title,
         })
         return await cancelVote({
             ideaId,
-            userId
+            userId,
         })
     }
 
-    static publishIdea = async ({
-        ideaId, adminId
-    }) => {
+    static publishIdea = async ({ ideaId, adminId }) => {
         const idea = await findPendingIdea({ id: ideaId })
-        if(!idea) throw new BadRequest('Not found idea')
+        if (!idea) throw new BadRequest('Not found idea')
         const updatedIdea = await updateIdea({
             id: ideaId,
             opt: {
-                isPublished: true
-            }
+                isPublished: true,
+            },
         })
 
         // Ingest elastic
@@ -367,12 +423,12 @@ class IdeaService {
             title: idea.title,
             content: idea.content,
             createdAt: idea.createdAt,
-            updatedAt: idea.updatedAt
+            updatedAt: idea.updatedAt,
         }
         await ElasticSearch.createDocument({
             // Using dynamic index getting from db
             index: 'ideas',
-            body
+            body,
         })
 
         const data = {
@@ -381,60 +437,64 @@ class IdeaService {
             target: 'idea',
             action: 'release',
             metadata: {
-                targetId: ideaId
-            }
+                targetId: ideaId,
+            },
         }
         await MessageQueue.send({
             nameExchange: 'post_notification',
-            message: data
+            message: data,
         })
 
         return updatedIdea ? 1 : 0
     }
 
-    static unPublishIdea = async ({
-        ideaId
-    }) => {
+    static unPublishIdea = async ({ ideaId }) => {
         const idea = await findPublisedIdea({ id: ideaId })
-        if(!idea) throw new BadRequest('Not found idea')
+        if (!idea) throw new BadRequest('Not found idea')
         const updatedIdea = await updateIdea({
             id: ideaId,
             opt: {
-                isPublished: false
-            }
+                isPublished: false,
+            },
         })
-        if(!updatedIdea) throw new BadRequest('Unpublish idea failed') 
+        if (!updatedIdea) throw new BadRequest('Unpublish idea failed')
         await ElasticSearch.deleteDocument({
             index: 'ideas',
-            id: ideaId
+            id: ideaId,
         })
         return updatedIdea ? 1 : 0
     }
 
-    static updateIdea = async ({
-        ideaId, payload
-    }) => {
+    static updateIdea = async ({ ideaId, payload }) => {
         let userId = payload.userId
         let prePayload = {
             title: payload.title,
             content: payload.content,
             isDrafted: payload.isDrafted,
-            isPublished: payload.isPublished
+            isPublished: payload.isPublished,
         }
         prePayload = removeField({
-            obj: prePayload
+            obj: prePayload,
         })
         // let ideaHolder = await findIdea({ id: ideaId, isPublished: null })
-        let ideaHolder = await this.getIdea({ id: ideaId, userId, isPublished: null, isDrafted: null })
-        if(ideaHolder.userId != userId) throw new BadRequest('[o] You don\'t have permission to execute action')
+        let ideaHolder = await this.getIdea({
+            id: ideaId,
+            userId,
+            isPublished: null,
+            isDrafted: null,
+        })
+        if (ideaHolder.userId != userId)
+            throw new BadRequest(
+                "[o] You don't have permission to execute action",
+            )
         let updatedIdea = await updateIdea({
             id: ideaId,
             opt: {
-                ...prePayload
-            }
+                ...prePayload,
+            },
         })
 
-        if(updatedIdea.isPublished) {
+        if (updatedIdea.isPublished) {
             await this.unPublishIdea({ ideaId })
         }
 
@@ -443,34 +503,33 @@ class IdeaService {
             userId,
             userTargetId: userId,
             objectTargetId: ideaId,
-            contentIdea: ideaHolder.title
+            contentIdea: ideaHolder.title,
         })
 
         return updatedIdea ? 1 : 0
     }
 
-    static deleteIdea = async ({
-        ideaId, userId
-    }) => {
+    static deleteIdea = async ({ ideaId, userId }) => {
         // let ideaHolder = await this.getIdea({ id: ideaId, userId, isPublished: null })
         let ideaHolder = await findIdea({ id: ideaId })
-        if(ideaHolder.userId != userId) throw new BadRequest('You don\'t have permission to access resource')
+        if (ideaHolder.userId != userId)
+            throw new BadRequest("You don't have permission to access resource")
 
         let deleted = await Promise.all([
             await deleteIdea(ideaId),
-            await CommentService.deleteCommentByIdeaId(ideaId)
+            await CommentService.deleteCommentByIdeaId(ideaId),
         ])
-        if(deleted[0] && deleted[1]) {
+        if (deleted[0] && deleted[1]) {
             await HistoryService.createHistory({
                 type: 'DI01',
                 userId,
                 userTargetId: userId,
                 objectTargetId: ideaId,
-                contentIdea: ideaHolder.title
+                contentIdea: ideaHolder.title,
             })
             await ElasticSearch.deleteDocument({
                 index: 'ideas',
-                id: ideaId
+                id: ideaId,
             })
             return 1
         }
@@ -479,16 +538,24 @@ class IdeaService {
 
     // FOR OWN USER
     static getAllOwnIdeas = async ({
-        limit = 10, page = 1, userId, isPublished = null, isDrafted = null
+        limit = 10,
+        page = 1,
+        userId,
+        isPublished = null,
+        isDrafted = null,
     }) => {
-        let {
-            ideas, totalIdea
-        } = await findAllOwnIdeas({ limit, page, userId, isPublished, isDrafted })
+        let { ideas, totalIdea } = await findAllOwnIdeas({
+            limit,
+            page,
+            userId,
+            isPublished,
+            isDrafted,
+        })
 
-        for(let i = 0; i < ideas.length; i++) {
+        for (let i = 0; i < ideas.length; i++) {
             let status = await VoteService.getStatusVote({
                 ideaId: ideas[i].id,
-                userId
+                userId,
             })
             ideas[i].vote = status
         }
@@ -505,21 +572,36 @@ class IdeaService {
     }
 
     static getAllOwnPublishedIdeas = async ({
-        limit = 5, page = 1, userId,
+        limit = 5,
+        page = 1,
+        userId,
     }) => {
-        return await this.getAllOwnIdeas({ limit, page, userId, isPublished: true })
+        return await this.getAllOwnIdeas({
+            limit,
+            page,
+            userId,
+            isPublished: true,
+        })
     }
 
-    static getAllOwnHidedIdeas = async ({
-        limit = 10, page = 1, userId,
-    }) => {
-        return await this.getAllOwnIdeas({ limit, page, userId, isPublished: false, isDrafted: false })
+    static getAllOwnHidedIdeas = async ({ limit = 10, page = 1, userId }) => {
+        return await this.getAllOwnIdeas({
+            limit,
+            page,
+            userId,
+            isPublished: false,
+            isDrafted: false,
+        })
     }
 
-    static getAllOwnDraftedIdeas = async ({
-        limit = 10, page = 1, userId,
-    }) => {
-        return await this.getAllOwnIdeas({ limit, page, userId, isPublished: false, isDrafted: true })
+    static getAllOwnDraftedIdeas = async ({ limit = 10, page = 1, userId }) => {
+        return await this.getAllOwnIdeas({
+            limit,
+            page,
+            userId,
+            isPublished: false,
+            isDrafted: true,
+        })
     }
 }
 

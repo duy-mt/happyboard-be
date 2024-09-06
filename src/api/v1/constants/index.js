@@ -1,14 +1,14 @@
 'use strict'
 
 const HEADER = {
-    API_KEY:'x-api-key',
+    API_KEY: 'x-api-key',
     CLIENT_ID: 'x-client-id',
-    AUTHORIZATION: 'authorization'
+    AUTHORIZATION: 'authorization',
 }
 
 const ROLE_USER = {
     USER: 'USER',
-    ADMIN: 'ADMIN'
+    ADMIN: 'ADMIN',
 }
 
 const REDIS = {
@@ -16,38 +16,38 @@ const REDIS = {
         CONNECT: 'connect',
         END: 'end',
         RECONNECT: 'reconnecting',
-        ERROR: 'error'
+        ERROR: 'error',
     },
     CONNECT: {
         TIMEOUT: 100000,
         CODE: -99,
         MESSAGE: {
             VN: 'Có lỗi xảy ra với redis',
-            EN: 'Have a trouble with redis'
-        }
-    }
+            EN: 'Have a trouble with redis',
+        },
+    },
 }
 
 const OPTION_SHOW_IDEA = {
-    'newest': 'createdAt',
-    'highvote': 'voteCount',
-    'highview': 'viewCount',
-    'highcomment': 'commentCount'
+    newest: 'createdAt',
+    highvote: 'voteCount',
+    highview: 'viewCount',
+    highcomment: 'commentCount',
 }
 
 const STATUS_USER = {
     block: {
         roleId: 4,
-        role: 'Pending-User'
+        role: 'Pending-User',
     },
     pending: {
         roleId: 4,
-        role: 'Pending-User'
+        role: 'Pending-User',
     },
     active: {
         roleId: 3,
-        role: 'User'
-    }
+        role: 'User',
+    },
 }
 
 const HISTORY_LOGS = {

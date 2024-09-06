@@ -6,13 +6,13 @@ const { Role } = require('../index')
 const findRoleById = async (roleId) => {
     let role = await Role.findOne({
         where: {
-            id: roleId
+            id: roleId,
         },
-        attributes: ['id', 'name', 'description']
+        attributes: ['id', 'name', 'description'],
     })
     return processReturnedData(role)
 }
 
 module.exports = {
-    findRoleById
+    findRoleById,
 }

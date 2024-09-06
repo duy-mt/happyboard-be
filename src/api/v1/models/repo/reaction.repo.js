@@ -3,20 +3,18 @@
 const { where } = require('sequelize')
 const { Reaction } = require('../index')
 
-const updateReaction = async ({
-    commentId, userId, reaction
-}) => {
+const updateReaction = async ({ commentId, userId, reaction }) => {
     let [r, isCreated] = await Reaction.findOrCreate({
         where: {
             userId,
-            commentId
+            commentId,
         },
         defaults: {
-            name: reaction
-        }
+            name: reaction,
+        },
     })
 
-    if(!isCreated) {
+    if (!isCreated) {
         r.name = reaction
         await r.save()
     }
@@ -24,43 +22,38 @@ const updateReaction = async ({
     return r
 }
 
-const countReactionByCommentId = async ({
-    commentId
-}) => {
+const countReactionByCommentId = async ({ commentId }) => {
     const count = await Reaction.count({
         where: {
-            commentId
-        }
+            commentId,
+        },
     })
 
     return count
 }
 
-const checkReaction = async ({
-    commentId, userId
-}) => {
-    console.log(`commentId`, commentId);
-    console.log(`userId`, userId);
+const checkReaction = async ({ commentId, userId }) => {
+    console.log(`commentId`, commentId)
+    console.log(`userId`, userId)
     const reaction = await Reaction.findOne({
         where: {
             userId,
-            commentId
+            commentId,
         },
-        raw: true
+        raw: true,
     })
-    console.log(reaction);
+    console.log(reaction)
     return reaction?.name
 }
 
-const deleteReaction = async ({
-    commentId, userId
-}) => {
+const deleteReaction = async ({ commentId, userId }) => {
     const r = await Reaction.findOne({
         where: {
-            commentId, userId
-        }
+            commentId,
+            userId,
+        },
     })
-    if(r) {
+    if (r) {
         await r.destroy({
             force: true,
         })
@@ -72,5 +65,5 @@ module.exports = {
     updateReaction,
     countReactionByCommentId,
     checkReaction,
-    deleteReaction
+    deleteReaction,
 }

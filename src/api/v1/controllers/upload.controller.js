@@ -8,7 +8,7 @@ class UploadController {
     uploadFileThumb = async (req, res, next) => {
         const { file } = req
         const userId = req.headers['x-client-id']
-        if(!file) {
+        if (!file) {
             throw new BadRequest('File missing')
         }
         new OK({
@@ -16,8 +16,8 @@ class UploadController {
             data: await UploadService.uploadImageFromLocal({
                 path: file.path,
                 folderName: 'user/avatar',
-                filename: userId
-            })
+                filename: userId,
+            }),
         }).send(res)
     }
 
@@ -26,8 +26,10 @@ class UploadController {
         new OK({
             message: 'Upload Thumbnail successfully',
             data: await UploadService.uploadFromURL({
-                urlImage, folderName: 'user/avatar', filename: userId
-            })
+                urlImage,
+                folderName: 'user/avatar',
+                filename: userId,
+            }),
         }).send(res)
     }
 }

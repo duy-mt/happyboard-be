@@ -7,14 +7,14 @@ class VoteController {
     upVote = async (req, res, next) => {
         new Created({
             message: 'Up vote successfully!',
-            data: await VoteService.createVote(req.body)
+            data: await VoteService.createVote(req.body),
         }).send(res)
     }
 
     cancelVote = async (req, res, next) => {
         new OK({
             message: 'Cancel vote successfully!',
-            data: await VoteService.deleteVote(req.body)
+            data: await VoteService.deleteVote(req.body),
         }).send(res)
     }
 }

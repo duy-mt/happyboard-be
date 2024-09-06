@@ -6,27 +6,35 @@ const { History } = require('../index')
 const queryHistory = {
     limit: 5,
     offset: 1,
-    order: [
-        ['createdAt', 'DESC']
-    ],
+    order: [['createdAt', 'DESC']],
     where: {
-        userId: null
-    }
+        userId: null,
+    },
 }
 
 const createHistory = async ({
-    type, userId, userTargetId, objectTargetId, objectTargetLv2Id = null, contentIdea = null, contentComment = null
+    type,
+    userId,
+    userTargetId,
+    objectTargetId,
+    objectTargetLv2Id = null,
+    contentIdea = null,
+    contentComment = null,
 }) => {
     const history = await History.create({
-        type, userId, userTargetId, objectTargetId, objectTargetLv2Id, contentIdea, contentComment
+        type,
+        userId,
+        userTargetId,
+        objectTargetId,
+        objectTargetLv2Id,
+        contentIdea,
+        contentComment,
     })
 
     return history
 }
 
-const findHistoriesByUserId = async ({
-    userId, limit, offset
-}) => {
+const findHistoriesByUserId = async ({ userId, limit, offset }) => {
     queryHistory.limit = limit
     queryHistory.offset = offset
     queryHistory.where.userId = userId
@@ -36,5 +44,5 @@ const findHistoriesByUserId = async ({
 
 module.exports = {
     createHistory,
-    findHistoriesByUserId
+    findHistoriesByUserId,
 }

@@ -10,10 +10,10 @@ router.post('/test', async (req, res, next) => {
     // TEST MQ
     const MessageQueue = require('../services/rabbitmq.service')
     const msg = req.body
-    
+
     await MessageQueue.send({
         nameExchange: 'post_notification',
-        message: JSON.stringify(msg)
+        message: JSON.stringify(msg),
     })
     res.json('Send OK')
 })

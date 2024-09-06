@@ -4,15 +4,15 @@ const { rabbitmq } = require('../../../config')
 const getRabbitMQInstance = async () => {
     console.log(rabbitmq)
     const connection = await amqp.connect(rabbitmq)
-        
+
     const channel = await connection.createChannel()
 
     return {
         connection,
-        channel
+        channel,
     }
 }
 
 module.exports = {
-    getRabbitMQInstance
+    getRabbitMQInstance,
 }

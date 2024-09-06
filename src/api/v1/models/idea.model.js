@@ -12,39 +12,42 @@ module.exports = (sequelize, DataTypes) => {
         static associate(models) {
             this.hasMany(models.Comment, {
                 foreignKey: 'ideaId',
-                as: 'comments'
+                as: 'comments',
             })
 
             this.hasMany(models.Vote, {
                 foreignKey: 'ideaId',
-                as: 'vote'
+                as: 'vote',
             })
 
             this.belongsTo(models.User, {
-                foreignKey: 'userId'
+                foreignKey: 'userId',
             })
 
             this.belongsTo(models.Category, {
-                foreignKey: 'categoryId'
+                foreignKey: 'categoryId',
             })
         }
     }
-    Idea.init({
-        title: DataTypes.STRING,
-        content: DataTypes.TEXT,
-        userId: DataTypes.INTEGER,
-        categoryId: DataTypes.INTEGER,
-        isPublished: DataTypes.BOOLEAN,
-        isDrafted: DataTypes.BOOLEAN,
-        voteCount: DataTypes.INTEGER,
-        commentCount: DataTypes.INTEGER,
-        viewCount: DataTypes.INTEGER,
-    }, {
-        sequelize,
-        modelName: 'Idea',
-        tableName: 'ideas',
-        // timestamps: true,
-        paranoid: true,
-    })
+    Idea.init(
+        {
+            title: DataTypes.STRING,
+            content: DataTypes.TEXT,
+            userId: DataTypes.INTEGER,
+            categoryId: DataTypes.INTEGER,
+            isPublished: DataTypes.BOOLEAN,
+            isDrafted: DataTypes.BOOLEAN,
+            voteCount: DataTypes.INTEGER,
+            commentCount: DataTypes.INTEGER,
+            viewCount: DataTypes.INTEGER,
+        },
+        {
+            sequelize,
+            modelName: 'Idea',
+            tableName: 'ideas',
+            // timestamps: true,
+            paranoid: true,
+        },
+    )
     return Idea
 }

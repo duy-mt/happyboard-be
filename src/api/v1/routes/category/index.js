@@ -12,8 +12,20 @@ router.use(asyncHandler(authentication))
 
 router.get('', asyncHandler(categoryController.getAllCategories))
 router.get('/:categoryId', asyncHandler(categoryController.getCategoryById))
-router.post('', authorize(['CAT02']), asyncHandler(categoryController.createCategory))
-router.put('/:categoryId', authorize(['CAT03']), asyncHandler(categoryController.updateCategory))
-router.delete('/:categoryId', authorize(['CAT04']), asyncHandler(categoryController.deleteCategory))
+router.post(
+    '',
+    authorize(['CAT02']),
+    asyncHandler(categoryController.createCategory),
+)
+router.put(
+    '/:categoryId',
+    authorize(['CAT03']),
+    asyncHandler(categoryController.updateCategory),
+)
+router.delete(
+    '/:categoryId',
+    authorize(['CAT04']),
+    asyncHandler(categoryController.deleteCategory),
+)
 
 module.exports = router
