@@ -68,6 +68,11 @@ const WHILELIST_DOMAIN = [
     undefined, //POSTMAN
 ]
 
+const HIGHLIGHT_ELASTIC_SEARCH = {
+    PRE_TAGS: "<span class='font-extrabold'>",
+    POST_TAGS: '</span>',
+}
+
 module.exports = {
     HEADER,
     ROLE_USER,
@@ -76,4 +81,5 @@ module.exports = {
     STATUS_USER,
     HISTORY_LOGS,
     WHILELIST_DOMAIN,
+    HIGHLIGHT_ELASTIC_SEARCH,
 }

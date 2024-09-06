@@ -246,7 +246,7 @@ class IdeaService {
     }
 
     static getRecentIdeas = async (userId) => {
-        let key = `user:${userId}:currentIdeas`
+        let key = `user:${userId}:recentIdeas`
         const recentIdeas = await RedisService.ZRANGE({
             key,
         })
