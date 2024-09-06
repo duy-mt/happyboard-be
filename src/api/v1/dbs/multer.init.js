@@ -3,7 +3,7 @@
 const multer = require('multer')
 
 const uploadMemory = multer({
-    storage: multer.memoryStorage()
+    storage: multer.memoryStorage(),
 })
 
 const uploadDisk = multer({
@@ -13,11 +13,11 @@ const uploadDisk = multer({
         },
         filename: function (req, file, cb) {
             cb(null, `${Date.now()}-${file.originalname}`)
-        }
-    })
+        },
+    }),
 })
 
 module.exports = {
     uploadMemory,
-    uploadDisk
+    uploadDisk,
 }

@@ -21,7 +21,7 @@
 //     client.instanceConnect.quit()
 // }
 
-// const getInstanceRedis = () => client 
+// const getInstanceRedis = () => client
 
 // const handleTimeoutError = () => {
 //     connectionTimeout = setTimeout(() => {
@@ -68,7 +68,7 @@
 //     }
 
 //     getInstance () {
-        
+
 //     }
 // }
 

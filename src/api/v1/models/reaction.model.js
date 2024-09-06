@@ -9,19 +9,21 @@ module.exports = (sequelize, DataTypes) => {
          * This method is not a part of Sequelize lifecycle.
          * The `models/index` file will call this method automatically.
          */
-        static associate(models) {
-        }
+        static associate(models) {}
     }
-    Reaction.init({
-        name: DataTypes.STRING(20),
-        userId: DataTypes.INTEGER,
-        commentId: DataTypes.INTEGER,
-    }, {
-        sequelize,
-        modelName: 'Reaction',
-        tableName: 'reactions',
-        // timestamps: true,
-        paranoid: true,
-    })
+    Reaction.init(
+        {
+            name: DataTypes.STRING(20),
+            userId: DataTypes.INTEGER,
+            commentId: DataTypes.INTEGER,
+        },
+        {
+            sequelize,
+            modelName: 'Reaction',
+            tableName: 'reactions',
+            // timestamps: true,
+            paranoid: true,
+        },
+    )
     return Reaction
 }

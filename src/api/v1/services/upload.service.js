@@ -3,11 +3,15 @@
 const cloudinary = require('../dbs/cloudinary.init')
 
 class UploadService {
-    static uploadImageFromLocal = async ({ path, folderName = 'user/avatar', filename = 'unknown' }) => {
+    static uploadImageFromLocal = async ({
+        path,
+        folderName = 'user/avatar',
+        filename = 'unknown',
+    }) => {
         try {
             const result = await cloudinary.uploader.upload(path, {
                 public_id: filename,
-                folder: folderName
+                folder: folderName,
             })
             return {
                 image_url: result.secure_url,
@@ -15,21 +19,23 @@ class UploadService {
                     width: 200,
                     height: 200,
                     crop: 'fill',
-                    format:'jpg'
-                })
-            }   
+                    format: 'jpg',
+                }),
+            }
         } catch (err) {
             console.log(err)
         }
     }
 
     static uploadFromURL = async ({
-        urlImage, folderName = 'user/avatar', filename = 'unknown'
+        urlImage,
+        folderName = 'user/avatar',
+        filename = 'unknown',
     }) => {
         try {
             const result = await cloudinary.uploader.upload(urlImage, {
                 public_id: filename,
-                folder: folderName
+                folder: folderName,
             })
             return {
                 image_url: result.secure_url,
@@ -37,34 +43,41 @@ class UploadService {
                     width: 200,
                     height: 200,
                     crop: 'fill',
-                    format:'jpg'
-                })
-            } 
+                    format: 'jpg',
+                }),
+            }
         } catch (err) {
             console.log(err)
         }
     }
 
     static uploadFromBuffer = async ({
-        file, folderName = 'user/avatar', filename = 'unknown'
+        file,
+        folderName = 'user/avatar',
+        filename = 'unknown',
     }) => {
-        console.log(`filename::`, filename);
+        console.log(`filename::`, filename)
         try {
             const buffer = new Uint8Array(file.buffer)
-            let result = await new Promise ((resolve, reject) => {
-                cloudinary.uploader.upload_stream({
-                    use_filename: true,
-                    unique_filename: false,
-                    folder: folderName,
-                    overwrite: true,
-                    public_id: filename   
-                }, function (error, result){
-                    if ( error ) {
-                        reject(error)
-                        return
-                    }
-                    resolve(result)
-                }).end(buffer)
+            let result = await new Promise((resolve, reject) => {
+                cloudinary.uploader
+                    .upload_stream(
+                        {
+                            use_filename: true,
+                            unique_filename: false,
+                            folder: folderName,
+                            overwrite: true,
+                            public_id: filename,
+                        },
+                        function (error, result) {
+                            if (error) {
+                                reject(error)
+                                return
+                            }
+                            resolve(result)
+                        },
+                    )
+                    .end(buffer)
             })
             return result
         } catch (error) {

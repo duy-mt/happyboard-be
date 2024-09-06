@@ -4,7 +4,12 @@ const StatusCodes = require('./statusCodes')
 const ReasonPhrases = require('./reasonPhrases')
 
 class SuccessResponse {
-    constructor({message, statusCode = StatusCodes.OK, reasonPhrases = ReasonPhrases.OK, data = {}}) {
+    constructor({
+        message,
+        statusCode = StatusCodes.OK,
+        reasonPhrases = ReasonPhrases.OK,
+        data = {},
+    }) {
         this.message = !message ? reasonPhrases : message
         this.status = statusCode
         this.data = data
@@ -17,12 +22,17 @@ class SuccessResponse {
 }
 
 class Created extends SuccessResponse {
-    constructor({message, statusCode = StatusCodes.CREATED, reasonPhrases = ReasonPhrases.CREATED, data = {}}) {
-        super({message, statusCode, reasonPhrases, data})
+    constructor({
+        message,
+        statusCode = StatusCodes.CREATED,
+        reasonPhrases = ReasonPhrases.CREATED,
+        data = {},
+    }) {
+        super({ message, statusCode, reasonPhrases, data })
     }
 }
 
 module.exports = {
     OK: SuccessResponse,
-    Created
+    Created,
 }

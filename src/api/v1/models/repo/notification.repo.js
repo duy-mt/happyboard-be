@@ -4,57 +4,62 @@ const { Notification, User } = require('../index')
 
 // CONFIG
 const queryConfig = {
-    order: [
-        ['createdAt', 'DESC'],
-    ],
+    order: [['createdAt', 'DESC']],
     include: [
         {
             model: User,
             as: 'fromUser',
-            attributes: ['id', 'username', 'email', 'avatar']
-        }
+            attributes: ['id', 'username', 'email', 'avatar'],
+        },
     ],
-    attributes: ['id', 'type', 'target', 'status', 'createdAt']
+    attributes: ['id', 'type', 'target', 'status', 'createdAt'],
 }
 
 // CREATE
-const createNotification = async ({
-    type, from, to, target
-}) => {
+const createNotification = async ({ type, from, to, target }) => {
     return await Notification.create({
-        type, from, to, target, status: 0
+        type,
+        from,
+        to,
+        target,
+        status: 0,
     })
 }
 
 // READ
-const getAllNotificationsByUserId = async ({
-    userId, offset, limit
-}) => {
+const getAllNotificationsByUserId = async ({ userId, offset, limit }) => {
     return await Notification.findAll({
         offset,
         limit,
         ...queryConfig,
         where: {
-            to: userId || '3'
-        }
+            to: userId || '3',
+        },
     })
 }
 
 // UPDATE
 const updateStatusNotification = async ({
-    id, status // OPENED
+    id,
+    status, // OPENED
 }) => {
-    await Notification.update({
-        status 
-    }, {
-        where: {
-            id: id
-        }
-    })
+    await Notification.update(
+        {
+            status,
+        },
+        {
+            where: {
+                id: id,
+            },
+        },
+    )
 }
 
 const getUnreadNotificationsByUserId = async ({
-    userId, offset, limit, status
+    userId,
+    offset,
+    limit,
+    status,
 }) => {
     return await Notification.findAll({
         offset,
@@ -62,8 +67,8 @@ const getUnreadNotificationsByUserId = async ({
         ...queryConfig,
         where: {
             to: userId || '3',
-            status: 0
-        }
+            status: 0,
+        },
     })
 }
 
@@ -71,5 +76,5 @@ module.exports = {
     createNotification,
     getAllNotificationsByUserId,
     updateStatusNotification,
-    getUnreadNotificationsByUserId
+    getUnreadNotificationsByUserId,
 }

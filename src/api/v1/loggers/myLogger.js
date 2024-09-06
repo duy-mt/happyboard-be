@@ -1,21 +1,21 @@
 'use strict'
 
-const { createLogger, format, transports } = require('winston');
+const { createLogger, format, transports } = require('winston')
 require('winston-daily-rotate-file')
-const { v4:uuid } = require('uuid')
+const { v4: uuid } = require('uuid')
 
 class MyLogger {
     constructor() {
         const formatPrint = format.printf(
-            ({level, message, context, requestId, timestamp, data}) => {
+            ({ level, message, context, requestId, timestamp, data }) => {
                 return `${timestamp}::${level}::${context}::${requestId}::${message}::${data ? JSON.stringify(data) : ''}`
-            }
+            },
         )
 
         this.logger = createLogger({
             format: format.combine(
-                format.timestamp({format: 'YYYY-MM-DD HH:mm:ss'}),
-                formatPrint
+                format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+                formatPrint,
             ),
             transports: [
                 new transports.Console(),
@@ -27,8 +27,8 @@ class MyLogger {
                     maxSize: '1m', // dung luong file
                     maxFiles: '14d', // xoa nhat ki sau 14 ngay
                     format: format.combine(
-                        format.timestamp({format: 'YYYY-MM-DD HH:mm:ss'}),
-                        formatPrint
+                        format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+                        formatPrint,
                     ),
                     level: 'info',
                 }),
@@ -40,21 +40,21 @@ class MyLogger {
                     maxSize: '1m', // dung luong file
                     maxFiles: '14d', // xoa nhat ki sau 14 ngay
                     format: format.combine(
-                        format.timestamp({format: 'YYYY-MM-DD HH:mm:ss'}),
-                        formatPrint
+                        format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+                        formatPrint,
                     ),
                     level: 'error',
                 }),
-            ]
+            ],
         })
     }
 
-    commonParams (params) {
+    commonParams(params) {
         let context, req, data
-        if(!Array.isArray(params)) {
+        if (!Array.isArray(params)) {
             context = params
         } else {
-            [context, req, data] = params
+            ;[context, req, data] = params
         }
 
         const requestId = req?.requestId || uuid()
@@ -62,25 +62,31 @@ class MyLogger {
         return {
             requestId,
             context,
-            data
+            data,
         }
     }
 
     log(message, params) {
         const paramLog = this.commonParams(params)
-        const logObject = Object.assign({
-            message
-        }, paramLog)
-        
+        const logObject = Object.assign(
+            {
+                message,
+            },
+            paramLog,
+        )
+
         this.logger.info(logObject)
     }
 
     error(message, params) {
         const paramLog = this.commonParams(params)
-        const logObject = Object.assign({
-            message
-        }, paramLog)
-        
+        const logObject = Object.assign(
+            {
+                message,
+            },
+            paramLog,
+        )
+
         this.logger.error(logObject)
     }
 }

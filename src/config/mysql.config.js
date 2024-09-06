@@ -9,7 +9,7 @@ const dev = {
 }
 
 const config = {
-    dev
+    dev,
 }
 
 const env = process.env.NODE_ENV || 'dev'

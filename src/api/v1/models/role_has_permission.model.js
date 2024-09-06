@@ -9,17 +9,19 @@ module.exports = (sequelize, DataTypes) => {
          * This method is not a part of Sequelize lifecycle.
          * The `models/index` file will call this method automatically.
          */
-        static associate(models) {
-        }
+        static associate(models) {}
     }
-    Role_has_permissions.init({
-        roleId: DataTypes.INTEGER,
-        permissionId: DataTypes.INTEGER,
-    }, {
-        sequelize,
-        modelName: 'Role_has_permissions',
-        tableName: 'role_has_permissions',
-        timestamps: true,
-    })
+    Role_has_permissions.init(
+        {
+            roleId: DataTypes.INTEGER,
+            permissionId: DataTypes.INTEGER,
+        },
+        {
+            sequelize,
+            modelName: 'Role_has_permissions',
+            tableName: 'role_has_permissions',
+            timestamps: true,
+        },
+    )
     return Role_has_permissions
 }

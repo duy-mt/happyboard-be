@@ -9,7 +9,8 @@
 		"undo": "npx sequelize db:migrate:undo:all",
 		"seed": "npx sequelize db:seed:all",
 		"seed-elastic": "node ./setup/migrate-elastic.js",
-		"reset-db": "npm run undo && npm run migrate && npm run seed && npm run seed-elastic"
+		"reset-db": "npm run undo && npm run migrate && npm run seed && npm run seed-elastic",
+		"pretty": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json,html,css}\"" 
 	},
 	"keywords": [],
 	"author": "",
@@ -49,6 +50,7 @@
 		"helmet": "^7.1.0",
 		"morgan": "^1.10.0",
 		"nodemon": "^3.1.4",
+		"prettier": "^3.3.3",
 		"sequelize-cli": "^6.6.2"
 	}
 }

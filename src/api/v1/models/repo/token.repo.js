@@ -2,46 +2,46 @@
 
 const { Token } = require('../index')
 
-const createNewToken = async ({
-    userId, accessToken, refreshToken
-}) => {
-    const token = await Token.create({ 
+const createNewToken = async ({ userId, accessToken, refreshToken }) => {
+    const token = await Token.create({
         userId,
         accessToken,
-        refreshToken
+        refreshToken,
     })
 
     return token?.dataValues
 }
 
 const updatePairToken = async ({
-    userId, accessToken, refreshToken, deviceToken
+    userId,
+    accessToken,
+    refreshToken,
+    deviceToken,
 }) => {
-    const [token, isCreated] = await Token.findOrCreate(
-        { 
-            where: { userId, refreshToken },
-            defaults: {
-                accessToken,
-                deviceToken
-            } 
-        },    
-    )
-
-    if(!isCreated) token.update({
-        accessToken
+    const [token, isCreated] = await Token.findOrCreate({
+        where: { userId, refreshToken },
+        defaults: {
+            accessToken,
+            deviceToken,
+        },
     })
 
+    if (!isCreated)
+        token.update({
+            accessToken,
+        })
+
     return token?.dataValues
-} 
+}
 
 // FIND
 const findAccessKeyByUserId = async (userId) => {
     const tokens = await Token.findAll({
         where: {
-            userId
+            userId,
         },
         attributes: ['accessToken'],
-        raw: true
+        raw: true,
     })
     return tokens
 }
@@ -49,8 +49,8 @@ const findAccessKeyByUserId = async (userId) => {
 const findTokenByRefreshToken = async (refreshToken) => {
     const token = await Token.findOne({
         where: {
-            refreshToken
-        }
+            refreshToken,
+        },
     })
 
     return token?.dataValues
@@ -60,15 +60,15 @@ const findTokenByRefreshToken = async (refreshToken) => {
 const removeTokenById = async (id) => {
     return await Token.destroy({
         where: {
-            id
+            id,
         },
     })
 }
 
-const removeTokenByAccessToken = async ({accessToken}) => {
+const removeTokenByAccessToken = async ({ accessToken }) => {
     return await Token.destroy({
         where: {
-            accessToken
+            accessToken,
         },
     })
 }
@@ -76,7 +76,7 @@ const removeTokenByAccessToken = async ({accessToken}) => {
 const removeTokenByUserId = async ({ userId }) => {
     return await Token.destroy({
         where: {
-            userId
+            userId,
         },
     })
 }
@@ -88,5 +88,5 @@ module.exports = {
     removeTokenById,
     findTokenByRefreshToken,
     removeTokenByAccessToken,
-    removeTokenByUserId
+    removeTokenByUserId,
 }

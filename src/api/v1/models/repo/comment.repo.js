@@ -11,26 +11,27 @@ const queryCommentWithReaction = {
         {
             model: User,
             attributes: ['id', 'username', 'email', 'avatar'],
-        }
+        },
     ],
-    attributes: { },
+    attributes: {},
     order: [
         ['createdAt', 'DESC'],
-        ['id', 'DESC']
-    ]
+        ['id', 'DESC'],
+    ],
 }
 
-const createComment = async ({
-    content, userId, ideaId, parentId
-}) => {
+const createComment = async ({ content, userId, ideaId, parentId }) => {
     const comment = Comment.create({
-        content, userId, ideaId, parentId
+        content,
+        userId,
+        ideaId,
+        parentId,
     })
 
     const idea = await Idea.findByPk(ideaId)
 
     await idea.increment('commentCount', {
-        by: 1
+        by: 1,
     })
 
     return comment
@@ -39,31 +40,32 @@ const createComment = async ({
 // FIND
 const getCommentsByIdeaId = async (ideaId) => {
     const [comments, totalCount] = await Promise.all([
-        Comment.findAll({ 
+        Comment.findAll({
             where: { ideaId },
-            ...queryCommentWithReaction
+            ...queryCommentWithReaction,
         }),
-        Comment.count({ where: { ideaId } })
+        Comment.count({ where: { ideaId } }),
     ])
 
     return { comments: processReturnedData(comments), totalCount }
 }
 
-const getCommentsByParentId = async (parentId) => await Comment.findAll({
-    where: { parentId }
-})
+const getCommentsByParentId = async (parentId) =>
+    await Comment.findAll({
+        where: { parentId },
+    })
 
 const getCommentById = async (id) => {
     return await Comment.findByPk(id, {
-        raw: true
+        raw: true,
     })
 }
 
 const deleteCommentByIdeaId = async (ideaId) => {
     const deleted = await Comment.destroy({
         where: {
-            ideaId
-        }
+            ideaId,
+        },
     })
     return deleted
 }

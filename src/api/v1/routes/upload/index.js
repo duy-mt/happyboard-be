@@ -10,7 +10,11 @@ const router = express.Router()
 
 router.use(asyncHandler(authentication))
 ////////////////////////////////////////
-router.post('/avatar/file', uploadDisk.single('file'), asyncHandler(uploadController.uploadFileThumb))
+router.post(
+    '/avatar/file',
+    uploadDisk.single('file'),
+    asyncHandler(uploadController.uploadFileThumb),
+)
 router.post('/avatar/url', asyncHandler(uploadController.uploadURLThumb))
 
 module.exports = router

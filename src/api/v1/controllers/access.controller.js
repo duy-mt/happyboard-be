@@ -1,7 +1,7 @@
 'use strict'
 
-const { OK, Created } = require("../core/success.response")
-const AccessService = require("../services/access.service")
+const { OK, Created } = require('../core/success.response')
+const AccessService = require('../services/access.service')
 
 class AccessController {
     login = async (req, res, next) => {
@@ -10,15 +10,17 @@ class AccessController {
 
         res.cookie('access-token', data.tokens.accessToken, {
             maxAge: 10 * 24 * 60 * 60 * 1000,
-        }).cookie('refresh-token', data.tokens.refreshToken, {
-            maxAge: 10 * 24 * 60 * 60 * 1000,
-        }).cookie('userId', data.user.id, {
-            maxAge: 10 * 24 * 60 * 60 * 1000,
         })
+            .cookie('refresh-token', data.tokens.refreshToken, {
+                maxAge: 10 * 24 * 60 * 60 * 1000,
+            })
+            .cookie('userId', data.user.id, {
+                maxAge: 10 * 24 * 60 * 60 * 1000,
+            })
 
         new OK({
             message: 'Login successfully',
-            data
+            data,
         }).send(res)
     }
 
@@ -26,16 +28,18 @@ class AccessController {
         const data = await AccessService.signUp(req.body)
 
         res.cookie('access-token', data.tokens.accessToken, {
-            maxAge: 10 * 24 * 60 * 60 * 1000
-        }).cookie('refresh-token', data.tokens.refreshToken, {
-            maxAge: 10 * 24 * 60 * 60 * 1000
-        }).cookie('userId', data.user.id, {
-            maxAge: 10 * 24 * 60 * 60 * 1000
+            maxAge: 10 * 24 * 60 * 60 * 1000,
         })
+            .cookie('refresh-token', data.tokens.refreshToken, {
+                maxAge: 10 * 24 * 60 * 60 * 1000,
+            })
+            .cookie('userId', data.user.id, {
+                maxAge: 10 * 24 * 60 * 60 * 1000,
+            })
 
         new Created({
             message: 'Register successfully',
-            data
+            data,
         }).send(res)
     }
 
@@ -45,7 +49,7 @@ class AccessController {
         res.clearCookie('userId')
         new OK({
             message: 'Logout successfully',
-            data: await AccessService.logout(req.token)
+            data: await AccessService.logout(req.token),
         }).send(res)
     }
 
@@ -54,38 +58,45 @@ class AccessController {
         const data = await AccessService.handleRefreshToken(req.body)
 
         res.cookie('access-token', data.accessToken, {
-            maxAge: 10 * 24 * 60 * 60 * 1000
+            maxAge: 10 * 24 * 60 * 60 * 1000,
         })
 
         new OK({
             message: 'Logout successfully',
-            data
+            data,
         }).send(res)
     }
 
     signUpWithGoogle = async (req, res, next) => {
         const data = await AccessService.signUpWithGoogle({
             user: req.user,
-            deviceToken: req.headers['device-token']
+            deviceToken: req.headers['device-token'],
         })
 
         res.cookie('access-token', data.tokens.accessToken, {
-            maxAge: 10 * 24 * 60 * 60 * 1000
-        }).cookie('refresh-token', data.tokens.refreshToken, {
-            maxAge: 10 * 24 * 60 * 60 * 1000
-        }).cookie('userId', data.user.id, {
-            maxAge: 10 * 24 * 60 * 60 * 1000
-        }).redirect(process.env.DOMAIN_CLIENT ? process.env.DOMAIN_CLIENT : 'https://happyboard.io.vn')
+            maxAge: 10 * 24 * 60 * 60 * 1000,
+        })
+            .cookie('refresh-token', data.tokens.refreshToken, {
+                maxAge: 10 * 24 * 60 * 60 * 1000,
+            })
+            .cookie('userId', data.user.id, {
+                maxAge: 10 * 24 * 60 * 60 * 1000,
+            })
+            .redirect(
+                process.env.DOMAIN_CLIENT
+                    ? process.env.DOMAIN_CLIENT
+                    : 'https://happyboard.io.vn',
+            )
         new Created({
             message: 'Register with google successfully',
-            data
+            data,
         }).send(res)
     }
 
     sendEmailForgotPW = async (req, res, next) => {
         new OK({
             message: 'Send token reset password successfully!',
-            data: await AccessService.forgotPW(req.body)
+            data: await AccessService.forgotPW(req.body),
         }).send(res)
     }
 
@@ -93,7 +104,7 @@ class AccessController {
         let data = await AccessService.validateToken(req.params)
         new OK({
             message: 'Validate token successfully!',
-            data
+            data,
         }).send(res)
     }
 
@@ -101,7 +112,7 @@ class AccessController {
         let data = await AccessService.changePW(req.body)
         new OK({
             message: 'Update password successfully!',
-            data
+            data,
         }).send(res)
     }
 
@@ -109,7 +120,7 @@ class AccessController {
         let data = await AccessService.updatePW(req.body)
         new OK({
             message: 'Update password successfully!',
-            data
+            data,
         }).send(res)
     }
 }
