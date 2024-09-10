@@ -35,9 +35,7 @@ const generateToken = async ({ payload, secretKey, expireTime }) => {
 }
 
 const createSecretKey = () => {
-    return process.env.DEV_SECRET_KEY
-        ? process.env.DEV_SECRET_KEY
-        : `Happyboard`
+    return process.env.SECRET_KEY
 }
 
 const createHash = (input) => {

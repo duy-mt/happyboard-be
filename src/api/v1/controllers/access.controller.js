@@ -103,9 +103,7 @@ class AccessController {
                 sameSite: 'None',
             })
             .redirect(
-                process.env.DOMAIN_CLIENT
-                    ? process.env.DOMAIN_CLIENT
-                    : 'https://happyboard.io.vn',
+                process.env.DOMAIN_CLIENT,
             )
         new Created({
             message: 'Register with google successfully',
