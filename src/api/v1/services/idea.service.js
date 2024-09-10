@@ -356,7 +356,7 @@ class IdeaService {
                     targetId: ideaId,
                 },
             }
-            if (idea.userId !== receiver) {
+            if (parseInt(userId) !== receiver) {
                 await MessageQueue.send({
                     nameExchange: 'post_notification',
                     message: data,
@@ -383,7 +383,7 @@ class IdeaService {
             throw new BadRequest(`Idea is pending or draft, you can't vote this`)
         }
         const receiver = await findUserIdByIdeaId({ id: ideaId })
-        if (idea.userId !== receiver) {
+        if (parseInt(userId) !== receiver) {
             await HistoryService.createHistory({
                 type: 'VI01',
                 userId,
