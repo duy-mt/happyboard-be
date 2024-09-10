@@ -4,6 +4,7 @@ const JWT = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const _ = require('lodash')
 const sequelize = require('../models')
+require('dotenv').config()
 
 // BEGIN AUTH
 
@@ -35,9 +36,7 @@ const generateToken = async ({ payload, secretKey, expireTime }) => {
 }
 
 const createSecretKey = () => {
-    return process.env.DEV_SECRET_KEY
-        ? process.env.DEV_SECRET_KEY
-        : `Happyboard`
+    return process.env.SECRET_KEY
 }
 
 const createHash = (input) => {

@@ -3,8 +3,6 @@ const path = require('path')
 
 const htmlForgotPW = async ({ email, token }) => {
     let url = process.env.DOMAIN_RESET_PASSWORD
-        ? process.env.DOMAIN_RESET_PASSWORD
-        : 'https://happyboard.io.vn/reset-password'
     url += `/${token}`
     let data = await fs.readFileSync(
         path.resolve(__dirname, 'forgotPW.html'),

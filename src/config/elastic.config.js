@@ -1,6 +1,6 @@
 // CLOUD
 const dev = {
-    node: 'https://localhost:9200',
+    node: process.env.DEV_ES_NODE || 'https://localhost:9200',
     auth: {
         username: process.env.DEV_ES_USER || 'elastic',
         password: process.env.DEV_ES_PW || 'pwelastic',
@@ -10,19 +10,15 @@ const dev = {
     },
 }
 
-// 355139ffce6342abb1325c087525040e:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvOjQ0MyQzNDMxNGE3ZjJlOWQ0YWFkYmVhNzFkMmUyM2E5OTZlMSRhZmY5NzJjNDk5ZTA0NDlkYTVlNDkxNzFhZjkyYWMzZQ==
-// CJHJPBft8P2jp39FpkBzEPgi
-
 // LOCAL
 const prod = {
     cloud: {
         id:
-            process.env.CLOUD_ES_CLOUDID ||
-            'Happyboard_ES:YXNpYS1zb3V0aGVhc3QxLmdjcC5lbGFzdGljLWNsb3VkLmNvbTo0NDMkZmI1ZGNkYjNiNTZkNDQzZWI5ODRmY2NiM2Y1ZGVmMDMkMmJmYjhlZDFjMGZjNDJkNTkzODljYTM3NGRhMDFhOTM=',
+            process.env.PROD_ES_CLOUDID
     },
     auth: {
-        username: process.env.CLOUD_ES_USER || 'elastic',
-        password: process.env.CLOUD_ES_PW || 'kaa1nhPE4WhMtHHyOStCXDVu',
+        username: process.env.PROD_ES_USER,
+        password: process.env.PROD_ES_PW,
     },
 }
 
@@ -31,6 +27,6 @@ const config = {
     prod,
 }
 
-const env = process.env.NODE_ENV || 'prod'
+const env = process.env.NODE_ENV || 'dev'
 
 module.exports = config[env]
