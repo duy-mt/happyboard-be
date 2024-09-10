@@ -10,12 +10,18 @@ class AccessController {
 
         res.cookie('access-token', data.tokens.accessToken, {
             maxAge: 10 * 24 * 60 * 60 * 1000,
+            secure: true,
+            sameSite: 'None',
         })
             .cookie('refresh-token', data.tokens.refreshToken, {
                 maxAge: 10 * 24 * 60 * 60 * 1000,
+                secure: true,
+                sameSite: 'None',
             })
             .cookie('userId', data.user.id, {
                 maxAge: 10 * 24 * 60 * 60 * 1000,
+                secure: true,
+                sameSite: 'None',
             })
 
         new OK({
@@ -29,12 +35,18 @@ class AccessController {
 
         res.cookie('access-token', data.tokens.accessToken, {
             maxAge: 10 * 24 * 60 * 60 * 1000,
+            secure: true,
+            sameSite: 'None',
         })
             .cookie('refresh-token', data.tokens.refreshToken, {
                 maxAge: 10 * 24 * 60 * 60 * 1000,
+                secure: true,
+                sameSite: 'None',
             })
             .cookie('userId', data.user.id, {
                 maxAge: 10 * 24 * 60 * 60 * 1000,
+                secure: true,
+                sameSite: 'None',
             })
 
         new Created({
@@ -59,6 +71,8 @@ class AccessController {
 
         res.cookie('access-token', data.accessToken, {
             maxAge: 10 * 24 * 60 * 60 * 1000,
+            secure: true,
+            sameSite: 'None',
         })
 
         new OK({
@@ -75,12 +89,18 @@ class AccessController {
 
         res.cookie('access-token', data.tokens.accessToken, {
             maxAge: 10 * 24 * 60 * 60 * 1000,
+            secure: true,
+            sameSite: 'None',
         })
             .cookie('refresh-token', data.tokens.refreshToken, {
                 maxAge: 10 * 24 * 60 * 60 * 1000,
+                secure: true,
+                sameSite: 'None',
             })
             .cookie('userId', data.user.id, {
                 maxAge: 10 * 24 * 60 * 60 * 1000,
+                secure: true,
+                sameSite: 'None',
             })
             .redirect(
                 process.env.DOMAIN_CLIENT
