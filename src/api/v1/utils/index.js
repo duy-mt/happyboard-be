@@ -4,6 +4,7 @@ const JWT = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const _ = require('lodash')
 const sequelize = require('../models')
+require('dotenv').config()
 
 // BEGIN AUTH
 
