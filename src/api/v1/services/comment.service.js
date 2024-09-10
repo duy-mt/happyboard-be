@@ -48,7 +48,7 @@ class CommentService {
 
         const receiver = await findUserIdByIdeaId({ id: ideaId })
 
-        if (ideaHolder.userId != receiver) {
+        if (ideaHolder.userId !== receiver) {
             const data = {
                 sender: userId,
                 receiver: receiver.toString(),
@@ -131,7 +131,7 @@ class CommentService {
 
         const receiver = cmt.userId
 
-        if (idea.userId != receiver) {
+        if (idea.userId !== receiver) {
             const data = {
                 sender: userId,
                 receiver: receiver.toString(),

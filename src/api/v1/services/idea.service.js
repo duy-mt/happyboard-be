@@ -98,7 +98,7 @@ class IdeaService {
     }) => {
         const idea = await findIdea({ id, isPublished, isDrafted })
         if (!idea) throw new BadRequest('Idea is not exist')
-        await upView(id)
+        if (idea.isDrafted === false || idea.isPublished === false) await upView(id)
         const handledComment = sortComment(idea.comments)
 
         let status = await VoteService.getStatusVote({
@@ -356,7 +356,7 @@ class IdeaService {
                     targetId: ideaId,
                 },
             }
-            if (idea.userId != receiver) {
+            if (idea.userId !== receiver) {
                 await MessageQueue.send({
                     nameExchange: 'post_notification',
                     message: data,
@@ -383,7 +383,7 @@ class IdeaService {
             throw new BadRequest(`Idea is pending or draft, you can't vote this`)
         }
         const receiver = await findUserIdByIdeaId({ id: ideaId })
-        if (idea.userId != receiver) {
+        if (idea.userId !== receiver) {
             await HistoryService.createHistory({
                 type: 'VI01',
                 userId,
