@@ -44,12 +44,15 @@ router.get('', asyncHandler(ideaController.getAllPublishedIdeas))
 router.post('', authorize(['IDE04']), asyncHandler(ideaController.createIdea))
 router.post('/draft', asyncHandler(ideaController.draftIdea))
 
+router.get('/public/:ideaId', asyncHandler(ideaController.getPublicIdea))
 router.get('/popular', asyncHandler(ideaController.getPopularIdeas))
 router.get('/recent', asyncHandler(ideaController.getRecentIdeas))
 router.get('/similar', asyncHandler(ideaController.getSimilarIdeas))
 router.get('/:ideaId', asyncHandler(ideaController.getIdea))
 
-router.get('/:ideaId', asyncHandler(ideaController.getIdea))
+router.get('/own/draft', asyncHandler(ideaController.getAllOwnDraftedIdeas))
+
+
 router.put('/:ideaId', asyncHandler(ideaController.updateIdea))
 router.delete('/:ideaId', asyncHandler(ideaController.deleteIdea))
 
