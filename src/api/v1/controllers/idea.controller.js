@@ -15,6 +15,18 @@ class IdeaController {
         }).send(res)
     }
 
+    getPublicIdea = async (req, res, next) => {
+        new OK({
+            message: 'Get public idea successfully',
+            data: await IdeaService.getIdea({
+                id: req.params.ideaId,
+                userId: req.body.userId,
+                isPublished: true,
+                isDrafted: false
+            }),
+        }).send(res)
+    }
+
     getOwnDraftedIdea = async (req, res, next) => {
         new OK({
             message: 'Get drafted idea successfully',
