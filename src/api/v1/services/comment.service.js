@@ -19,22 +19,18 @@ const HistoryService = require('./history.service')
 const MessageQueue = require('./rabbitmq.service')
 
 class CommentService {
-    static createComment = async ({
-        content,
-        userId,
-        ideaId,
-        parentId = null,
-    }) => {
-        if (!content || !content.trim()) throw new BadRequest('Missing content')
+    static createComment = async ({ content, userId, ideaId, parentId }) => {
+        content = content.trim()
+        if (!content) throw new BadRequest('Missing content')
 
         let ideaHolder = await findIdea({
             id: ideaId,
+            isPublished: true,
+            isDrafted: false,
         })
-        if (ideaHolder.isDrafted == true || ideaHolder.isPublished == false) {
-            throw new BadRequest(`Idea is pending or draft, you can't vote this`)
-        }
         if (!ideaHolder)
             throw new BadRequest("Idea is not exist! So don't create comment")
+
         let type = 'CC01'
         let contentComment
         if (parentId) {
@@ -121,7 +117,9 @@ class CommentService {
         let idea = await findIdea({ id: cmt.ideaId })
         if (!idea) throw new BadRequest('Idea is not exist!')
         if (idea.isDrafted == true || idea.isPublished == false) {
-            throw new BadRequest(`Idea is pending or draft, you can't vote this`)
+            throw new BadRequest(
+                `Idea is pending or draft, you can't vote this`,
+            )
         }
         const r = await updateReaction({
             commentId,

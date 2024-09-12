@@ -8,7 +8,7 @@ class IdeaController {
     getIdea = async (req, res, next) => {
         new OK({
             message: 'Get idea successfully',
-            data: await IdeaService.getIdea({
+            data: await IdeaService.getPublishIdea({
                 id: req.params.ideaId,
                 userId: req.body.userId,
             }),

@@ -77,14 +77,14 @@ const createIdea = async ({
 }
 
 // FIND
-const findIdea = async ({ id, isPublished = null, isDrafted = null }) => {
+const findIdea = async ({ id, isPublished, isDrafted }) => {
     let where = {
         id,
     }
 
-    if (isPublished != null) where.isPublished = isPublished
+    if (isPublished) where.isPublished = isPublished
 
-    if (isDrafted != null) where.isDrafted = isDrafted
+    if (isDrafted) where.isDrafted = isDrafted
 
     const idea = await Idea.findOne({
         where,
@@ -93,6 +93,22 @@ const findIdea = async ({ id, isPublished = null, isDrafted = null }) => {
 
     return idea && processReturnedData(idea)
 }
+// const findIdea = async ({ id, isPublished = null, isDrafted = null }) => {
+//     let where = {
+//         id,
+//     }
+
+//     if (isPublished != null) where.isPublished = isPublished
+
+//     if (isDrafted != null) where.isDrafted = isDrafted
+
+//     const idea = await Idea.findOne({
+//         where,
+//         ...optIdea,
+//     })
+
+//     return idea && processReturnedData(idea)
+// }
 
 const findPublisedIdea = async ({ id }) => {
     const idea = await Idea.findOne({

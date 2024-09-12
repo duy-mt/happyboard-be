@@ -1,12 +1,11 @@
 'use strict'
 
-const { Conflict, BadRequest, Unauthorized } = require('../core/error.response')
+const { Conflict, BadRequest } = require('../core/error.response')
 const {
-    createNewToken,
     updatePairToken,
-    removeTokenById,
     findTokenByRefreshToken,
     removeTokenByAccessToken,
+    updateDeviceToken,
 } = require('../models/repo/token.repo')
 const {
     findUserByEmail,
@@ -17,9 +16,7 @@ const {
 const { createRole } = require('../models/repo/user_has_roles.repo')
 const { htmlForgotPW } = require('../template')
 const {
-    createAccessToken,
     createSecretKey,
-    createRefreshToken,
     createHash,
     compareHash,
     verifyJWT,
@@ -32,8 +29,8 @@ const redisService = require('./redis.service')
 class AccessService {
     static login = async ({ email, password, deviceToken }) => {
         // 1.Check email
-        if (!email || !password)
-            throw new BadRequest('Email and password are required')
+        ;[email, password] = this.validateInput({ email, password })
+
         const { password: foundPW, user: foundUser } =
             await findUserByEmail(email)
         if (!foundUser) throw new Conflict('Account does not exist')
@@ -45,43 +42,49 @@ class AccessService {
         const isPw = await compareHash(password, foundPW)
         if (!isPw) throw new BadRequest('Password is incorrect')
 
-        // 3. Update access token
-        const payload = {
-            userId: foundUser.id,
-            email,
-        }
-        const secretKey = createSecretKey()
-        const newAccessToken = await createAccessToken({
-            payload,
-            secretKey,
-        })
-        const newRefreshToken = await createRefreshToken({
-            payload,
-            secretKey,
+        let user = removeField({
+            obj: foundUser,
+            field: ['isOnline', 'password', 'createdAt', 'updatedAt'],
         })
 
-        await updatePairToken({
-            userId: foundUser.id,
-            accessToken: newAccessToken,
-            refreshToken: newRefreshToken,
-            deviceToken: deviceToken,
+        let tokens = await this.saveToken({
+            userId: user.id,
+            email: email,
         })
+
+        // Update device token
+        if (deviceToken)
+            await this.saveDeviceToken({
+                accessToken: tokens.accessToken,
+                deviceToken,
+            })
 
         return {
-            user: foundUser,
-            tokens: {
-                accessToken: newAccessToken,
-                refreshToken: newRefreshToken,
-            },
+            user,
+            tokens,
         }
     }
 
     static signUp = async ({ email, password, username }) => {
-        if (!email || !password)
-            throw new BadRequest('Missing Email Or Password')
+        ;[email, password, username] = this.validateInput({
+            email,
+            password,
+            username,
+        })
+
+        // Validate email
+        let regexEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g
+        let isEmail = regexEmail.test(email)
+        if (!isEmail) throw new BadRequest('Email is invalid')
+
+        // Validate password
+        if (password.length < 8)
+            throw new BadRequest('Password must be at least 8 characters')
+
+        // Find user
         const holderUser = await findUserByEmail(email)
-        console.log(holderUser)
         if (holderUser.user) throw new Conflict('Account already exists')
+
         const hashPW = await createHash(password)
         const newUser = await createUser({
             email,
@@ -89,61 +92,39 @@ class AccessService {
             username,
         })
 
-        if (newUser) {
-            // Add role user
-            await createRole({
-                userId: newUser.id,
-            })
+        if (!newUser) throw new BadRequest('Create account failed')
+        let user = removeField({
+            obj: newUser,
+            field: ['isOnline', 'password', 'createdAt', 'updatedAt'],
+        })
+        // Add role user
+        await createRole({
+            userId: user.id,
+        })
 
-            const payload = {
-                userId: newUser.id,
-                email,
-            }
-            const secretKey = createSecretKey()
-            const accessToken = await createAccessToken({
-                payload,
-                secretKey,
-            })
-            const refreshToken = await createRefreshToken({
-                payload,
-                secretKey,
-            })
-            await createNewToken({
-                userId: newUser.id,
-                accessToken,
-                refreshToken,
-            })
+        let tokens = await this.saveToken({
+            userId: user.id,
+            email: email,
+        })
 
-            return {
-                user: removeField({
-                    obj: newUser,
-                    field: ['password', 'createdAt', 'updatedAt'],
-                }),
-                tokens: {
-                    accessToken,
-                    refreshToken,
-                },
-            }
+        return {
+            user,
+            tokens,
         }
-        return null
     }
 
     static logout = async ({ accessToken }) => {
-        // const delToken = await removeTokenById(token.id)
         const delToken = await removeTokenByAccessToken({ accessToken })
         return delToken
     }
 
-    static handleRefreshToken = async ({
-        userId,
-        refreshToken,
-        deviceToken,
-    }) => {
+    static handleRefreshToken = async ({ userId, refreshToken }) => {
         if (!refreshToken)
             throw new BadRequest('Wrong infomation. Relogin please')
 
         // 1. Check refreshToken exists in db
         const holderToken = await findTokenByRefreshToken(refreshToken)
+
         if (!holderToken)
             throw new BadRequest('Wrong infomation. Relogin please')
 
@@ -155,21 +136,22 @@ class AccessService {
 
         if (id != userId)
             throw new BadRequest('Wrong infomation. Relogin please')
+
         const payload = {
             userId,
             email,
         }
 
-        const accessToken = await createAccessToken({
+        const accessToken = await generateToken({
             payload,
             secretKey: createSecretKey(),
+            expireTime: '1h',
         })
 
         const token = await updatePairToken({
             userId,
             accessToken,
             refreshToken,
-            deviceToken: deviceToken,
         })
 
         if (!token) throw new BadRequest('Wrong infomation. Relogin please')
@@ -178,7 +160,7 @@ class AccessService {
         }
     }
 
-    static signUpWithGoogle = async ({ user, deviceToken = '' }) => {
+    static signUpWithGoogle = async ({ user, deviceToken }) => {
         const email = user.emails[0].value
         const username = email.split('@')[0]
         const password = 'password123'
@@ -188,33 +170,19 @@ class AccessService {
         if (foundUser?.status === 'block')
             throw new BadRequest('Account is blocked')
         if (foundUser) {
-            const payload = {
+            let tokens = await this.saveToken({
                 userId: foundUser.id,
                 email,
-            }
-            const secretKey = createSecretKey()
-            const newAccessToken = await createAccessToken({
-                payload,
-                secretKey,
             })
-            const newRefreshToken = await createRefreshToken({
-                payload,
-                secretKey,
-            })
-
-            await updatePairToken({
-                userId: foundUser.id,
-                accessToken: newAccessToken,
-                refreshToken: newRefreshToken,
-                deviceToken: deviceToken,
-            })
+            if (deviceToken)
+                await this.saveDeviceToken({
+                    accessToken: tokens.accessToken,
+                    deviceToken,
+                })
 
             return {
                 user: foundUser,
-                tokens: {
-                    accessToken: newAccessToken,
-                    refreshToken: newRefreshToken,
-                },
+                tokens,
             }
         } else {
             const hashPW = await createHash(password)
@@ -225,45 +193,26 @@ class AccessService {
                 avatar,
             })
 
-            if (newUser) {
-                await createRole({
-                    userId: newUser.id,
-                })
+            if (!newUser) throw new BadRequest('Create account failed')
 
-                const payload = {
-                    userId: newUser.id,
-                    email,
-                }
-                const secretKey = createSecretKey()
-                const accessToken = await createAccessToken({
-                    payload,
-                    secretKey,
-                })
-                const refreshToken = await createRefreshToken({
-                    payload,
-                    secretKey,
-                })
-                await createNewToken({
-                    userId: newUser.id,
-                    accessToken,
-                    refreshToken,
-                })
+            await createRole({
+                userId: newUser.id,
+            })
 
-                return {
-                    user: removeField({
-                        obj: newUser,
-                        field: ['password', 'createdAt', 'updatedAt'],
-                    }),
-                    tokens: {
-                        accessToken,
-                        refreshToken,
-                    },
-                }
+            let tokens = await this.saveToken({
+                userId: newUser.id,
+                email: email,
+            })
+
+            return {
+                user,
+                tokens,
             }
         }
     }
 
     static forgotPW = async ({ email }) => {
+        ;[email] = this.validateInput({ email })
         if (!email) throw new BadRequest('Email is required!')
         let { user } = await findUserByEmail(email)
         if (!user) throw new BadRequest('Account is not exist!')
@@ -300,24 +249,6 @@ class AccessService {
         })
 
         return rs
-    }
-
-    static verifyToken = async ({ token, secretKey }) => {
-        try {
-            const decode = await verifyJWT({ token, secretKey })
-            return decode
-        } catch (error) {
-            return null
-        }
-    }
-
-    static validateToken = async ({ token }) => {
-        let decode = await this.verifyToken({
-            token,
-            secretKey: createSecretKey(),
-        })
-        if (!decode) throw new BadRequest('Invalid token')
-        return 1
     }
 
     static changePW = async ({ new_password, token }) => {
@@ -365,6 +296,71 @@ class AccessService {
         })
         if (!result) throw new BadRequest('Update password failed')
         return result
+    }
+
+    // Component
+    static verifyToken = async ({ token, secretKey }) => {
+        try {
+            const decode = await verifyJWT({ token, secretKey })
+            return decode
+        } catch (error) {
+            return null
+        }
+    }
+
+    static validateToken = async ({ token }) => {
+        let decode = await this.verifyToken({
+            token,
+            secretKey: createSecretKey(),
+        })
+        if (!decode) throw new BadRequest('Invalid token')
+        return 1
+    }
+
+    static saveToken = async ({ userId, email }) => {
+        const secretKey = createSecretKey()
+
+        const payload = {
+            userId,
+            email,
+        }
+
+        const accessToken = await generateToken({
+            payload,
+            secretKey,
+            expireTime: '1h',
+        })
+
+        const refreshToken = await generateToken({
+            payload,
+            secretKey,
+            expireTime: '90d',
+        })
+
+        await updatePairToken({
+            userId,
+            accessToken,
+            refreshToken,
+        })
+
+        return {
+            accessToken,
+            refreshToken,
+        }
+    }
+
+    static saveDeviceToken = async ({ accessToken, deviceToken }) => {
+        await updateDeviceToken({ accessToken, deviceToken })
+    }
+
+    static validateInput = (input) => {
+        let output = Object.keys(input).map((key) => {
+            if (!input[key]) throw new BadRequest(`Missing ${key}`)
+            let res = input[key].trim()
+            if (!res) throw new BadRequest(`Missing ${key}`)
+            return res
+        })
+        return output
     }
 }
 

@@ -7,11 +7,12 @@ const { default: helmet } = require('helmet')
 const morgan = require('morgan')
 const cookieParser = require('cookie-parser')
 const cors = require('cors')
-const { NotFound } = require('./api/v1/core/error.response')
+const { NotFound, Forbidden } = require('./api/v1/core/error.response')
 const passport = require('passport')
 const session = require('express-session')
 const { v4: uuidv4 } = require('uuid')
 const MyLogger = require('./api/v1/loggers/myLogger')
+const { WHILELIST_DOMAIN } = require('./api/v1/constants')
 
 const app = express()
 
@@ -28,15 +29,20 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 app.use(morgan('dev'))
-app.use(
-    cors({
-        origin: [
-            process.env.DOMAIN_CLIENT,
-            process.env.DOMAIN_ADMIN,
-        ],
-        credentials: true,
-    }),
-)
+
+var corsOptions = {
+    origin: function (origin, callback) {
+        if (WHILELIST_DOMAIN.indexOf(origin) !== -1) {
+            callback(null, true)
+        } else {
+            callback(new Forbidden('Not allowed by CORS'))
+        }
+    },
+    credentials: true,
+}
+
+app.use(cors(corsOptions))
+
 app.use(helmet())
 app.use(compression())
 app.use(express.json())
