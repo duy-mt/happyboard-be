@@ -1,5 +1,5 @@
 'use strict'
-const { Op,literal, where } = require('sequelize')
+const { Op, literal, where } = require('sequelize')
 const { Idea, Comment, User, Category, Vote, sequelize } = require('../index')
 const { upVote, downVote, deleteVote, findVote } = require('./vote.repo')
 const { processReturnedData } = require('../../utils')
@@ -8,54 +8,61 @@ const { processReturnedData } = require('../../utils')
 const optIdea = {
     order: [
         ['updatedAt', 'DESC'],
-        ['id', 'DESC']
+        ['id', 'DESC'],
     ],
-    include: [{
-        model: Comment,
-        as: 'comments',
-        include: [
-            {
-                model: User,
-                attributes: ['id', 'username', 'email', 'avatar']
-            }
-        ]
-        }, {
+    include: [
+        {
+            model: Comment,
+            as: 'comments',
+            include: [
+                {
+                    model: User,
+                    attributes: ['id', 'username', 'email', 'avatar'],
+                },
+            ],
+        },
+        {
             model: Category,
             attributes: ['id', 'title', 'icon'],
-        }, 
+        },
         {
             model: User,
-            attributes: ['id', 'username', 'email', 'avatar']
+            attributes: ['id', 'username', 'email', 'avatar'],
         },
     ],
     // attributes: ['id', 'title', 'content', 'voteCount', 'commentCount', 'viewCount', 'createdAt', 'updatedAt']
     attributes: {
-        exclude: ['categoryId']
-    }
+        exclude: ['categoryId'],
+    },
 }
 
 const optIdeaNoComment = {
     order: [
         ['updatedAt', 'DESC'],
-        ['id', 'DESC']
+        ['id', 'DESC'],
     ],
     include: [
         {
             model: User,
-            attributes: ['id', 'username', 'email', 'avatar']
+            attributes: ['id', 'username', 'email', 'avatar'],
         },
         {
             model: Category,
-            attributes: ['id', 'title', 'icon']
-        }
+            attributes: ['id', 'title', 'icon'],
+        },
     ],
     attributes: {
         exclude: ['isDrafted', 'isPublished', 'categoryId', 'userId'],
-    }
+    },
 }
 
 const createIdea = async ({
-    title, content, categoryId, userId, isPublished, isDrafted
+    title,
+    content,
+    categoryId,
+    userId,
+    isPublished,
+    isDrafted,
 }) => {
     const idea = await Idea.create({
         title,
@@ -63,37 +70,53 @@ const createIdea = async ({
         userId,
         categoryId,
         isPublished,
-        isDrafted
+        isDrafted,
     })
 
     return idea
 }
 
 // FIND
-const findIdea = async ({ id, isPublished = null, isDrafted = null}) => {  
+const findIdea = async ({ id, isPublished, isDrafted }) => {
     let where = {
-        id
+        id,
     }
-    
-    if(isPublished != null) where.isPublished = isPublished
 
-    if(isDrafted != null) where.isDrafted = isDrafted
+    if (isPublished) where.isPublished = isPublished
+
+    if (isDrafted) where.isDrafted = isDrafted
 
     const idea = await Idea.findOne({
         where,
-        ...optIdea
+        ...optIdea,
     })
 
     return idea && processReturnedData(idea)
 }
+// const findIdea = async ({ id, isPublished = null, isDrafted = null }) => {
+//     let where = {
+//         id,
+//     }
+
+//     if (isPublished != null) where.isPublished = isPublished
+
+//     if (isDrafted != null) where.isDrafted = isDrafted
+
+//     const idea = await Idea.findOne({
+//         where,
+//         ...optIdea,
+//     })
+
+//     return idea && processReturnedData(idea)
+// }
 
 const findPublisedIdea = async ({ id }) => {
     const idea = await Idea.findOne({
         where: {
             id,
-            isPublished: true
+            isPublished: true,
         },
-        raw: true
+        raw: true,
     })
     return idea && processReturnedData(idea)
 }
@@ -102,43 +125,81 @@ const findPendingIdea = async ({ id }) => {
     const idea = await Idea.findOne({
         where: {
             id,
-            isPublished: false
+            isPublished: false,
         },
-        raw: true
+        raw: true,
     })
     return idea && processReturnedData(idea)
 }
 
 const findAllIdeas = async ({
-    limit, page, fieldSort, isPublished = true, isDrafted = false
+    limit,
+    page,
+    fieldSort,
+    categories = null,
+    isPublished = true,
+    isDrafted = false,
 }) => {
-    let queryFindIdeas = {
-        offset: 0,
-        limit: 5,
-        where: {},
-        order: [
-            ['updatedAt', 'DESC'],  
-            ['id', 'DESC']
-        ],
-        include: [
-            {
-                model: User,
-                attributes: ['id', 'username', 'email', 'avatar']
+    let queryFindIdeas
+    if (!categories) {
+        queryFindIdeas = {
+            offset: 0,
+            limit: 5,
+            where: {},
+            order: [
+                ['updatedAt', 'DESC'],
+                ['id', 'DESC'],
+            ],
+            include: [
+                {
+                    model: User,
+                    attributes: ['id', 'username', 'email', 'avatar'],
+                },
+                {
+                    model: Category,
+                    attributes: ['id', 'title', 'icon'],
+                },
+            ],
+            attributes: {
+                exclude: ['categoryId', 'userId'],
             },
-            {
-                model: Category,
-                attributes: ['id', 'title', 'icon']
-            }
-        ],
-        attributes: {
-            exclude: ['categoryId', 'userId'],
+        }
+    } else {
+        queryFindIdeas = {
+            offset: 0,
+            limit: 5,
+            where: {},
+            order: [
+                ['updatedAt', 'DESC'],
+                ['id', 'DESC'],
+            ],
+            include: [
+                {
+                    model: User,
+                    attributes: ['id', 'username', 'email', 'avatar'],
+                },
+                {
+                    model: Category,
+                    attributes: ['id', 'title', 'icon'],
+                    where: {
+                        title: {
+                            [Op.in]: categories
+                                .split(',')
+                                .map((cat) => cat.trim()),
+                        },
+                    },
+                },
+            ],
+            attributes: {
+                exclude: ['categoryId', 'userId'],
+            },
         }
     }
     let offset = (page - 1) * limit
     queryFindIdeas.offset = offset
     queryFindIdeas.limit = limit
     queryFindIdeas.order[0][0] = fieldSort
-    if(isPublished != null) {
+    if (isPublished != null) {
         queryFindIdeas.where.isPublished = isPublished
     } else {
         delete queryFindIdeas.where.isPublished
@@ -146,8 +207,7 @@ const findAllIdeas = async ({
     }
     if (isDrafted != null) {
         queryFindIdeas.where.isDrafted = isDrafted
-    }
-    else {
+    } else {
         delete queryFindIdeas.where.isDrafted
         queryFindIdeas.attributes.exclude = ['categoryId', 'userId']
     }
@@ -155,81 +215,85 @@ const findAllIdeas = async ({
 
     return {
         ideas: processReturnedData(ideas),
-        totalIdea: count
+        totalIdea: count,
     }
 }
 
-const findAllIdeasByUsedId = async ({userId, isPublished = true}) => {
+const findAllIdeasByUsedId = async ({ userId, isPublished = true }) => {
     const ideas = await Idea.findAll({
         where: {
             userId,
             // isPublished
         },
-        ...optIdea
+        ...optIdea,
     })
     return processReturnedData(ideas)
 }
 
 const findIdeaPage = async ({ limit, page, q = null, fieldSort }) => {
     const offset = (page - 1) * limit
-    const search = q ? {
-        title: {
-            [Op.like]: `%${q}%`
-        }
-    } : null
+    const search = q
+        ? {
+              title: {
+                  [Op.like]: `%${q}%`,
+              },
+          }
+        : null
 
     const { count, rows: ideas } = await Idea.findAndCountAll({
         offset,
         limit,
         where: {
             isPublished: null,
-            ...search
+            ...search,
         },
         ...optIdeaNoComment,
         order: [
             [fieldSort, 'DESC'],
-            ['id', 'DESC']
+            ['id', 'DESC'],
         ],
     })
 
     return {
         ideas: processReturnedData(ideas),
-        totalIdea: count
+        totalIdea: count,
     }
 }
 
-const findUserIdByIdeaId = async ({
-    id
-}) => {
+const findUserIdByIdeaId = async ({ id }) => {
     const idea = await Idea.findByPk(id)
     return idea.userId
 }
 
 // OWN USER
 const findAllOwnIdeas = async ({
-    limit, page, userId, isPublished = true, isDrafted = false
+    limit,
+    page,
+    userId,
+    isPublished = true,
+    isDrafted = false,
 }) => {
     let queryFindIdeas = {
         offset: 0,
         limit: 5,
         where: {},
         order: [
-            ['updatedAt', 'DESC'],  
-            ['id', 'DESC']
+            ['updatedAt', 'DESC'],
+            ['id', 'DESC'],
         ],
         include: [
             {
                 model: User,
-                attributes: ['id', 'username', 'email', 'avatar']
+                attributes: ['id', 'username', 'email', 'avatar'],
             },
             {
                 model: Category,
-                attributes: ['id', 'title', 'icon']
-            }
+                attributes: ['id', 'title', 'icon'],
+            },
         ],
         attributes: {
             exclude: ['categoryId', 'userId'],
-        }
+        },
     }
     let offset = (page - 1) * limit
     queryFindIdeas.offset = offset
@@ -237,106 +301,106 @@ const findAllOwnIdeas = async ({
     queryFindIdeas.where.userId = userId
     if (isPublished != null) {
         queryFindIdeas.where.isPublished = isPublished
-    }
-    else {
+    } else {
         delete queryFindIdeas.where.isPublished
     }
     if (isDrafted != null) {
         queryFindIdeas.where.isDrafted = isDrafted
-    }
-    else {
+    } else {
         delete queryFindIdeas.where.isDrafted
     }
     let { count, rows: ideas } = await Idea.findAndCountAll(queryFindIdeas)
 
     return {
         ideas: processReturnedData(ideas),
-        totalIdea: count
+        totalIdea: count,
     }
 }
 // ENDOWN USER
 
-const increaseVoteCount = async ({
-    ideaId, userId
-}) => {
+const increaseVoteCount = async ({ ideaId, userId }) => {
     const vote = await findVote({ ideaId, userId })
     const idea = await Idea.findByPk(ideaId)
     let updated = vote?.status == 1
-    if(updated) return {
-        voteCount: idea.voteCount,
-        updated: !updated
-    }
+    if (updated)
+        return {
+            voteCount: idea.voteCount,
+            updated: !updated,
+        }
 
     const t = await sequelize.transaction()
     const point = await upVote({
-        ideaId, userId
+        ideaId,
+        userId,
     })
     await idea.increment('voteCount', {
-        by: point
+        by: point,
     })
     await t.commit()
     return {
         voteCount: idea.voteCount,
-        updated: !updated
+        updated: !updated,
     }
 }
 
-const decrementVoteCount = async ({
-    ideaId, userId
-}) => {
+const decrementVoteCount = async ({ ideaId, userId }) => {
     const vote = await findVote({ ideaId, userId })
     const idea = await Idea.findByPk(ideaId)
-    if(vote?.status == -1) return {
-        voteCount: idea.voteCount
-    }
+    if (vote?.status == -1)
+        return {
+            voteCount: idea.voteCount,
+        }
     const t = await sequelize.transaction()
 
     const point = await downVote({
-        userId, ideaId 
+        userId,
+        ideaId,
     })
     await idea.decrement('voteCount', {
-        by: point
+        by: point,
     })
     await t.commit()
     return {
-        voteCount: idea.voteCount
+        voteCount: idea.voteCount,
     }
 }
 
-const cancelVote = async ({
-    ideaId, userId
-}) => {
+const cancelVote = async ({ ideaId, userId }) => {
     const vote = await findVote({ ideaId, userId })
     const idea = await Idea.findByPk(ideaId)
-    if(vote == null) return {
-        voteCount: idea.voteCount
-    }
+    if (vote == null)
+        return {
+            voteCount: idea.voteCount,
+        }
     const t = await sequelize.transaction()
     const point = await deleteVote({
-        userId, ideaId 
+        userId,
+        ideaId,
     })
     await idea.increment('voteCount', {
-        by: point
+        by: point,
     })
     await t.commit()
     return {
-        voteCount: idea.voteCount
+        voteCount: idea.voteCount,
     }
 }
 
 const upView = async (id) => {
-    const idea = await Idea.increment({
-        viewCount: 1
-    }, 
-    { 
-        where: { id },
-        raw: true
-    })
+    const idea = await Idea.increment(
+        {
+            viewCount: 1,
+        },
+        {
+            where: { id },
+            raw: true,
+        },
+    )
 
     return idea.viewCount
 }
 
-const updateIdea = async ({ id, opt}) => {
+const updateIdea = async ({ id, opt }) => {
     const idea = await Idea.findByPk(id)
 
     await idea.update(opt)
@@ -346,34 +410,36 @@ const updateIdea = async ({ id, opt}) => {
 }
 
 const findIdeasByIds = async (ids = []) => {
-    if(ids.length === 0) return ids
+    if (ids.length === 0) return ids
     let ideas = []
-    await Promise.all(await ids.map(async (id) => {
-        let i = await Idea.findOne({
-            where: {
-                id,
-                isDrafted: false,
-                isPublished: true
-            },
-            ...optIdeaNoComment,
-        })
-        if(i) ideas.push(processReturnedData(i))
-    }))
+    await Promise.all(
+        await ids.map(async (id) => {
+            let i = await Idea.findOne({
+                where: {
+                    id,
+                    isDrafted: false,
+                    isPublished: true,
+                },
+                ...optIdeaNoComment,
+            })
+            if (i) ideas.push(processReturnedData(i))
+        }),
+    )
     return ideas
 }
 
-const findIdeasByCategoryId = async ({categoryId, limit, ideaId}) => {
+const findIdeasByCategoryId = async ({ categoryId, limit, ideaId }) => {
     const ideas = await Idea.findAll({
         limit,
-        where: {    
+        where: {
             id: {
-                [Op.not]: ideaId
+                [Op.not]: ideaId,
             },
             categoryId,
             isPublished: true,
-            isDrafted: false
+            isDrafted: false,
         },
-        ...optIdeaNoComment
+        ...optIdeaNoComment,
     })
     return processReturnedData(ideas)
 }
@@ -382,22 +448,20 @@ const findIdeasByVote = async ({ limit }) => {
     const ideas = await Idea.findAll({
         limit,
         where: {
-            [Op.and]: {
+            [Op.or]: {
                 voteCount: {
-                    [Op.gt]: 5
+                    [Op.gt]: 5,
                 },
                 commentCount: {
-                    [Op.gt]: 5
+                    [Op.gt]: 5,
                 },
                 viewCount: {
-                    [Op.gt]: 10
-                }
-            }
+                    [Op.gt]: 5,
+                },
+            },
         },
         ...optIdeaNoComment,
-        order: [
-            ['voteCount', 'DESC']
-        ],
+        order: [['voteCount', 'DESC']],
     })
     return processReturnedData(ideas)
 }
@@ -405,8 +469,8 @@ const findIdeasByVote = async ({ limit }) => {
 const deleteIdea = async (id) => {
     const deleted = await Idea.destroy({
         where: {
-            id
-        }
+            id,
+        },
     })
     return deleted
 }

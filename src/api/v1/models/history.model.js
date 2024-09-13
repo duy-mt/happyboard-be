@@ -11,28 +11,30 @@ module.exports = (sequelize, DataTypes) => {
          */
         static associate(models) {
             this.belongsTo(models.User, {
-                foreignKey: 'userId'
+                foreignKey: 'userId',
             })
 
             this.belongsTo(models.User, {
-                foreignKey: 'userTargetId'
+                foreignKey: 'userTargetId',
             })
         }
     }
-    History.init({
-        userId: DataTypes.INTEGER,
-        type: DataTypes.STRING(4),
-        userTargetId: DataTypes.INTEGER,
-        objectTargetId: DataTypes.INTEGER,
-        objectTargetLv2Id: DataTypes.INTEGER,
-        contentIdea: DataTypes.TEXT,
-        contentComment: DataTypes.TEXT
-
-    }, {
-        sequelize,
-        modelName: 'History',
-        tableName: 'histories',
-        timestamps: true,
-    })
+    History.init(
+        {
+            userId: DataTypes.INTEGER,
+            type: DataTypes.STRING(4),
+            userTargetId: DataTypes.INTEGER,
+            objectTargetId: DataTypes.INTEGER,
+            objectTargetLv2Id: DataTypes.INTEGER,
+            contentIdea: DataTypes.TEXT,
+            contentComment: DataTypes.TEXT,
+        },
+        {
+            sequelize,
+            modelName: 'History',
+            tableName: 'histories',
+            timestamps: true,
+        },
+    )
     return History
 }

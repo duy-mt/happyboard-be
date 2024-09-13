@@ -6,22 +6,22 @@ const { User_has_permissions } = require('../index')
 const findPermissionsByUserId = async (userId) => {
     const permissions = await User_has_permissions.findAll({
         where: {
-            userId: userId
+            userId: userId,
         },
         attributes: ['permissionId'],
-        raw: true
+        raw: true,
     })
-    return permissions.map(p => p.permissionId)
+    return permissions.map((p) => p.permissionId)
 }
 
 const createPermission = async ({ userId, permissions }) => {
     if (!Array.isArray(permissions)) {
-        throw new Error("Permissions must be an array");
+        throw new Error('Permissions must be an array')
     }
 
-    const userPermissions = permissions.map(permissionId => ({
+    const userPermissions = permissions.map((permissionId) => ({
         userId,
-        permissionId
+        permissionId,
     }))
 
     let rows = await User_has_permissions.bulkCreate(userPermissions)
@@ -31,16 +31,16 @@ const createPermission = async ({ userId, permissions }) => {
 
 const deletePermissionOfUser = async ({ userId, permissions }) => {
     if (!Array.isArray(permissions)) {
-        throw new Error("Permissions must be an array");
+        throw new Error('Permissions must be an array')
     }
 
     const result = await User_has_permissions.destroy({
         where: {
             userId,
             permissionId: {
-                [Op.in]: permissions
-            }
-        }
+                [Op.in]: permissions,
+            },
+        },
     })
 
     return result
@@ -49,5 +49,5 @@ const deletePermissionOfUser = async ({ userId, permissions }) => {
 module.exports = {
     findPermissionsByUserId,
     createPermission,
-    deletePermissionOfUser
+    deletePermissionOfUser,
 }

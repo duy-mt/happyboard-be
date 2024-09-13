@@ -9,17 +9,19 @@ module.exports = (sequelize, DataTypes) => {
          * This method is not a part of Sequelize lifecycle.
          * The `models/index` file will call this method automatically.
          */
-        static associate(models) {
-        }
+        static associate(models) {}
     }
-    User_has_permissions.init({
-        permissionId: DataTypes.INTEGER,
-        userId: DataTypes.INTEGER,
-    }, {
-        sequelize,
-        modelName: 'User_has_permissions',
-        tableName: 'user_has_permissions',
-        timestamps: true,
-    })
+    User_has_permissions.init(
+        {
+            permissionId: DataTypes.INTEGER,
+            userId: DataTypes.INTEGER,
+        },
+        {
+            sequelize,
+            modelName: 'User_has_permissions',
+            tableName: 'user_has_permissions',
+            timestamps: true,
+        },
+    )
     return User_has_permissions
 }

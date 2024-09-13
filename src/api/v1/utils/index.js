@@ -4,44 +4,39 @@ const JWT = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const _ = require('lodash')
 const sequelize = require('../models')
+require('dotenv').config()
 
 // BEGIN AUTH
 
-const createAccessToken = async ({
-    payload, secretKey
-}) => {
+const createAccessToken = async ({ payload, secretKey }) => {
     const accessToken = JWT.sign(payload, secretKey, {
         algorithm: 'HS256',
-        expiresIn: '1d'
+        expiresIn: '1d',
     })
     return accessToken
 }
 
-const createRefreshToken = async ({
-    payload, secretKey
-}) => {
+const createRefreshToken = async ({ payload, secretKey }) => {
     const refreshToken = JWT.sign(payload, secretKey, {
         algorithm: 'HS256',
-        expiresIn: '90d'
+        expiresIn: '90d',
     })
 
     return refreshToken
 }
 
 // Shorten
-const generateToken = async ({
-    payload, secretKey, expireTime
-}) => {
+const generateToken = async ({ payload, secretKey, expireTime }) => {
     const token = JWT.sign(payload, secretKey, {
         algorithm: 'HS256',
-        expiresIn: expireTime
+        expiresIn: expireTime,
     })
 
     return token
 }
 
 const createSecretKey = () => {
-    return process.env.DEV_SECRET_KEY ? process.env.DEV_SECRET_KEY : `Happyboard`
+    return process.env.SECRET_KEY
 }
 
 const createHash = (input) => {
@@ -54,7 +49,7 @@ const compareHash = (input1, input2) => {
     return bcrypt.compareSync(input1, input2)
 }
 
-const verifyJWT = async ({token, secretKey}) => {
+const verifyJWT = async ({ token, secretKey }) => {
     return await JWT.verify(token, secretKey)
 }
 
@@ -68,48 +63,45 @@ const convertTime = (originTime) => {
     // const hours = String(date.getUTCHours() + 7).padStart(2, '0')
     // const minutes = String(date.getUTCMinutes()).padStart(2, '0')
     // const seconds = String(date.getUTCSeconds()).padStart(2, '0')
-    
+
     // // Format: hh:mm:ss dd/MM/yyyy
     // const formattedDate = `${day}/${month}/${year} at ${hours}:${minutes}`
     // return formattedDate
     return originTime
 }
 
-
 const getModel = (modelName) => {
     return sequelize[modelName]
 }
 
-const removeUndefinedObject = obj => {
+const removeUndefinedObject = (obj) => {
     console.log(obj)
-} 
+}
 
-const removeField = ({
-    obj, field = []
-}) => {
-    Object.keys(obj).forEach(key => {
-        if(obj[key] == null || obj[key] == undefined) delete obj[key]
-        else if(obj[key].toString().trim() === '') delete obj[key]
-        else if(field.includes(key)) delete obj[key]
+const removeField = ({ obj, field = [] }) => {
+    Object.keys(obj).forEach((key) => {
+        if (obj[key] == null || obj[key] == undefined) delete obj[key]
+        else if (obj[key].toString().trim() === '') delete obj[key]
+        else if (field.includes(key)) delete obj[key]
     })
 
     return obj
 }
 
 const processReturnedData = (obj) => {
-    if(obj == null) return obj
+    if (obj == null) return obj
     obj = JSON.parse(JSON.stringify(obj))
 
-    if(Array.isArray(obj)) {
-        obj = obj.map(child => {
+    if (Array.isArray(obj)) {
+        obj = obj.map((child) => {
             return processReturnedData(child)
         })
     }
 
-    Object.keys(obj).forEach(key => {
-        if(obj[key] == null) {
+    Object.keys(obj).forEach((key) => {
+        if (obj[key] == null) {
             delete obj[key]
-        } else if(Array.isArray(obj[key])) {
+        } else if (Array.isArray(obj[key])) {
             obj[key] = processReturnedData(obj[key])
         }
     })
@@ -124,14 +116,14 @@ const processReturnedData = (obj) => {
 const sortComment = (comments) => {
     const commentMap = {}
 
-    comments.forEach(comment => {
+    comments.forEach((comment) => {
         comment.children = []
         commentMap[comment.id] = comment
     })
 
     const rootComments = []
 
-    comments.forEach(comment => {
+    comments.forEach((comment) => {
         if (comment.parentId) {
             commentMap[comment.parentId].children.push(comment)
         } else {
@@ -146,22 +138,22 @@ const heartbeatSocket = (wss) => {
     setInterval(() => {
         wss.clients.forEach((ws) => {
             if (!ws.isAlive) {
-              console.log('Client is not alive, terminating connection');
-              ws.terminate(); 
+                console.log('Client is not alive, terminating connection')
+                ws.terminate()
             }
-            ws.isAlive = false;
-            ws.ping(); 
-        });
+            ws.isAlive = false
+            ws.ping()
+        })
     }, 5000)
 }
 
 const convetToTimestamp = (time) => {
     let types = {
-        m: 60*1000,
-        h: 60*60*1000,
-        d: 24*60*60*1000,
-        M: 30*24*60*60*1000,
-        y: 365*24*60*60*1000
+        m: 60 * 1000,
+        h: 60 * 60 * 1000,
+        d: 24 * 60 * 60 * 1000,
+        M: 30 * 24 * 60 * 60 * 1000,
+        y: 365 * 24 * 60 * 60 * 1000,
     }
     let type = time.slice(-1)
     let amount = parseInt(time.slice(0, -1))

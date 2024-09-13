@@ -12,26 +12,29 @@ module.exports = (sequelize, DataTypes) => {
         static associate(models) {
             this.belongsTo(models.User, {
                 as: 'fromUser',
-                foreignKey: 'from'
+                foreignKey: 'from',
             })
             this.belongsTo(models.User, {
                 as: 'toUser',
-                foreignKey: 'to'
+                foreignKey: 'to',
             })
         }
     }
-    Notification.init({
-        type: DataTypes.STRING,
-        from: DataTypes.INTEGER,
-        to: DataTypes.INTEGER,
-        target: DataTypes.INTEGER,
-        status: DataTypes.INTEGER,
-    }, {
-        sequelize,
-        modelName: 'Notification',
-        tableName: 'notifications',
-        // timestamps: true,
-        paranoid: true,
-    })
+    Notification.init(
+        {
+            type: DataTypes.STRING,
+            from: DataTypes.INTEGER,
+            to: DataTypes.INTEGER,
+            target: DataTypes.INTEGER,
+            status: DataTypes.INTEGER,
+        },
+        {
+            sequelize,
+            modelName: 'Notification',
+            tableName: 'notifications',
+            // timestamps: true,
+            paranoid: true,
+        },
+    )
     return Notification
 }

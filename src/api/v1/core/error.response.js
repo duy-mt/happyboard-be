@@ -12,25 +12,37 @@ class ErrorResponse extends Error {
 }
 
 class NotFound extends ErrorResponse {
-    constructor(message = ReasonPhrases.NOT_FOUND, statusCode = StatusCodes.NOT_FOUND) {
+    constructor(
+        message = ReasonPhrases.NOT_FOUND,
+        statusCode = StatusCodes.NOT_FOUND,
+    ) {
         super(message, statusCode)
     }
 }
 
 class BadRequest extends ErrorResponse {
-    constructor(message = ReasonPhrases.BAD_REQUEST, statusCode = StatusCodes.BAD_REQUEST) {
+    constructor(
+        message = ReasonPhrases.BAD_REQUEST,
+        statusCode = StatusCodes.BAD_REQUEST,
+    ) {
         super(message, statusCode)
     }
 }
 
 class Unauthorized extends ErrorResponse {
-    constructor(message = ReasonPhrases.UNAUTHORIZED, statusCode = StatusCodes.UNAUTHORIZED) {
+    constructor(
+        message = ReasonPhrases.UNAUTHORIZED,
+        statusCode = StatusCodes.UNAUTHORIZED,
+    ) {
         super(message, statusCode)
     }
 }
 
 class Conflict extends ErrorResponse {
-    constructor(message = ReasonPhrases.CONFLICT, statusCode = StatusCodes.CONFLICT) {
+    constructor(
+        message = ReasonPhrases.CONFLICT,
+        statusCode = StatusCodes.CONFLICT,
+    ) {
         super(message, statusCode)
     }
 }
@@ -42,7 +54,10 @@ class ErrorRedis extends ErrorResponse {
 }
 
 class Forbidden extends ErrorResponse {
-    constructor(message = ReasonPhrases.FORBIDDEN, statusCode = StatusCodes.FORBIDDEN) {
+    constructor(
+        message = ReasonPhrases.FORBIDDEN,
+        statusCode = StatusCodes.FORBIDDEN,
+    ) {
         super(message, statusCode)
     }
 }
@@ -53,5 +68,5 @@ module.exports = {
     Unauthorized,
     Conflict,
     ErrorRedis,
-    Forbidden
+    Forbidden,
 }

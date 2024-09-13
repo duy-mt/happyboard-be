@@ -12,29 +12,32 @@ module.exports = (sequelize, DataTypes) => {
         static associate(models) {
             this.belongsTo(models.Idea, {
                 foreignKey: 'ideaId',
-            });
+            })
 
             this.belongsTo(models.User, {
                 foreignKey: 'userId',
-            });
+            })
 
             this.hasMany(models.Comment, {
                 foreignKey: 'parentId',
-                as: 'children'
+                as: 'children',
             })
         }
     }
-    Comment.init({
-        content: DataTypes.TEXT,
-        userId: DataTypes.INTEGER,
-        ideaId: DataTypes.INTEGER,
-        parentId: DataTypes.INTEGER,
-    }, {
-        sequelize,
-        modelName: 'Comment',
-        tableName: 'comments',
-        // timestamps: true,
-        paranoid: true,
-    })
+    Comment.init(
+        {
+            content: DataTypes.TEXT,
+            userId: DataTypes.INTEGER,
+            ideaId: DataTypes.INTEGER,
+            parentId: DataTypes.INTEGER,
+        },
+        {
+            sequelize,
+            modelName: 'Comment',
+            tableName: 'comments',
+            // timestamps: true,
+            paranoid: true,
+        },
+    )
     return Comment
 }

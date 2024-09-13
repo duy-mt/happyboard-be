@@ -1,22 +1,23 @@
 'use strict'
 
-const { BadRequest } = require('../core/error.response');
-const { convetToTimestamp } = require('../utils');
+const { HIGHLIGHT_ELASTIC_SEARCH } = require('../constants')
+const { BadRequest } = require('../core/error.response')
+const { convetToTimestamp } = require('../utils')
 
 class ElasticSearch {
     static elasticClient = require('../dbs/es.init')
 
     static createIndex = async ({ index }) => {
         try {
-            const exists = await this.elasticClient.indices.exists({ index });
+            const exists = await this.elasticClient.indices.exists({ index })
             if (!exists.body) {
-                await this.elasticClient.indices.create({ index });
-                console.log('Create Index ElasticSearch Successfully');
+                await this.elasticClient.indices.create({ index })
+                console.log('Create Index ElasticSearch Successfully')
             } else {
-                console.log('Index already exists:', index);
+                console.log('Index already exists:', index)
             }
         } catch (err) {
-            console.error('Error creating index:', err);
+            console.error('Error creating index:', err)
         }
     }
 
@@ -24,10 +25,10 @@ class ElasticSearch {
         try {
             const exists = await this.elasticClient.indices.exists({ index })
             if (!exists.body) {
-                await this.elasticClient.indices.delete({ index });
-                console.log('Deleting Index ElasticSearch Successfully');
+                await this.elasticClient.indices.delete({ index })
+                console.log('Deleting Index ElasticSearch Successfully')
             } else {
-                console.log('Not found index');
+                console.log('Not found index')
             }
         } catch (err) {
             console.error('Error deleting index:', err)
@@ -36,23 +37,32 @@ class ElasticSearch {
 
     static createDocument = async ({ index, body }) => {
         try {
-            await this.elasticClient.index({
-                index,
-                id: body.id,
-                body
-            }, function (err,resp,status) {
-                if (err) {
-                    console.log('Create document failed')
-                } else {
-                    console.log('Create document successfully');
-                }
-            })
+            await this.elasticClient.index(
+                {
+                    index,
+                    id: body.id,
+                    body,
+                },
+                function (err, resp, status) {
+                    if (err) {
+                        console.log('Create document failed')
+                    } else {
+                        console.log('Create document successfully')
+                    }
+                },
+            )
         } catch (err) {
             console.log('Error create document:', err)
         }
     }
 
-    static searchDocument = async ({ index, queryString, start = 0, limit = 5, duration = '30d' }) => {
+    static searchDocument = async ({
+        index,
+        queryString,
+        start = 0,
+        limit = 5,
+        duration = '30d',
+    }) => {
         try {
             let now = Date.now()
             let time = now - convetToTimestamp(duration)
@@ -68,30 +78,30 @@ class ElasticSearch {
                                     fields: ['title', 'content'],
                                     // minimum_should_match: '3<90%',
                                     fuzziness: 'AUTO',
-                                    type: 'best_fields'
-                                }
+                                    type: 'best_fields',
+                                },
                             },
                             filter: {
                                 range: {
                                     updatedAt: {
-                                        gte: time
-                                    }
-                                }
-                            }
-                        }
+                                        gte: time,
+                                    },
+                                },
+                            },
+                        },
                     },
                     highlight: {
                         tags_schema: 'styled',
-                        pre_tags: `<span class='font-extrabold'>`,
-                        post_tags: '</span>',
+                        pre_tags: HIGHLIGHT_ELASTIC_SEARCH.PRE_TAGS,
+                        post_tags: HIGHLIGHT_ELASTIC_SEARCH.POST_TAGS,
                         fields: {
                             title: {},
                             content: {},
-                        }
+                        },
                     },
                     from: start,
                     size: limit,
-                }
+                },
             })
 
             return result.hits.hits
@@ -100,23 +110,26 @@ class ElasticSearch {
             throw new BadRequest(err.message)
         }
     }
-    
+
     static deleteDocument = async ({ index, id }) => {
         try {
-            await this.elasticClient.delete({
-                index,
-                id
-            }, function (err, resp, status) {
-                if (err) {
-                    console.log('Delete document failed');
-                } else {
-                    console.log('Delete document successfully');
-                }
-            });
+            await this.elasticClient.delete(
+                {
+                    index,
+                    id,
+                },
+                function (err, resp, status) {
+                    if (err) {
+                        console.log('Delete document failed')
+                    } else {
+                        console.log('Delete document successfully')
+                    }
+                },
+            )
         } catch (err) {
-            console.log('Error deleting document:', err);
+            console.log('Error deleting document:', err)
         }
-    }    
+    }
 }
 
 module.exports = ElasticSearch

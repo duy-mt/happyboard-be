@@ -1,14 +1,14 @@
 'use strict'
 
 const HEADER = {
-    API_KEY:'x-api-key',
+    API_KEY: 'x-api-key',
     CLIENT_ID: 'x-client-id',
-    AUTHORIZATION: 'authorization'
+    AUTHORIZATION: 'authorization',
 }
 
 const ROLE_USER = {
     USER: 'USER',
-    ADMIN: 'ADMIN'
+    ADMIN: 'ADMIN',
 }
 
 const REDIS = {
@@ -16,38 +16,38 @@ const REDIS = {
         CONNECT: 'connect',
         END: 'end',
         RECONNECT: 'reconnecting',
-        ERROR: 'error'
+        ERROR: 'error',
     },
     CONNECT: {
         TIMEOUT: 100000,
         CODE: -99,
         MESSAGE: {
             VN: 'Có lỗi xảy ra với redis',
-            EN: 'Have a trouble with redis'
-        }
-    }
+            EN: 'Have a trouble with redis',
+        },
+    },
 }
 
 const OPTION_SHOW_IDEA = {
-    'newest': 'createdAt',
-    'highvote': 'voteCount',
-    'highview': 'viewCount',
-    'highcomment': 'commentCount'
+    newest: 'createdAt',
+    highvote: 'voteCount',
+    highview: 'viewCount',
+    highcomment: 'commentCount',
 }
 
 const STATUS_USER = {
     block: {
         roleId: 4,
-        role: 'Pending-User'
+        role: 'Pending-User',
     },
     pending: {
         roleId: 4,
-        role: 'Pending-User'
+        role: 'Pending-User',
     },
     active: {
         roleId: 3,
-        role: 'User'
-    }
+        role: 'User',
+    },
 }
 
 const HISTORY_LOGS = {
@@ -62,6 +62,17 @@ const HISTORY_LOGS = {
     RC02: 'Reaction Comment Log',
 }
 
+const WHILELIST_DOMAIN = [
+    process.env.DOMAIN_CLIENT || 'http://localhost:8888',
+    process.env.DOMAIN_ADMIN || 'http://localhost:3000',
+    undefined, //POSTMAN
+]
+
+const HIGHLIGHT_ELASTIC_SEARCH = {
+    PRE_TAGS: "<span class='font-extrabold'>",
+    POST_TAGS: '</span>',
+}
+
 module.exports = {
     HEADER,
     ROLE_USER,
@@ -69,4 +80,6 @@ module.exports = {
     OPTION_SHOW_IDEA,
     STATUS_USER,
     HISTORY_LOGS,
+    WHILELIST_DOMAIN,
+    HIGHLIGHT_ELASTIC_SEARCH,
 }

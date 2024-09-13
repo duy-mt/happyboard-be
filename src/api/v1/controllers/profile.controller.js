@@ -12,15 +12,15 @@ class ProfileController {
             data: await ProfileService.updateProfile({
                 file,
                 userId,
-                body: req.body
-            })
+                body: req.body,
+            }),
         }).send(res)
     }
 
     getProfile = async (req, res, next) => {
         new OK({
             message: 'Get profile successfully!',
-            data: await ProfileService.getProfile(req.body.userId)
+            data: await ProfileService.getProfile(req.body.userId),
         }).send(res)
     }
 }

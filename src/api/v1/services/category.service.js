@@ -1,15 +1,21 @@
 'use strict'
 
-const { BadRequest } = require("../core/error.response")
-const { createCategory, getAllCategories, getCategoryById, updateCategory, deleteCategory } = require("../models/repo/category.repo")
-const { removeField } = require("../utils")
+const { BadRequest } = require('../core/error.response')
+const {
+    createCategory,
+    getAllCategories,
+    getCategoryById,
+    updateCategory,
+    deleteCategory,
+} = require('../models/repo/category.repo')
+const { removeField } = require('../utils')
 
 class CategoryService {
-    static createCategory = async ({
-        title, description, icon
-    }) => {
+    static createCategory = async ({ title, description, icon }) => {
         return await createCategory({
-            title, description, icon
+            title,
+            description,
+            icon,
         })
     }
 
@@ -18,41 +24,47 @@ class CategoryService {
 
         return {
             total,
-            categories
+            categories,
         }
-    }    
+    }
 
     static getCategoryById = async (id) => {
-        const category = await getCategoryById({id})
-        if(!category) throw new BadRequest('Category is not exist')
+        const category = await getCategoryById({ id })
+        if (!category) throw new BadRequest('Category is not exist')
         return category
-    }   
+    }
 
     static updateCategory = async ({
-        categoryId, title, description, icon
+        categoryId,
+        title,
+        description,
+        icon,
     }) => {
-        if(!categoryId) throw new BadRequest('Category ID is required')
+        if (!categoryId) throw new BadRequest('Category ID is required')
         await this.getCategoryById(categoryId)
         let prePayload = {
-            title, description, icon
+            title,
+            description,
+            icon,
         }
         // Remove field null
         const payload = removeField({
-            obj: prePayload
+            obj: prePayload,
         })
 
         const updatedCategory = await updateCategory({
-            categoryId, payload
+            categoryId,
+            payload,
         })
 
         return updatedCategory[0]
-    }   
+    }
 
     static deleteCategory = async (categoryId) => {
         await this.getCategoryById(categoryId)
         const deleted = await deleteCategory(categoryId)
         return deleted
-    } 
+    }
 }
 
 module.exports = CategoryService

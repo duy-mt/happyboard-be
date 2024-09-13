@@ -11,7 +11,7 @@ class NotificationController {
                 userId: req.body.userId,
                 limit: req.query?.limit,
                 page: req.query?.page,
-            })
+            }),
         }).send(res)
     }
 
@@ -19,8 +19,8 @@ class NotificationController {
         new OK({
             message: 'Open notification successfully!',
             data: await NotificationService.updateStatusNotification({
-                notificationId: req.params?.notificationId
-            })
+                notificationId: req.params?.notificationId,
+            }),
         }).send(res)
     }
 
@@ -31,11 +31,9 @@ class NotificationController {
                 userId: req.body.userId,
                 limit: req.query?.limit,
                 page: req.query?.page,
-            })
+            }),
         }).send(res)
     }
-
-
 }
 
 module.exports = new NotificationController()

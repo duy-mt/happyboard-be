@@ -2,13 +2,11 @@
 
 const { Vote } = require('../index')
 
-const upVote = async ({
-    userId, ideaId
-}) => {
+const upVote = async ({ userId, ideaId }) => {
     const [vote, isCreated] = await Vote.findOrCreate({
         where: {
             userId,
-            ideaId
+            ideaId,
         },
         defaults: {
             status: 1,
@@ -16,8 +14,8 @@ const upVote = async ({
     })
     let point = 1
 
-    if(!isCreated) {
-        if(vote.status == -1) {
+    if (!isCreated) {
+        if (vote.status == -1) {
             point = 2
             vote.status = 1
         } else {
@@ -29,13 +27,11 @@ const upVote = async ({
     return point
 }
 
-const downVote = async ({
-    userId, ideaId
-}) => {
+const downVote = async ({ userId, ideaId }) => {
     const [vote, isCreated] = await Vote.findOrCreate({
         where: {
             userId,
-            ideaId
+            ideaId,
         },
         defaults: {
             status: -1,
@@ -43,8 +39,8 @@ const downVote = async ({
     })
     let point = 1
 
-    if(!isCreated) {
-        if(vote.status == 1) {
+    if (!isCreated) {
+        if (vote.status == 1) {
             point = 2
             vote.status = -1
         } else {
@@ -56,36 +52,33 @@ const downVote = async ({
     return point
 }
 
-const deleteVote = async ({
-    userId, ideaId
-}) => {
+const deleteVote = async ({ userId, ideaId }) => {
     const v = await Vote.findOne({
         where: {
-            userId, 
-            ideaId
+            userId,
+            ideaId,
         },
-        raw: true
+        raw: true,
     })
     let point = v ? -v.status : 0
 
     await Vote.destroy({
         where: {
-            userId, 
-            ideaId
+            userId,
+            ideaId,
         },
-        force: true
+        force: true,
     })
     return point
 }
 
-const findVote = async ({
-    ideaId, userId
-}) => {
+const findVote = async ({ ideaId, userId }) => {
     const v = await Vote.findOne({
         where: {
-            ideaId, userId
+            ideaId,
+            userId,
         },
-        raw: true
+        raw: true,
     })
     return v
 }

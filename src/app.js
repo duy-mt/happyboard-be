@@ -7,11 +7,12 @@ const { default: helmet } = require('helmet')
 const morgan = require('morgan')
 const cookieParser = require('cookie-parser')
 const cors = require('cors')
-const { NotFound } = require('./api/v1/core/error.response')
+const { NotFound, Forbidden } = require('./api/v1/core/error.response')
 const passport = require('passport')
 const session = require('express-session')
-const {v4:uuidv4}= require('uuid')
+const { v4: uuidv4 } = require('uuid')
 const MyLogger = require('./api/v1/loggers/myLogger')
+const { WHILELIST_DOMAIN } = require('./api/v1/constants')
 
 const app = express()
 
@@ -21,27 +22,35 @@ app.use(
         secret: 'keyboard cat',
         resave: false,
         saveUninitialized: false,
-    })
+    }),
 )
 
 app.use(passport.initialize())
 app.use(passport.session())
 
 app.use(morgan('dev'))
-app.use(cors({
-    origin: [
-        process.env.DOMAIN_CLIENT || "http://localhost:8888",
-        process.env.DOMAIN_ADMIN || "http://localhost:3000"
-        // process.env.DOMAIN_FRONTEND ? process.env.DOMAIN_FRONTEND : 'https://happyboard.io.vn'
-    ],
-    credentials: true
-}))
+
+var corsOptions = {
+    origin: function (origin, callback) {
+        if (WHILELIST_DOMAIN.indexOf(origin) !== -1) {
+            callback(null, true)
+        } else {
+            callback(new Forbidden('Not allowed by CORS'))
+        }
+    },
+    credentials: true,
+}
+
+app.use(cors(corsOptions))
+
 app.use(helmet())
 app.use(compression())
 app.use(express.json())
-app.use(express.urlencoded({
-    extended: true
-}))
+app.use(
+    express.urlencoded({
+        extended: true,
+    }),
+)
 app.use(cookieParser())
 
 // INIT DB
@@ -51,14 +60,13 @@ require('./api/v1/dbs/es.init')
 require('./api/v1/dbs/rabbitmq.init')
 require('./api/v1/dbs/websocket.init')
 
-
 // Middleware save log
 app.use((req, res, next) => {
     req.requestId = uuidv4()
     MyLogger.log(`input params ::${req.method}`, [
         req.path,
-        {requestId: req.requestId},
-        req.method === 'POST' ? req.body : req.query
+        { requestId: req.requestId },
+        req.method === 'POST' ? req.body : req.query,
     ])
     next()
 })
@@ -77,10 +85,10 @@ app.use((err, req, res, next) => {
     const resMessage = `${err.status} - ${Date.now() - err.now}ms - Response: ${JSON.stringify(err)}`
     MyLogger.error(resMessage, [
         req.path,
-        {requestId: req.requestId},
+        { requestId: req.requestId },
         {
-          message: err.message
-        }
+            message: err.message,
+        },
     ])
 
     return res.status(statusCode).json({
