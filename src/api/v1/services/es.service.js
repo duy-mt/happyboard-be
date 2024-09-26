@@ -1,5 +1,6 @@
 'use strict'
 
+const { HIGHLIGHT_ELASTIC_SEARCH } = require('../constants')
 const { BadRequest } = require('../core/error.response')
 const { convetToTimestamp } = require('../utils')
 
@@ -91,8 +92,8 @@ class ElasticSearch {
                     },
                     highlight: {
                         tags_schema: 'styled',
-                        pre_tags: `<span class='font-extrabold'>`,
-                        post_tags: '</span>',
+                        pre_tags: HIGHLIGHT_ELASTIC_SEARCH.PRE_TAGS,
+                        post_tags: HIGHLIGHT_ELASTIC_SEARCH.POST_TAGS,
                         fields: {
                             title: {},
                             content: {},

@@ -34,13 +34,11 @@ class RedisService {
         let offset = (page - 1) * limit
         let timeNow = Date.now()
         let timeStart = timeNow - duration
-
         let items = await this.client.sendCommand([
-            'ZRANGE',
+            'ZREVRANGEBYSCORE',
             key,
-            timeStart.toString(),
             timeNow.toString(),
-            'BYSCORE',
+            timeStart.toString(),
             'LIMIT',
             offset.toString(),
             limit.toString(),

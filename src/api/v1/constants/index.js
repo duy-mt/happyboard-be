@@ -62,6 +62,17 @@ const HISTORY_LOGS = {
     RC02: 'Reaction Comment Log',
 }
 
+const WHILELIST_DOMAIN = [
+    process.env.DOMAIN_CLIENT || 'http://localhost:8888',
+    process.env.DOMAIN_ADMIN || 'http://localhost:3000',
+    undefined, //POSTMAN
+]
+
+const HIGHLIGHT_ELASTIC_SEARCH = {
+    PRE_TAGS: "<span class='font-extrabold'>",
+    POST_TAGS: '</span>',
+}
+
 module.exports = {
     HEADER,
     ROLE_USER,
@@ -69,4 +80,6 @@ module.exports = {
     OPTION_SHOW_IDEA,
     STATUS_USER,
     HISTORY_LOGS,
+    WHILELIST_DOMAIN,
+    HIGHLIGHT_ELASTIC_SEARCH,
 }

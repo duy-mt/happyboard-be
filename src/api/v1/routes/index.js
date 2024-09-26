@@ -21,6 +21,7 @@ router.post('/test', async (req, res, next) => {
 
 // router.use('/api/v1/vote', require('./vote'))
 router.use('/api/v1/googleanalytics', require('./googleanalytics'))
+router.use('/api/v1/analysis', require('./analysis'))
 router.use('/api/v1/hitories', require('./history'))
 router.use('/api/v1/users', require('./user'))
 router.use('/api/v1/upload', require('./upload'))
