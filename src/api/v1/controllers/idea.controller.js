@@ -168,8 +168,21 @@ class IdeaController {
 
     createIdea = async (req, res, next) => {
         new Created({
-            message: 'Created idea successfully!',
+            message: 'Created text content idea successfully!',
             data: await IdeaService.createIdea(req.body),
+        }).send(res)
+    }
+
+    createMediaIdea = async (req, res, next) => {
+        const { file } = req
+        const userId = req.headers['x-client-id']
+        new Created({
+            message: 'Created media content idea successfully!',
+            data: await IdeaService.createMediaIdea({
+                file, 
+                userId, 
+                body: req.body
+            }),
         }).send(res)
     }
 

@@ -5,6 +5,7 @@ const asyncHandler = require('../../helpers/asyncHandler')
 const ideaController = require('../../controllers/idea.controller')
 const { authentication } = require('../../auth')
 const { authorize } = require('../../middlewares')
+const { uploadMemory } = require('../../dbs/multer.init')
 
 const router = express.Router()
 
@@ -42,6 +43,7 @@ router.get('/own/draft/:ideaId', asyncHandler(ideaController.getOwnDraftedIdea))
 
 router.get('', asyncHandler(ideaController.getAllPublishedIdeas))
 router.post('', authorize(['IDE04']), asyncHandler(ideaController.createIdea))
+router.post('/media', authorize(['IDE04']), uploadMemory.single('file'), asyncHandler(ideaController.createMediaIdea))
 router.post('/draft', asyncHandler(ideaController.draftIdea))
 
 router.get('/popular', asyncHandler(ideaController.getPopularIdeas))

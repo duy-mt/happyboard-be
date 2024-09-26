@@ -1,6 +1,6 @@
 'use strict'
 
-const { Model, BOOLEAN } = require('sequelize')
+const { Model, BOOLEAN, ENUM } = require('sequelize')
 
 module.exports = (sequelize, DataTypes) => {
     class Idea extends Model {
@@ -40,6 +40,9 @@ module.exports = (sequelize, DataTypes) => {
             voteCount: DataTypes.INTEGER,
             commentCount: DataTypes.INTEGER,
             viewCount: DataTypes.INTEGER,
+            type: ENUM('text', 'link', 'image'),
+            linkUrl: DataTypes.TEXT,
+            linkImage: DataTypes.TEXT
         },
         {
             sequelize,
