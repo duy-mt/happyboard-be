@@ -29,6 +29,7 @@ const ElasticSearch = require('./es.service')
 const MessageQueue = require('./rabbitmq.service')
 const CommentService = require('./comment.service')
 const HistoryService = require('./history.service')
+const UploadService = require('./upload.service')
 
 class IdeaService {
     // CREATE IDEA
@@ -62,6 +63,39 @@ class IdeaService {
 
         return 1
     }
+
+    static createMediaIdea = async ({
+        file, userId, body
+    }) => {
+        if (!file || !body.title || !body.categoryId)
+            throw new BadRequest('Title, image, video and category are required')
+        let urlImage;
+        if (file) {
+            let image = await UploadService.uploadFromBuffer({
+                file,
+                folderName: 'idea/media',
+                filename: userId
+            })
+            urlImage = image.url
+        }
+        body.linkImage = urlImage
+        body.userId = userId
+        body.isDrafted = false
+        body.isPublished =false
+
+        const savedIdea = await createIdea(body)
+
+        await HistoryService.createHistory({
+            type: 'CI01',
+            userId,
+            userTargetId: userId,
+            objectTargetId: savedIdea.id,
+            contentIdea: savedIdea.title,
+        })
+
+        return 1
+    }
+
 
     static draftIdea = async ({
         title,

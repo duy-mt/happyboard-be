@@ -11,8 +11,9 @@ const { NotFound, Forbidden } = require('./api/v1/core/error.response')
 const passport = require('passport')
 const session = require('express-session')
 const { v4: uuidv4 } = require('uuid')
-const MyLogger = require('./api/v1/loggers/myLogger')
-const { WHILELIST_DOMAIN } = require('./api/v1/constants')
+const MyLogger = require('./api/v1/loggers/myLogger'
+const bodyParser = require('body-parser')
+const { WHILELIST_DOMAIN } = require('./api/v1/constants'
 
 const app = express()
 
@@ -28,6 +29,8 @@ app.use(
 app.use(passport.initialize())
 app.use(passport.session())
 
+// app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
 app.use(morgan('dev'))
 
 var corsOptions = {

@@ -58,17 +58,23 @@ const optIdeaNoComment = {
 
 const createIdea = async ({
     title,
-    content,
+    content = null,
+    type = 'text',
     categoryId,
     userId,
+    linkImage = null, 
+    linkUrl = null,
     isPublished,
     isDrafted,
 }) => {
     const idea = await Idea.create({
         title,
         content,
-        userId,
+        type, 
         categoryId,
+        userId,
+        linkImage, 
+        linkUrl,
         isPublished,
         isDrafted,
     })

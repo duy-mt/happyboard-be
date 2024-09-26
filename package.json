@@ -10,7 +10,7 @@
 		"seed": "npx sequelize db:seed:all",
 		"seed-elastic": "node ./setup/migrate-elastic.js",
 		"reset-db": "npm run undo && npm run migrate && npm run seed && npm run seed-elastic",
-		"pretty": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json,html,css}\"" 
+		"pretty": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json,html,css}\""
 	},
 	"keywords": [],
 	"author": "",
@@ -22,6 +22,7 @@
 		"amqplib": "^0.10.4",
 		"axios": "^1.7.2",
 		"bcryptjs": "^2.4.3",
+		"body-parser": "^1.20.3",
 		"cloudinary": "^2.4.0",
 		"cookie-parser": "^1.4.6",
 		"cors": "^2.8.5",

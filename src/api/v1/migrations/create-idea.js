@@ -15,7 +15,7 @@ module.exports = {
             },
             content: {
                 type: Sequelize.TEXT,
-                allowNull: false,
+                allowNull: true,
             },
             userId: {
                 type: Sequelize.INTEGER,
@@ -43,7 +43,7 @@ module.exports = {
             },
             isDrafted: {
                 type: Sequelize.BOOLEAN,
-                defaultValue: true,
+                defaultValue: false,
             },
             createdAt: {
                 allowNull: false,
@@ -57,6 +57,18 @@ module.exports = {
                 allowNull: true,
                 type: Sequelize.DATE,
             },
+            type: {
+                type: Sequelize.ENUM('text', 'link', 'image'),
+                defaultValue: 'text',
+            },
+            linkUrl: {
+                allowNull: true,
+                type: Sequelize.TEXT
+            },
+            linkImage: {
+                allowNull: true,
+                type: Sequelize.TEXT
+            } 
         })
     },
     async down(queryInterface, Sequelize) {
