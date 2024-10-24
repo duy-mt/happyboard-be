@@ -65,20 +65,26 @@ class IdeaService {
     }
 
     static createMediaIdea = async ({
-        file, userId, body
+        files, userId, body
     }) => {
-        if (!file || !body.title || !body.categoryId)
+        if (!files || !body.title || !body.categoryId)
             throw new BadRequest('Title, image, video and category are required')
-        let urlImage;
-        if (file) {
-            let image = await UploadService.uploadFromBuffer({
-                file,
-                folderName: 'idea/media',
-                filename: userId
-            })
-            urlImage = image.url
+        let urls = []
+        let urlsString = '' 
+        if (files && files.length > 0) {
+            const uploadPromises = files.map(file => 
+                UploadService.uploadFromBuffer({
+                    file,
+                    folderName: 'idea/media',
+                    filename: `${userId}_${Date.now()}`
+                })
+            )
+            
+            const images = await Promise.all(uploadPromises)
+            urls = images.map(image => image.url)
+            urlsString = urls.join(',');
         }
-        body.linkImage = urlImage
+        body.linkImage = urlsString
         body.userId = userId
         body.isDrafted = false
         body.isPublished =false

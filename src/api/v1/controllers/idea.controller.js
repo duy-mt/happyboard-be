@@ -3,6 +3,7 @@
 const { OK, Created } = require('../core/success.response')
 const IdeaService = require('../services/idea.service')
 const CommentService = require('../services/comment.service')
+const cloudinaryConfig = require('../../../config/cloudinary.config')
 
 class IdeaController {
     getIdea = async (req, res, next) => {
@@ -186,12 +187,13 @@ class IdeaController {
     }
 
     createMediaIdea = async (req, res, next) => {
-        const { file } = req
+        const { files } = req
+        console.log('--------------------------------\n', files)
         const userId = req.headers['x-client-id']
         new Created({
             message: 'Created media content idea successfully!',
             data: await IdeaService.createMediaIdea({
-                file, 
+                files, 
                 userId, 
                 body: req.body
             }),

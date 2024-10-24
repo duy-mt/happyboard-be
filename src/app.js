@@ -11,9 +11,9 @@ const { NotFound, Forbidden } = require('./api/v1/core/error.response')
 const passport = require('passport')
 const session = require('express-session')
 const { v4: uuidv4 } = require('uuid')
-const MyLogger = require('./api/v1/loggers/myLogger'
+const MyLogger = require('./api/v1/loggers/myLogger')
 const bodyParser = require('body-parser')
-const { WHILELIST_DOMAIN } = require('./api/v1/constants'
+const { WHILELIST_DOMAIN } = require('./api/v1/constants')
 
 const app = express()
 

@@ -53,7 +53,7 @@ class UploadService {
 
     static uploadFromBuffer = async ({
         file,
-        folderName = 'user/avatar',
+        folderName = 'default',
         filename = 'unknown',
     }) => {
         console.log(`filename::`, filename)
@@ -84,6 +84,55 @@ class UploadService {
             console.log(`Error Upload Image:`, error.message)
         }
     }
+
+    // static uploadMultipleFromBuffer = async ({
+    //     files, 
+    //     folderName = 'idea',
+    // }) => {
+    //     try {
+    //         const uploadPromises = files.map(file => {
+    //             const buffer = new Uint8Array(file.buffer)
+
+    //             let resourceType = 'auto' 
+    //             const mimetype = file.mimetype
+
+    //             if (mimetype.startsWith('image/')) {
+    //                 folderName = 'idea/image'
+    //                 resourceType = 'image'
+    //             } else if (mimetype.startsWith('video/')) {
+    //                 folderName = 'idea/videos'
+    //                 resourceType = 'video'
+    //             }
+
+    //             return new Promise((resolve, reject) => {
+    //                 cloudinary.uploader
+    //                     .upload_stream(
+    //                         {
+    //                             use_filename: true,
+    //                             unique_filename: false,
+    //                             folder: folderName,
+    //                             overwrite: true,
+    //                             resource_type: resourceType,
+    //                         },
+    //                         function (error, result) {
+    //                             if (error) {
+    //                                 reject(error)
+    //                                 return
+    //                             }
+    //                             resolve(result)
+    //                         },
+    //                     )
+    //                     .end(buffer)
+    //             })
+    //         })
+
+    //         let results = await Promise.all(uploadPromises)
+    //         return results
+    //     } catch (error) {
+    //         console.log(`Error Uploading Files:`, error.message)
+    //     }
+    // }
+
 }
 
 module.exports = UploadService
