@@ -53,7 +53,7 @@ class UploadService {
 
     static uploadFromBuffer = async ({
         file,
-        folderName = 'user/avatar',
+        folderName = 'default',
         filename = 'unknown',
     }) => {
         console.log(`filename::`, filename)
