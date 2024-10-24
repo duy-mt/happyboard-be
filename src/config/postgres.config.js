@@ -33,7 +33,6 @@ const config = {
     prod,
 }
 
-// let env = process.env.NODE_ENV || 'dev'
-let env = 'dev'
+let env = process.env.NODE_ENV || 'dev'
 
 module.exports = config[env]
