@@ -64,30 +64,30 @@ class IdeaService {
         return 1
     }
 
-    static createMediaIdea = async ({
-        files, userId, body
-    }) => {
+    static createMediaIdea = async ({ files, userId, body }) => {
         if (!files || !body.title || !body.categoryId)
-            throw new BadRequest('Title, image, video and category are required')
+            throw new BadRequest(
+                'Title, image, video and category are required',
+            )
         let urls = []
-        let urlsString = '' 
+        let urlsString = ''
         if (files && files.length > 0) {
-            const uploadPromises = files.map(file => 
+            const uploadPromises = files.map((file) =>
                 UploadService.uploadFromBuffer({
                     file,
                     folderName: 'idea/media',
-                    filename: `${userId}_${Date.now()}`
-                })
+                    filename: `${userId}_${Date.now()}`,
+                }),
             )
-            
+
             const images = await Promise.all(uploadPromises)
-            urls = images.map(image => image.url)
-            urlsString = urls.join(',');
+            urls = images.map((image) => image.url)
+            urlsString = urls.join(',')
         }
         body.linkImage = urlsString
         body.userId = userId
         body.isDrafted = false
-        body.isPublished =false
+        body.isPublished = false
 
         const savedIdea = await createIdea(body)
 
@@ -102,26 +102,51 @@ class IdeaService {
         return 1
     }
 
-
-    static draftIdea = async ({
-        title,
-        content,
-        categoryId,
-        userId,
-        isPublished = false,
-        isDrafted = true,
+    static draftIdea = async ({ 
+        files, 
+        userId, 
+        body 
     }) => {
-        if (!content || !title || !categoryId)
+        if (!body.title || !body.categoryId || !body.type)
             throw new BadRequest('Title, content and category are required')
 
-        const savedIdea = await createIdea({
-            title,
-            content,
-            categoryId,
-            userId,
-            isPublished,
-            isDrafted,
-        })
+        if (body.type === 'text') {
+            if (!body.content)
+                throw new BadRequest('Title, content and category are required')
+            body.isDrafted = true
+            body.userId = userId
+            await createIdea(body)
+        }
+
+        if (body.type === 'image') {
+            if (!files) {
+                throw new BadRequest(
+                    'Title, image, video and category are required',
+                )
+            }
+
+            let urls = []
+            let urlsString = ''
+            if (files && files.length > 0) {
+                const uploadPromises = files.map((file) =>
+                    UploadService.uploadFromBuffer({
+                        file,
+                        folderName: 'idea/media',
+                        filename: `${userId}_${Date.now()}`,
+                    }),
+                )
+
+                const images = await Promise.all(uploadPromises)
+                urls = images.map((image) => image.url)
+                urlsString = urls.join(',')
+            }
+            body.linkImage = urlsString
+            body.userId = userId
+            body.isDrafted = true
+            body.isPublished = false
+
+            await createIdea(body)
+        }
         // Ingest elastic
         // await ElasticSearch.createDocument({
         //     // Using dynamic index getting from db

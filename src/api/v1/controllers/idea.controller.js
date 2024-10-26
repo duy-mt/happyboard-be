@@ -188,7 +188,6 @@ class IdeaController {
 
     createMediaIdea = async (req, res, next) => {
         const { files } = req
-        console.log('--------------------------------\n', files)
         const userId = req.headers['x-client-id']
         new Created({
             message: 'Created media content idea successfully!',
@@ -201,9 +200,15 @@ class IdeaController {
     }
 
     draftIdea = async (req, res, next) => {
+        const userId = req.headers['x-client-id']
+        const { files } = req ? req : {}
         new Created({
             message: 'Drafted idea successfully!',
-            data: await IdeaService.draftIdea(req.body),
+            data: await IdeaService.draftIdea({
+                files, 
+                userId, 
+                body: req.body
+            }),
         }).send(res)
     }
 
