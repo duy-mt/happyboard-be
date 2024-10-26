@@ -45,8 +45,6 @@ router.get('', asyncHandler(ideaController.getAllPublishedIdeas))
 router.post('', authorize(['IDE04']), asyncHandler(ideaController.createIdea))
 router.post('/media', authorize(['IDE04']), uploadMemory.array('files', 10), asyncHandler(ideaController.createMediaIdea))
 router.post('/draft', uploadMemory.array('files', 10), asyncHandler(ideaController.draftIdea))
-router.post('/draft-media', uploadMemory.array('files', 10), asyncHandler(ideaController.draftMediaIdea))
-
 
 router.get('/public/:ideaId', asyncHandler(ideaController.getPublicIdea))
 router.get('/popular', asyncHandler(ideaController.getPopularIdeas))

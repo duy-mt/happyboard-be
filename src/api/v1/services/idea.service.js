@@ -102,17 +102,11 @@ class IdeaService {
         return 1
     }
 
-    static draftIdea = async (
-        { files, userId, body },
-        //     {
-        //     title,
-        //     content,
-        //     categoryId,
-        //     userId,
-        //     isPublished = false,
-        //     isDrafted = true,
-        // }
-    ) => {
+    static draftIdea = async ({ 
+        files, 
+        userId, 
+        body 
+    }) => {
         if (!body.title || !body.categoryId || !body.type)
             throw new BadRequest('Title, content and category are required')
 
