@@ -1,5 +1,6 @@
 'use strict'
 
+const { where } = require('sequelize')
 const { processReturnedData } = require('../../utils')
 const { Comment, User, Idea } = require('../index')
 
@@ -70,10 +71,19 @@ const deleteCommentByIdeaId = async (ideaId) => {
     return deleted
 }
 
+const editComment = async ({content, id}) => {
+    const comment = await Comment.update({ content }, {
+        where: { id },
+    })
+    console.log('comment: ', comment)
+    return comment
+}
+
 module.exports = {
     createComment,
     getCommentsByIdeaId,
     getCommentsByParentId,
     getCommentById,
     deleteCommentByIdeaId,
+    editComment
 }

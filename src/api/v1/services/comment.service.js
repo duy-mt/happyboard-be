@@ -6,6 +6,7 @@ const {
     getCommentsByIdeaId,
     getCommentById,
     deleteCommentByIdeaId,
+    editComment,
 } = require('../models/repo/comment.repo')
 const { findUserIdByIdeaId, findIdea } = require('../models/repo/idea.repo')
 const {
@@ -74,6 +75,58 @@ class CommentService {
             objectTargetLv2Id: parentId,
             contentIdea: ideaHolder.title,
             contentComment: contentComment,
+        })
+        return processReturnedData(savedComment)
+    }
+
+    static editComment = async ({ content, id, userId }) => {
+        content = content.trim()
+        if (!content) throw new BadRequest('Missing content')
+
+        let commentHolder = await getCommentById(id)
+        if (!commentHolder)
+            throw new BadRequest("Comment is not exist! So don't edit comment")
+
+        let type = 'EC01'
+
+        let ideaHolder = await findIdea({
+            id: commentHolder.ideaId,
+            isPublished: true,
+            isDrafted: false,
+        })
+        if (!ideaHolder)
+            throw new BadRequest("Idea is not exist! So don't edit comment")
+
+        const receiver = await findUserIdByIdeaId({ id: ideaHolder.id })
+
+        if (parseInt(userId) !== receiver) {
+            const data = {
+                sender: userId,
+                receiver: receiver.toString(),
+                target: 'comment',
+                action: 'edit',
+                metadata: {
+                    targetId: id,
+                },
+            }
+            await MessageQueue.send({
+                nameExchange: 'post_notification',
+                message: data,
+            })
+        }
+
+        const savedComment = await editComment({
+            content,
+            id,
+        })
+
+        await HistoryService.createHistory({
+            type,
+            userId,
+            userTargetId: receiver,
+            objectTargetId: id,
+            contentIdea: ideaHolder.title,
+            contentComment: content,
         })
         return processReturnedData(savedComment)
     }
