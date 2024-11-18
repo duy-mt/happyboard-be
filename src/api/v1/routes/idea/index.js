@@ -43,8 +43,17 @@ router.get('/own/draft/:ideaId', asyncHandler(ideaController.getOwnDraftedIdea))
 
 router.get('', asyncHandler(ideaController.getAllPublishedIdeas))
 router.post('', authorize(['IDE04']), asyncHandler(ideaController.createIdea))
-router.post('/media', authorize(['IDE04']), uploadMemory.array('files', 10), asyncHandler(ideaController.createMediaIdea))
-router.post('/draft', uploadMemory.array('files', 10), asyncHandler(ideaController.draftIdea))
+router.post(
+    '/media',
+    authorize(['IDE04']),
+    uploadMemory.array('files', 10),
+    asyncHandler(ideaController.createMediaIdea),
+)
+router.post(
+    '/draft',
+    uploadMemory.array('files', 10),
+    asyncHandler(ideaController.draftIdea),
+)
 
 router.get('/public/:ideaId', asyncHandler(ideaController.getPublicIdea))
 router.get('/popular', asyncHandler(ideaController.getPopularIdeas))
@@ -53,7 +62,6 @@ router.get('/similar', asyncHandler(ideaController.getSimilarIdeas))
 router.get('/:ideaId', asyncHandler(ideaController.getIdea))
 
 router.get('/own/draft', asyncHandler(ideaController.getAllOwnDraftedIdeas))
-
 
 router.put('/:ideaId', asyncHandler(ideaController.updateIdea))
 router.delete('/:ideaId', asyncHandler(ideaController.deleteIdea))
@@ -65,6 +73,7 @@ router.post(
     authorize(['IDE04']),
     asyncHandler(ideaController.createComment),
 )
+router.put('/comment/edit/:commentId', asyncHandler(ideaController.editComment))
 
 // Vote
 router.post(

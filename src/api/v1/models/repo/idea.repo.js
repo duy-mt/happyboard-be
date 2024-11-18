@@ -99,22 +99,6 @@ const findIdea = async ({ id, isPublished, isDrafted }) => {
 
     return idea && processReturnedData(idea)
 }
-// const findIdea = async ({ id, isPublished = null, isDrafted = null }) => {
-//     let where = {
-//         id,
-//     }
-
-//     if (isPublished != null) where.isPublished = isPublished
-
-//     if (isDrafted != null) where.isDrafted = isDrafted
-
-//     const idea = await Idea.findOne({
-//         where,
-//         ...optIdea,
-//     })
-
-//     return idea && processReturnedData(idea)
-// }
 
 const findPublisedIdea = async ({ id }) => {
     const idea = await Idea.findOne({
@@ -456,13 +440,13 @@ const findIdeasByVote = async ({ limit }) => {
         where: {
             [Op.or]: {
                 voteCount: {
-                    [Op.gt]: 5,
+                    [Op.gt]: 0,
                 },
                 commentCount: {
-                    [Op.gt]: 5,
+                    [Op.gt]: 0,
                 },
                 viewCount: {
-                    [Op.gt]: 5,
+                    [Op.gt]: 0,
                 },
             },
         },

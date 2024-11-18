@@ -250,6 +250,14 @@ class IdeaController {
         }).send(res)
     }
 
+    editComment = async (req, res, next) => {
+        req.body.id = req.params.commentId
+        new Created({
+            message: 'Comment editted successfully',
+            data: await CommentService.editComment(req.body),
+        }).send(res)
+    }
+
     getCommentByIdeaId = async (req, res, next) => {
         new OK({
             message: 'Comment successfully',
