@@ -6,6 +6,7 @@ const {
     getCommentsByIdeaId,
     getCommentById,
     deleteCommentByIdeaId,
+    deleteComment,
     editComment,
 } = require('../models/repo/comment.repo')
 const { findUserIdByIdeaId, findIdea } = require('../models/repo/idea.repo')
@@ -129,6 +130,55 @@ class CommentService {
             contentComment: content,
         })
         return processReturnedData(savedComment)
+    }
+
+    static deleteComment = async ({ id, userId }) => {
+
+        let commentHolder = await getCommentById(id)
+        if (!commentHolder)
+            throw new BadRequest("Comment is not exist! So don't edit comment")
+
+        let type = 'DC01'
+
+        let ideaHolder = await findIdea({
+            id: commentHolder.ideaId,
+            isPublished: true,
+            isDrafted: false,
+        })
+        if (!ideaHolder)
+            throw new BadRequest("Idea is not exist! So don't edit comment")
+
+        const receiver = await findUserIdByIdeaId({ id: ideaHolder.id })
+
+        if (parseInt(userId) !== receiver) {
+            const data = {
+                sender: userId,
+                receiver: receiver.toString(),
+                target: 'comment',
+                action: 'delete',
+                metadata: {
+                    targetId: id,
+                },
+            }
+            await MessageQueue.send({
+                nameExchange: 'post_notification',
+                message: data,
+            })
+        }
+
+        await deleteComment({
+            id
+        })
+
+        await HistoryService.createHistory({
+            type,
+            userId,
+            userTargetId: receiver,
+            objectTargetId: id,
+            contentIdea: ideaHolder.title,
+            contentComment: commentHolder?.content,
+        })
+        return 1
     }
 
     static getCommentByIdeaId = async ({ userId, ideaId }) => {

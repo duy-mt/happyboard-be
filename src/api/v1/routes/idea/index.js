@@ -73,7 +73,10 @@ router.post(
     authorize(['IDE04']),
     asyncHandler(ideaController.createComment),
 )
+
 router.put('/comment/edit/:commentId', asyncHandler(ideaController.editComment))
+
+router.delete('/comment/delete/:commentId', asyncHandler(ideaController.deleteComment))
 
 // Vote
 router.post(

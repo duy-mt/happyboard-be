@@ -3,6 +3,7 @@
 const { where } = require('sequelize')
 const { processReturnedData } = require('../../utils')
 const { Comment, User, Idea } = require('../index')
+// const { deleteComment } = require('../../services/comment.service')
 
 /*
 FROM - WHERE - GROUP BY - HAVING - ORDER BY
@@ -79,11 +80,20 @@ const editComment = async ({content, id}) => {
     return comment
 }
 
+const deleteComment = async ({ id }) => {
+    await Comment.destroy({
+        where: {
+            id
+        }
+    })
+}
+
 module.exports = {
     createComment,
     getCommentsByIdeaId,
     getCommentsByParentId,
     getCommentById,
     deleteCommentByIdeaId,
-    editComment
+    editComment,
+    deleteComment
 }

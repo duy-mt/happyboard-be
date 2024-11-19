@@ -113,6 +113,27 @@ const processReturnedData = (obj) => {
     return obj
 }
 
+// const sortComment = (comments) => {
+//     const commentMap = {}
+
+//     comments.forEach((comment) => {
+//         comment.children = []
+//         commentMap[comment.id] = comment
+//     })
+
+//     const rootComments = []
+
+//     comments.forEach((comment) => {
+//         if (comment.parentId) {
+//             commentMap[comment.parentId].children.push(comment)
+//         } else {
+//             rootComments.push(comment)
+//         }
+//     })
+
+//     return rootComments
+// }
+
 const sortComment = (comments) => {
     const commentMap = {}
 
@@ -125,7 +146,13 @@ const sortComment = (comments) => {
 
     comments.forEach((comment) => {
         if (comment.parentId) {
-            commentMap[comment.parentId].children.push(comment)
+            // Kiểm tra xem commentMap[comment.parentId] có tồn tại không
+            if (commentMap[comment.parentId]) {
+                commentMap[comment.parentId].children.push(comment)
+            } else {
+                // Nếu không tìm thấy parentId, có thể xử lý theo cách khác nếu cần
+                console.warn(`Parent comment with ID ${comment.parentId} not found`)
+            }
         } else {
             rootComments.push(comment)
         }
@@ -133,6 +160,7 @@ const sortComment = (comments) => {
 
     return rootComments
 }
+
 
 const heartbeatSocket = (wss) => {
     setInterval(() => {
