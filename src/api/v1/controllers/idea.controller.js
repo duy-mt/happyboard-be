@@ -258,6 +258,17 @@ class IdeaController {
         }).send(res)
     }
 
+    deleteComment = async (req, res, next) => {
+        console.log(req.params.commentId)
+        new OK({
+            message: 'Delete comment successfully',
+            data: await CommentService.deleteComment({
+                id: req.params.commentId,
+                userId: req.body.userId
+            })
+        }).send(res)
+    }
+
     getCommentByIdeaId = async (req, res, next) => {
         new OK({
             message: 'Comment successfully',
