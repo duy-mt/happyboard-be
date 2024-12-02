@@ -76,6 +76,7 @@ class IdeaController {
                 limit: req.query?.limit,
                 page: req.query?.page,
                 userId: req.body.userId,
+                option: req.query?.option,
             }),
         }).send(res)
     }
@@ -98,6 +99,31 @@ class IdeaController {
                 limit: req.query?.limit,
                 page: req.query?.page,
                 userId: req.body.userId,
+            }),
+        }).send(res)
+    }
+
+    getAllUpvotedIdeas = async (req, res, next) => {
+        console.log(req.query)
+        new OK({
+            message: 'Get own upvoted ideas successfully',
+            data: await IdeaService.getAllUpvotedIdeas({
+                limit: req.query?.limit,
+                page: req.query?.page,
+                userId: req.body.userId,
+                option: req.query?.option,
+            }),
+        }).send(res)
+    }
+
+    getAllDownvotedIdeas = async (req, res, next) => {
+        new OK({
+            message: 'Get own downvoted ideas successfully',
+            data: await IdeaService.getAllDownvotedIdeas({
+                limit: req.query?.limit,
+                page: req.query?.page,
+                userId: req.body.userId,
+                option: req.query?.option,
             }),
         }).send(res)
     }
@@ -128,7 +154,6 @@ class IdeaController {
     }
 
     getAllPublishedIdeas = async (req, res, next) => {
-        console.log(`getAllPublishedIdeas`)
         const { q } = req.query
         if (!q) {
             new OK({
@@ -237,7 +262,6 @@ class IdeaController {
             message: 'Cancel vote successfully',
             data: await IdeaService.cancelVote({
                 ideaId: req.params.ideaId,
-                userId: req.body.userId,
             }),
         }).send(res)
     }

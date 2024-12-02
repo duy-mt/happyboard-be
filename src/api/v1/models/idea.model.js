@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
 
             this.hasMany(models.Vote, {
                 foreignKey: 'ideaId',
-                as: 'vote',
+                as: 'votes',
             })
 
             this.belongsTo(models.User, {

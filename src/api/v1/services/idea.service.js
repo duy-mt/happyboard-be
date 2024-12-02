@@ -20,6 +20,9 @@ const {
     findAllIdeas,
     deleteIdea,
     findAllOwnIdeas,
+    findAllUpvotedIdeasByUsedId,
+    findAllDownvotedIdeasByUsedId,
+    findAllPublishIdeasByUsedId,
 } = require('../models/repo/idea.repo')
 const { sortComment, removeField } = require('../utils')
 const VoteService = require('./vote.service')
@@ -102,11 +105,7 @@ class IdeaService {
         return 1
     }
 
-    static draftIdea = async ({ 
-        files, 
-        userId, 
-        body 
-    }) => {
+    static draftIdea = async ({ files, userId, body }) => {
         if (!body.title || !body.categoryId || !body.type)
             throw new BadRequest('Title, content and category are required')
 
@@ -236,7 +235,7 @@ class IdeaService {
     // GET MANY IDEA
 
     static getAllIdeas = async ({
-        limit = 5,
+        limit = 10,
         page = 1,
         userId,
         option = Object.keys(OPTION_SHOW_IDEA)[0],
@@ -293,7 +292,7 @@ class IdeaService {
     }
 
     static getAllPengindIdeas = async ({
-        limit = 10,
+        limit = 5,
         page = 1,
         userId,
         option = Object.keys(OPTION_SHOW_IDEA)[0],
@@ -665,16 +664,42 @@ class IdeaService {
     }
 
     static getAllOwnPublishedIdeas = async ({
-        limit = 5,
+        limit = 10,
         page = 1,
         userId,
+        option = Object.keys(OPTION_SHOW_IDEA)[0],
+        categories = null,
+        isPublished = true,
+        isDrafted = false,
     }) => {
-        return await this.getAllOwnIdeas({
+        let fieldSort = OPTION_SHOW_IDEA[option]
+        const { ideas, totalIdea } = await findAllPublishIdeasByUsedId  ({
             limit,
             page,
+            fieldSort,
             userId,
-            isPublished: true,
+            categories,
+            isPublished,
+            isDrafted,
         })
+
+        for (let i = 0; i < ideas.length; i++) {
+            let status = await VoteService.getStatusVote({
+                ideaId: ideas[i].id,
+                userId,
+            })
+            ideas[i].vote = status
+        }
+
+        const totalPage = Math.ceil(totalIdea / limit)
+
+        return {
+            totalPage: totalPage,
+            currentPage: page,
+            pageSize: limit,
+            total: totalIdea,
+            ideas,
+        }
     }
 
     static getAllOwnHidedIdeas = async ({ limit = 10, page = 1, userId }) => {
@@ -695,6 +720,84 @@ class IdeaService {
             isPublished: false,
             isDrafted: true,
         })
+    }
+
+    static getAllUpvotedIdeas = async ({
+        limit = 10,
+        page = 1,
+        userId,
+        option = Object.keys(OPTION_SHOW_IDEA)[0],
+        categories = null,
+        isPublished = null,
+        isDrafted = false,
+    }) => {
+        let fieldSort = OPTION_SHOW_IDEA[option]
+        const { ideas, totalIdea } = await findAllUpvotedIdeasByUsedId({
+            limit,
+            page,
+            fieldSort,
+            userId,
+            categories,
+            isPublished,
+            isDrafted,
+        })
+
+        for (let i = 0; i < ideas.length; i++) {
+            let status = await VoteService.getStatusVote({
+                ideaId: ideas[i].id,
+                userId,
+            })
+            ideas[i].vote = status
+        }
+
+        const totalPage = Math.ceil(totalIdea / limit)
+
+        return {
+            totalPage: totalPage,
+            currentPage: page,
+            pageSize: limit,
+            total: totalIdea,
+            ideas,
+        }
+    }
+
+    static getAllDownvotedIdeas = async ({
+        limit = 10,
+        page = 1,
+        userId,
+        option = Object.keys(OPTION_SHOW_IDEA)[0],
+        categories = null,
+        isPublished = null,
+        isDrafted = false,
+    }) => {
+        let fieldSort = OPTION_SHOW_IDEA[option]
+        const { ideas, totalIdea } = await findAllDownvotedIdeasByUsedId({
+            limit,
+            page,
+            fieldSort,
+            userId,
+            categories,
+            isPublished,
+            isDrafted,
+        })
+
+        for (let i = 0; i < ideas.length; i++) {
+            let status = await VoteService.getStatusVote({
+                ideaId: ideas[i].id,
+                userId,
+            })
+            ideas[i].vote = status
+        }
+
+        const totalPage = Math.ceil(totalIdea / limit)
+
+        return {
+            totalPage: totalPage,
+            currentPage: page,
+            pageSize: limit,
+            total: totalIdea,
+            ideas,
+        }
     }
 }
 

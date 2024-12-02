@@ -17,9 +17,29 @@ const queryCommentWithReaction = {
     ],
     attributes: {},
     order: [
-        ['createdAt', 'DESC'],
+        ['updatedAt', 'DESC'],
         ['id', 'DESC'],
     ],
+}
+
+const queryMyComment = {
+    include: [
+        {
+            model: User,
+            attributes: ['id', 'username', 'email', 'avatar'],
+        },
+        {
+            model: Idea,
+            attributes: ['id', 'title', 'userId']
+        }
+    ],
+    attributes: {},
+    order: [
+        ['updatedAt', 'DESC'],
+        ['id', 'DESC'],
+    ],
+    offset: 0,
+    limit: 5
 }
 
 const createComment = async ({ content, userId, ideaId, parentId }) => {
@@ -76,7 +96,6 @@ const editComment = async ({content, id}) => {
     const comment = await Comment.update({ content }, {
         where: { id },
     })
-    console.log('comment: ', comment)
     return comment
 }
 
@@ -88,6 +107,44 @@ const deleteComment = async ({ id }) => {
     })
 }
 
+const getMyComments = async ({ limit, page, userId }) => {
+    let offset = (page - 1) * limit
+    queryMyComment.offset = offset
+    queryMyComment.limit = limit
+    let {count, rows: comments} = await Comment.findAndCountAll({
+        where: {
+            userId
+        },
+        ...queryMyComment
+    })
+    comments = await mapCommentsWithIdeaAuthor(comments.map(comment => comment.toJSON()))
+    const totalPage = Math.ceil(count / limit)
+    return {
+        totalPage: totalPage,
+        currentPage: page, 
+        pageSize: limit, 
+        total: count, 
+        comments,
+    }
+}
+
+const mapCommentsWithIdeaAuthor = async (comments) => {
+    const commentsWithIdeaAuthor = await Promise.all(
+      comments.map(async (comment) => {
+        const ideaAuthor = await User.findAll   ({
+            where: {id: comment.Idea.userId},
+            attributes: ['username', 'avatar']
+        }
+        )
+        return {
+          ...comment,
+          ideaAuthor,
+        }
+      })
+    )
+    return commentsWithIdeaAuthor
+  }
+
 module.exports = {
     createComment,
     getCommentsByIdeaId,
@@ -95,5 +152,6 @@ module.exports = {
     getCommentById,
     deleteCommentByIdeaId,
     editComment,
-    deleteComment
+    deleteComment,
+    getMyComments
 }

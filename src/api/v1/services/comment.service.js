@@ -8,6 +8,7 @@ const {
     deleteCommentByIdeaId,
     deleteComment,
     editComment,
+    getMyComments
 } = require('../models/repo/comment.repo')
 const { findUserIdByIdeaId, findIdea } = require('../models/repo/idea.repo')
 const {
@@ -133,7 +134,6 @@ class CommentService {
     }
 
     static deleteComment = async ({ id, userId }) => {
-
         let commentHolder = await getCommentById(id)
         if (!commentHolder)
             throw new BadRequest("Comment is not exist! So don't edit comment")
@@ -167,7 +167,7 @@ class CommentService {
         }
 
         await deleteComment({
-            id
+            id,
         })
 
         await HistoryService.createHistory({
@@ -274,6 +274,14 @@ class CommentService {
         let deleted = await deleteCommentByIdeaId(ideaId)
         if (totalCount === deleted) return 1
         return 0
+    }
+
+    static getMyComments = async ({ limit = 10, page = 1, userId }) => {
+        return await getMyComments({
+            limit, 
+            page,
+            userId,
+        })
     }
 }
 
