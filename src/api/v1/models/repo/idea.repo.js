@@ -29,14 +29,41 @@ const optIdea = {
             model: User,
             attributes: ['id', 'username', 'email', 'avatar'],
         },
+        {
+            model: Vote,
+            as: 'votes',
+            attributes: ['id', 'status'],
+        },
     ],
-    // attributes: ['id', 'title', 'content', 'voteCount', 'commentCount', 'viewCount', 'createdAt', 'updatedAt']
     attributes: {
         exclude: ['categoryId'],
     },
 }
 
-const optIdeaNoComment = {
+let optUpvotedIdea = {
+    offset: 0,
+    limit: 5,
+    where: {},
+    order: [
+        ['updatedAt', 'DESC'],
+        ['id', 'DESC'],
+    ],
+    include: [
+        {
+            model: User,
+            attributes: ['id', 'username', 'email', 'avatar'],
+        },
+        {
+            model: Category,
+            attributes: ['id', 'title', 'icon'],
+        },
+    ],
+    attributes: {
+        exclude: ['categoryId', 'userId'],
+    },
+}
+
+let optIdeaNoComment = {
     order: [
         ['updatedAt', 'DESC'],
         ['id', 'DESC'],
@@ -62,7 +89,7 @@ const createIdea = async ({
     type = 'text',
     categoryId,
     userId,
-    linkImage = null, 
+    linkImage = null,
     linkUrl = null,
     isPublished,
     isDrafted,
@@ -70,10 +97,10 @@ const createIdea = async ({
     const idea = await Idea.create({
         title,
         content,
-        type, 
+        type,
         categoryId,
         userId,
-        linkImage, 
+        linkImage,
         linkUrl,
         isPublished,
         isDrafted,
@@ -209,11 +236,319 @@ const findAllIdeas = async ({
     }
 }
 
+const findAllUpvotedIdeasByUsedId = async ({
+    limit,
+    page,
+    fieldSort,
+    userId,
+    categories = null,
+    isPublished = true,
+    isDrafted = false,
+}) => {
+    let queryFindIdeas
+    if (!categories) {
+        queryFindIdeas = {
+            offset: 0,
+            limit: 5,
+            where: {},
+            order: [
+                ['updatedAt', 'DESC'],
+                ['id', 'DESC'],
+            ],
+            include: [
+                {
+                    model: User,
+                    attributes: ['id', 'username', 'email', 'avatar'],
+                },
+                {
+                    model: Category,
+                    attributes: ['id', 'title', 'icon'],
+                },
+                {
+                    model: Vote,
+                    as: 'votes',
+                    attributes: ['id', 'status'],
+                    where: {
+                        status: 1,
+                    },
+                },
+            ],
+            attributes: {
+                exclude: ['categoryId', 'userId'],
+            },
+        }
+    } else {
+        queryFindIdeas = {
+            offset: 0,
+            limit: 5,
+            where: {},
+            order: [
+                ['updatedAt', 'DESC'],
+                ['id', 'DESC'],
+            ],
+            include: [
+                {
+                    model: User,
+                    attributes: ['id', 'username', 'email', 'avatar'],
+                },
+                {
+                    model: Category,
+                    attributes: ['id', 'title', 'icon'],
+                    where: {
+                        title: {
+                            [Op.in]: categories
+                                .split(',')
+                                .map((cat) => cat.trim()),
+                        },
+                    },
+                },
+                {
+                    model: Vote,
+                    as: 'votes',
+                    attributes: ['id', 'status'],
+                    where: {
+                        status: 1,
+                    },
+                },
+            ],
+            attributes: {
+                exclude: ['categoryId', 'userId'],
+            },
+        }
+    }
+    let offset = (page - 1) * limit
+    queryFindIdeas.offset = offset
+    queryFindIdeas.limit = limit
+    queryFindIdeas.order[0][0] = fieldSort
+    queryFindIdeas.where.userId = userId
+    if (isPublished != null) {
+        queryFindIdeas.where.isPublished = isPublished
+    } else {
+        delete queryFindIdeas.where.isPublished
+        queryFindIdeas.attributes.exclude = ['categoryId', 'userId']
+    }
+    if (isDrafted != null) {
+        queryFindIdeas.where.isDrafted = isDrafted
+    } else {
+        delete queryFindIdeas.where.isDrafted
+        queryFindIdeas.attributes.exclude = ['categoryId', 'userId']
+    }
+    let { count, rows: ideas } = await Idea.findAndCountAll(queryFindIdeas)
+
+    return {
+        ideas: processReturnedData(ideas),
+        totalIdea: count,
+    }
+}
+
+const findAllDownvotedIdeasByUsedId = async ({
+    limit,
+    page,
+    fieldSort,
+    userId,
+    categories = null,
+    isPublished = true,
+    isDrafted = false,
+}) => {
+    let queryFindIdeas
+    if (!categories) {
+        queryFindIdeas = {
+            offset: 0,
+            limit: 5,
+            where: {},
+            order: [
+                ['updatedAt', 'DESC'],
+                ['id', 'DESC'],
+            ],
+            include: [
+                {
+                    model: User,
+                    attributes: ['id', 'username', 'email', 'avatar'],
+                },
+                {
+                    model: Category,
+                    attributes: ['id', 'title', 'icon'],
+                },
+                {
+                    model: Vote,
+                    as: 'votes',
+                    attributes: ['id', 'status'],
+                    where: {
+                        status: -1,
+                    },
+                },
+            ],
+            attributes: {
+                exclude: ['categoryId', 'userId'],
+            },
+        }
+    } else {
+        queryFindIdeas = {
+            offset: 0,
+            limit: 5,
+            where: {},
+            order: [
+                ['updatedAt', 'DESC'],
+                ['id', 'DESC'],
+            ],
+            include: [
+                {
+                    model: User,
+                    attributes: ['id', 'username', 'email', 'avatar'],
+                },
+                {
+                    model: Category,
+                    attributes: ['id', 'title', 'icon'],
+                    where: {
+                        title: {
+                            [Op.in]: categories
+                                .split(',')
+                                .map((cat) => cat.trim()),
+                        },
+                    },
+                },
+                {
+                    model: Vote,
+                    as: 'votes',
+                    attributes: ['id', 'status'],
+                    where: {
+                        status: -1,
+                    },
+                },
+            ],
+            attributes: {
+                exclude: ['categoryId', 'userId'],
+            },
+        }
+    }
+    let offset = (page - 1) * limit
+    queryFindIdeas.offset = offset
+    queryFindIdeas.limit = limit
+    queryFindIdeas.order[0][0] = fieldSort
+    queryFindIdeas.where.userId = userId
+    if (isPublished != null) {
+        queryFindIdeas.where.isPublished = isPublished
+    } else {
+        delete queryFindIdeas.where.isPublished
+        queryFindIdeas.attributes.exclude = ['categoryId', 'userId']
+    }
+    if (isDrafted != null) {
+        queryFindIdeas.where.isDrafted = isDrafted
+    } else {
+        delete queryFindIdeas.where.isDrafted
+        queryFindIdeas.attributes.exclude = ['categoryId', 'userId']
+    }
+    let { count, rows: ideas } = await Idea.findAndCountAll(queryFindIdeas)
+
+    return {
+        ideas: processReturnedData(ideas),
+        totalIdea: count,
+    }
+}
+
+const findAllPublishIdeasByUsedId = async ({
+    limit,
+    page,
+    fieldSort,
+    userId,
+    categories = null,
+    isPublished = true,
+    isDrafted = false,
+}) => {
+    let queryFindIdeas
+    if (!categories) {
+        queryFindIdeas = {
+            offset: 0,
+            limit: 5,
+            where: {},
+            order: [
+                ['updatedAt', 'DESC'],
+                ['id', 'DESC'],
+            ],
+            include: [
+                {
+                    model: User,
+                    attributes: ['id', 'username', 'email', 'avatar'],
+                },
+                {
+                    model: Category,
+                    attributes: ['id', 'title', 'icon'],
+                },
+                {
+                    model: Vote,
+                    as: 'votes',
+                    attributes: ['id', 'status'],
+                },
+            ],
+            attributes: {
+                exclude: ['categoryId', 'userId'],
+            },
+        }
+    } else {
+        queryFindIdeas = {
+            offset: 0,
+            limit: 5,
+            where: {},
+            order: [
+                ['updatedAt', 'DESC'],
+                ['id', 'DESC'],
+            ],
+            include: [
+                {
+                    model: User,
+                    attributes: ['id', 'username', 'email', 'avatar'],
+                },
+                {
+                    model: Category,
+                    attributes: ['id', 'title', 'icon'],
+                    where: {
+                        title: {
+                            [Op.in]: categories
+                                .split(',')
+                                .map((cat) => cat.trim()),
+                        },
+                    },
+                },
+                {
+                    model: Vote,
+                    as: 'votes',
+                    attributes: ['id', 'status'],
+                },
+            ],
+            attributes: {
+                exclude: ['categoryId', 'userId'],
+            },
+        }
+    }
+    let offset = (page - 1) * limit
+    queryFindIdeas.offset = offset
+    queryFindIdeas.limit = limit
+    queryFindIdeas.order[0][0] = fieldSort
+    queryFindIdeas.where.userId = userId
+    if (isPublished != null) {
+        queryFindIdeas.where.isPublished = isPublished
+    } else {
+        delete queryFindIdeas.where.isPublished
+        queryFindIdeas.attributes.exclude = ['categoryId', 'userId']
+    }
+    if (isDrafted != null) {
+        queryFindIdeas.where.isDrafted = isDrafted
+    } else {
+        delete queryFindIdeas.where.isDrafted
+        queryFindIdeas.attributes.exclude = ['categoryId', 'userId']
+    }
+    let { count, rows: ideas } = await Idea.findAndCountAll(queryFindIdeas)
+
+    return {
+        ideas: processReturnedData(ideas),
+        totalIdea: count,
+    }
+}
+
 const findAllIdeasByUsedId = async ({ userId, isPublished = true }) => {
     const ideas = await Idea.findAll({
         where: {
             userId,
-            // isPublished
         },
         ...optIdea,
     })
@@ -484,4 +819,7 @@ module.exports = {
     findUserIdByIdeaId,
     deleteIdea,
     findAllOwnIdeas,
+    findAllUpvotedIdeasByUsedId,
+    findAllDownvotedIdeasByUsedId,
+    findAllPublishIdeasByUsedId
 }

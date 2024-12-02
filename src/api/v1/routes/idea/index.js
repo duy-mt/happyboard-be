@@ -59,6 +59,8 @@ router.get('/public/:ideaId', asyncHandler(ideaController.getPublicIdea))
 router.get('/popular', asyncHandler(ideaController.getPopularIdeas))
 router.get('/recent', asyncHandler(ideaController.getRecentIdeas))
 router.get('/similar', asyncHandler(ideaController.getSimilarIdeas))
+router.get('/upvoted', asyncHandler(ideaController.getAllUpvotedIdeas))
+router.get('/downvoted', asyncHandler(ideaController.getAllDownvotedIdeas))
 router.get('/:ideaId', asyncHandler(ideaController.getIdea))
 
 router.get('/own/draft', asyncHandler(ideaController.getAllOwnDraftedIdeas))

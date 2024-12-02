@@ -7,10 +7,6 @@ class VoteService {
             ideaId,
             userId,
         })
-        // if(isCreated) {
-
-        // }
-
         return vote
     }
 
@@ -30,6 +26,22 @@ class VoteService {
             if (vote.status == 1) return 'up'
             else if (vote.status == -1) return 'down'
         } else return null
+    }
+
+    static getMyUpvoted = async ({ limit = 10, page = 1, userId }) => {
+        return await getMyUpvoted({
+            limit, 
+            page,
+            userId,
+        })
+    }
+
+    static getMyDownvoted = async ({ limit = 10, page = 1, userId }) => {
+        return await getMyDownvoted({
+            limit, 
+            page,
+            userId,
+        })
     }
 }
 

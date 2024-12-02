@@ -31,6 +31,17 @@ class CommentController {
             }),
         }).send(res)
     }
+
+    getMyComments = async (req, res, next) => {
+        new OK({
+            message: 'List my comments successfully',
+            data: await CommentService.getMyComments({
+                limit: req.query?.limit,
+                page: req.query?.page,
+                userId: req.body?.userId,
+            }),
+        }).send(res)
+    }
 }
 
 module.exports = new CommentController()

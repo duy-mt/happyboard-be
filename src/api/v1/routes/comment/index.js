@@ -19,4 +19,9 @@ router.post(
     asyncHandler(commentController.cancelReaction),
 )
 
+router.get(
+    '',
+    asyncHandler(commentController.getMyComments),
+)
+
 module.exports = router

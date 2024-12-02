@@ -29,7 +29,7 @@ const REDIS = {
 }
 
 const OPTION_SHOW_IDEA = {
-    newest: 'createdAt',
+    newest: 'updatedAt',
     highvote: 'voteCount',
     highview: 'viewCount',
     highcomment: 'commentCount',
