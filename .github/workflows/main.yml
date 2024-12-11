@@ -66,14 +66,13 @@ jobs:
             - name: Build, Tag, the Image to Amazon ECR
               id: build-image
               env: 
-                ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+                ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
                 ECR_REPOSITORY: public-repo
                 IMAGE_TAG: latest
               run: |
                 docker buildx build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-            - name: Push Docker image to ECR
-              run: |
-                docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+                docker push 
+           
     # deploy:
     #   needs: build
     #   runs-on: cicd-be
