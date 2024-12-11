@@ -262,6 +262,7 @@ class IdeaController {
             message: 'Cancel vote successfully',
             data: await IdeaService.cancelVote({
                 ideaId: req.params.ideaId,
+                userId: req.body.userId
             }),
         }).send(res)
     }
