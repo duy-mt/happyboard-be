@@ -145,7 +145,7 @@ class AccessService {
         const accessToken = await generateToken({
             payload,
             secretKey: createSecretKey(),
-            expireTime: '1h',
+            expireTime: '1d',
         })
 
         const token = await updatePairToken({
@@ -229,7 +229,7 @@ class AccessService {
         let token = await generateToken({
             payload: info,
             secretKey: createSecretKey(),
-            expireTime: '2h',
+            expireTime: '1d',
         })
 
         await redisService.setEx({
@@ -328,7 +328,7 @@ class AccessService {
         const accessToken = await generateToken({
             payload,
             secretKey,
-            expireTime: '1h',
+            expireTime: '1d',
         })
 
         const refreshToken = await generateToken({

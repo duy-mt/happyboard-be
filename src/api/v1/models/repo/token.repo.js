@@ -1,5 +1,6 @@
 'use strict'
 
+const { Op } = require('sequelize')
 const { processReturnedData } = require('../../utils')
 const { Token, sequelize } = require('../index')
 
@@ -93,6 +94,21 @@ const removeTokenByUserId = async ({ userId }) => {
     return res == 1
 }
 
+const removeExpiredTokens = async ({ currentTime }) => {
+    const oneDayInMs = 24 * 60 * 60 * 1000
+    const oneDayAgo = new Date(currentTime - oneDayInMs)
+
+    let res = await Token.destroy({
+        where: {
+            createdAt: {
+                [Op.lt]: oneDayAgo,
+            },
+        },
+    });
+
+    return res == 1
+};
+
 module.exports = {
     createNewToken,
     updatePairToken,
@@ -101,4 +117,5 @@ module.exports = {
     removeTokenByAccessToken,
     removeTokenByUserId,
     updateDeviceToken,
+    removeExpiredTokens
 }

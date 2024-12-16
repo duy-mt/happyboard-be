@@ -1,5 +1,5 @@
-const dev = `amqp://${process.env.DEV_RMQ_USER}:${process.env.DEV_RMQ_PW}@${process.env.DEV_RMQ_HOST}`
-   
+// const dev = `amqp://${process.env.DEV_RMQ_USER}:${process.env.DEV_RMQ_PW}@${process.env.DEV_RMQ_HOST}`
+const dev = `amqps://uypxmvvt:U8D0oQym0Bdm8DmH3iLvxT8ag6V-CBNA@octopus.rmq3.cloudamqp.com/uypxmvvt`
 
 const prod = `amqps://${process.env.PROD_RMQ_USER}:${process.env.PROD_RMQ_PW}@${process.env.PROD_RMQ_HOST}`
 

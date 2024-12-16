@@ -57,9 +57,8 @@ app.use(
 app.use(cookieParser())
 
 // INIT DB
-// require('./api/v1/dbs/mysql.init')
 require('./api/v1/dbs/postgres.init')
-require('./api/v1/dbs/es.init')
+// require('./api/v1/dbs/es.init')
 require('./api/v1/dbs/rabbitmq.init')
 require('./api/v1/dbs/websocket.init')
 

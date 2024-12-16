@@ -2,12 +2,14 @@
 
 const { Client } = require('@elastic/elasticsearch')
 const { elastic } = require('../../../config')
+const fs = require('fs')
 
 const client = new Client(elastic)
 
 client
-    .info()
-    .then((res) =>
+    .
+    info()
+    .then(() =>
         console.log('\x1b[42m%s\x1b[0m', `Elastic Search: Connect succefully`),
     )
     .catch((err) => console.log(`Elastic Search: Connect error :`, err))

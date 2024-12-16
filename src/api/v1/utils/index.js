@@ -188,6 +188,19 @@ const convetToTimestamp = (time) => {
     return types[type] * amount
 }
 
+const setupCronJobs = () => {
+    cron.schedule('*/5 * * * *', async () => {
+        console.log('Running cron job to clean up expired tokens...');
+        try {
+            const now = Date.now()
+            const result = await removeExpiredTokens({currentTime: now}); 
+            console.log(`Cron job completed. Removed ${result.deletedCount} expired tokens.`);
+        } catch (error) {
+            console.error('Error running token cleanup cron job:', error);
+        }
+    });
+};
+
 module.exports = {
     generateToken,
     createAccessToken,
@@ -204,4 +217,5 @@ module.exports = {
     sortComment,
     heartbeatSocket,
     convetToTimestamp,
+    setupCronJobs
 }
