@@ -2,7 +2,6 @@
 
 const { Client } = require('@elastic/elasticsearch')
 const { elastic } = require('../../../config')
-const fs = require('fs')
 
 const client = new Client(elastic)
 

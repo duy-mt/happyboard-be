@@ -1,13 +1,6 @@
 // LOCAL
 const dev = {
-    node: process.env.DEV_ES_NODE || 'https://localhost:9200',
-    auth: {
-        username: process.env.DEV_ES_USER || 'elastic',
-        password: process.env.DEV_ES_PW || 'pwelastic',
-    },
-    ssl: {
-        rejectUnauthorized: false,
-    }
+    node: process.env.DEV_ES_NODE || 'http://localhost:9200',
 }
 
 // CLOUD
