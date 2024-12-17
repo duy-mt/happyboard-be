@@ -16,11 +16,12 @@ const {
     createNewRole,
     updateRoleNotForAnUser,
     findAllRolesNotForAnUser,
-    deleteRole
+    deleteRole,
 } = require('../models/repo/role.repo')
 const {
     findPermissionIdsByRoleIds,
     findPermissionIdsByRoleId,
+    createPermissionsForRole,
 } = require('../models/repo/role_has_permissions.repo')
 const { removeTokenByUserId } = require('../models/repo/token.repo')
 const {
@@ -31,12 +32,13 @@ const {
 } = require('../models/repo/user.repo')
 const {
     findPermissionsByUserId,
-    createPermission,
+    createPermissionForUser,
     deletePermissionOfUser,
 } = require('../models/repo/user_has_permissions.repo')
 const {
     findRoleIdByUserId,
     updateRole,
+    findRoleIdsByUserId,
 } = require('../models/repo/user_has_roles.repo')
 const { htmlBlockUser } = require('../template')
 const { removeField } = require('../utils')
@@ -199,7 +201,11 @@ class UserService {
         }
     }
 
-    static addPermission = async ({ userId, adminId, permissions = [] }) => {
+    static addPermissionForUser = async ({
+        userId,
+        adminId,
+        permissions = [],
+    }) => {
         // 1. Check array permission
         if (permissions.length === 0)
             throw new BadRequest("Can't add empty permisisons for user")
@@ -214,11 +220,11 @@ class UserService {
         }
         // 3. Check exist permission of user
         let permissionIdsOfUser = await findPermissionsByUserId(userId)
-        let roleId = await findRoleIdByUserId(userId)
-        let permissionIdsOfRole = await findPermissionIdsByRoleId(roleId)
+        let roleIds = await findRoleIdsByUserId(userId)
+        let permissionIdsOfRoles = await findPermissionIdsByRoleIds(roleIds)
 
         const existingPermissions = new Set([
-            ...permissionIdsOfRole,
+            ...permissionIdsOfRoles,
             ...permissionIdsOfUser,
         ])
 
@@ -230,11 +236,13 @@ class UserService {
             }
             return acc
         }, [])
-        // 4. Add permission
-        let result = await createPermission({
-            userId,
-            permissions,
-        })
+
+        if (permissions) {
+            await createPermissionForUser({
+                userId,
+                permissions,
+            })
+        }
 
         return 1
     }
@@ -292,6 +300,18 @@ class UserService {
         }
 
         let { count, roles } = await findAllRolesNotForAnUser(query)
+
+        roles = await Promise.all(
+            roles.map(async (role) => {
+                const permissionIds = await findPermissionIdsByRoleId(role.id)
+                const permissions = await findPermissionsByIds(permissionIds)
+                return {
+                    ...role,
+                    permissions,
+                }
+            }),
+        )
+
         const totalPage = Math.ceil(count / limit)
         return {
             totalPage,
@@ -306,7 +326,6 @@ class UserService {
         await deleteRole(roleId)
         return 1
     }
-
 
     static removePermission = async ({ userId, adminId, permissions = [] }) => {
         // 1. Check array permission
@@ -341,16 +360,23 @@ class UserService {
         let role = await findRoleById(roleId)
         if (!role) throw new BadRequest('Not found role')
 
-        let adminRoleId = await findRoleIdByUserId(adminId)
-        //    let { id: adminRoleId } = await findRoleById(adminId)
-
-        let priorityTarget = roleId
-        let priorityAdmin = adminRoleId
-
-        if (priorityAdmin > priorityTarget)
+        let admin = await findUserByUserId(adminId)
+        if (!admin) throw new BadRequest('Not found admin')
+        if (admin.email !== 'admin@example.com') {
             throw new BadRequest(
                 "You can't assign a role higher than your own.",
             )
+        }
+
+        // let adminRoleId = await findRoleIdByUserId(adminId)
+
+        // let priorityTarget = roleId
+        // let priorityAdmin = adminRoleId
+
+        // if (priorityAdmin > priorityTarget)
+        //     throw new BadRequest(
+        //         "You can't assign a role higher than your own.",
+        //     )
 
         let rs = await updateRole({
             userId,
@@ -397,6 +423,48 @@ class UserService {
         })
 
         return users
+    }
+
+    static addPermissionsForRole = async ({
+        roleId,
+        adminId,
+        permissions = [],
+    }) => {
+        // 1. Check array permission
+        if (permissions.length === 0)
+            throw new BadRequest("Can't add empty permisisons for role")
+        // 2. Check permission of admin
+        let permissionIdsOfAdmin = await findPermissionsByUserId(adminId)
+        let RolesOfAdmin = await findRoleIdsByUserId(adminId)
+        let permissionsIdOfRoles =
+            await findPermissionIdsByRoleIds(RolesOfAdmin)
+        for (let i = 0; i < permissions.length; i++) {
+            if (
+                !permissionIdsOfAdmin.includes(permissions[i]) &&
+                !permissionsIdOfRoles.includes(permissions[i])
+            ) {
+                throw new BadRequest(
+                    `You can't add permission beyond your own capabilities`,
+                )
+            }
+        }
+
+        let permissionIdsOfRole = await findPermissionIdsByRoleId(roleId)
+        const existingPermissions = new Set([...permissionIdsOfRole])
+
+        permissions = permissions.reduce((acc, current) => {
+            if (existingPermissions.has(current)) {
+                console.log(`Permission ${current} already exists`)
+            } else {
+                acc.push(current)
+            }
+            return acc
+        }, [])
+
+        if (permissions.length !== 0) {
+            await createPermissionsForRole({ roleId, permissions })
+        }
+        return 1
     }
 }
 

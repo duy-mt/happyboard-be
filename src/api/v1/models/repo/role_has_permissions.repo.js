@@ -28,7 +28,23 @@ const findPermissionIdsByRoleId = async (roleId) => {
     return data.map((p) => p.permissionId)
 }
 
+const createPermissionsForRole = async ({ roleId, permissions }) => {
+    if (!Array.isArray(permissions)) {
+        throw new Error('Permissions must be an array')
+    }
+
+    const permissionOfRole = permissions.map((permissionId) => ({
+        roleId,
+        permissionId,
+    }))
+
+    let rows = await Role_has_permissions.bulkCreate(permissionOfRole)
+
+    return rows
+}
+
 module.exports = {
     findPermissionIdsByRoleIds,
     findPermissionIdsByRoleId,
+    createPermissionsForRole
 }

@@ -14,7 +14,7 @@ const findPermissionsByUserId = async (userId) => {
     return permissions.map((p) => p.permissionId)
 }
 
-const createPermission = async ({ userId, permissions }) => {
+const createPermissionForUser = async ({ userId, permissions }) => {
     if (!Array.isArray(permissions)) {
         throw new Error('Permissions must be an array')
     }
@@ -48,6 +48,6 @@ const deletePermissionOfUser = async ({ userId, permissions }) => {
 
 module.exports = {
     findPermissionsByUserId,
-    createPermission,
+    createPermissionForUser,
     deletePermissionOfUser,
 }

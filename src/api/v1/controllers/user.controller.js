@@ -43,10 +43,10 @@ class UserController {
         }).send(res)
     }
 
-    addPermissions = async (req, res, next) => {
+    addPermissionForUser = async (req, res, next) => {
         new OK({
             message: 'Add permission successfully',
-            data: await UserService.addPermission({
+            data: await UserService.addPermissionForUser({
                 userId: req.params.userId,
                 adminId: req.body.userId,
                 permissions: req.body.permissions,
@@ -160,6 +160,17 @@ class UserController {
         new OK({
             message: 'Get latest user online successfully',
             data: await UserService.getLatestUserOnline(req.query),
+        }).send(res)
+    }
+
+    addPermissionsForRole = async (req, res, next) => {
+        new OK({
+            message: 'Add permission for role successfully',
+            data: await UserService.addPermissionsForRole({
+                roleId: req.params.roleId,
+                adminId: req.body.userId,
+                permissions: req.body.permissions,
+            }),
         }).send(res)
     }
 
