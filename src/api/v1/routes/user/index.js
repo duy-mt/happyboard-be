@@ -39,6 +39,22 @@ router.put(
     asyncHandler(userController.updateRole),
 )
 
+router.post('/role', asyncHandler(userController.addNewRole))
+
+router.get('/roles/all', asyncHandler(userController.getAllRolesNotForAnUser))
+
+router.put('/role/:roleId', asyncHandler(userController.updateRoleNotForAnUser))
+
+router.delete('/role/:roleId', asyncHandler(userController.deleteRole))
+
+router.post('/permission', asyncHandler(userController.addNewPermission))
+
+router.get('/permissions/all', asyncHandler(userController.getAllPermissonsNotForAnUser))
+
+router.delete('/permission/:permissionId', asyncHandler(userController.deletePermission))
+
+router.put('/permission/:permissionId', asyncHandler(userController.updatePermission))
+
 router.get(
     '/:userId/permissions',
     authorize(['USR01']),

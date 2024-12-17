@@ -3,8 +3,21 @@
 const { Op, fn, col, where } = require('sequelize')
 const { STATUS_USER } = require('../constants')
 const { BadRequest } = require('../core/error.response')
-const { findPermissionsByIds } = require('../models/repo/permission.repo')
-const { findRoleById } = require('../models/repo/role.repo')
+const {
+    findPermissionsByIds,
+    createNewPermisision,
+    findAllPermissionsNotForAnUser,
+    deletePermission,
+    updatePermission,
+} = require('../models/repo/permission.repo')
+
+const {
+    findRoleById,
+    createNewRole,
+    updateRoleNotForAnUser,
+    findAllRolesNotForAnUser,
+    deleteRole
+} = require('../models/repo/role.repo')
 const {
     findPermissionIdsByRoleIds,
     findPermissionIdsByRoleId,
@@ -225,6 +238,75 @@ class UserService {
 
         return 1
     }
+
+    static addNewPermission = async ({ name, description }) => {
+        await createNewPermisision({ name, description })
+        return 1
+    }
+
+    static getAllPermissonsNotForAnUser = async ({ page = 1, limit = 5 }) => {
+        let offset = (page - 1) * limit
+
+        let query = {
+            offset,
+            limit,
+        }
+
+        let { count, permissions } = await findAllPermissionsNotForAnUser(query)
+        const totalPage = Math.ceil(count / limit)
+        return {
+            totalPage,
+            currentPage: page,
+            pageSize: limit,
+            total: count,
+            permissions,
+        }
+    }
+
+    static deletePermission = async (permissionId) => {
+        await deletePermission(permissionId)
+        return 1
+    }
+
+    static updatePermission = async ({ permissionId, name, description }) => {
+        await updatePermission({ permissionId, name, description })
+        return 1
+    }
+
+    static addNewRole = async ({ name, description }) => {
+        await createNewRole({ name, description })
+        return 1
+    }
+
+    static updateRoleNotForAnUser = async ({ roleId, name, description }) => {
+        await updateRoleNotForAnUser({ roleId, name, description })
+        return 1
+    }
+
+    static getAllRolesNotForAnUser = async ({ page = 1, limit = 5 }) => {
+        let offset = (page - 1) * limit
+
+        let query = {
+            offset,
+            limit,
+        }
+
+        let { count, roles } = await findAllRolesNotForAnUser(query)
+        const totalPage = Math.ceil(count / limit)
+        return {
+            totalPage,
+            currentPage: page,
+            pageSize: limit,
+            total: count,
+            roles,
+        }
+    }
+
+    static deleteRole = async (roleId) => {
+        await deleteRole(roleId)
+        return 1
+    }
+
 
     static removePermission = async ({ userId, adminId, permissions = [] }) => {
         // 1. Check array permission
