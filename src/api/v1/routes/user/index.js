@@ -36,7 +36,7 @@ router.get(
 router.put(
     '/:userId/role',
     authorize(['USR07']),
-    asyncHandler(userController.addRolesForUser),
+    asyncHandler(userController.addRoleForUser),
 )
 
 router.post('/role', asyncHandler(userController.addNewRole))
@@ -68,7 +68,7 @@ router.put(
 router.delete(
     '/:userId/permissions',
     authorize(['USR07']),
-    asyncHandler(userController.removePermissions),
+    asyncHandler(userController.removePermissionsOfUser),
 )
 
 router.put(

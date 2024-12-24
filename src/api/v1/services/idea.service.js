@@ -67,33 +67,88 @@ class IdeaService {
         return 1
     }
 
+    // static createMediaIdea = async ({ files, userId, body }) => {
+    //     if (!files || !body.title || !body.categoryId)
+    //         throw new BadRequest(
+    //             'Title, image, video and category are required',
+    //         )
+    //     let urls = []
+    //     let urlsString = ''
+    //     if (files && files.length > 0) {
+    //         const uploadPromises = files.map((file) =>
+    //             UploadService.uploadFromBuffer({
+    //                 file,
+    //                 folderName: 'idea/media',
+    //                 filename: `${userId}_${Date.now()}`,
+    //             }),
+    //         )
+
+    //         const images = await Promise.all(uploadPromises)
+    //         urls = images.map((image) => image.url)
+    //         urlsString = urls.join(',')
+    //     }
+    //     body.linkMedia = urlsString
+    //     body.userId = userId
+    //     body.isDrafted = false
+    //     body.isPublished = false
+
+    //     const savedIdea = await createIdea(body)
+
+    //     await HistoryService.createHistory({
+    //         type: 'CI01',
+    //         userId,
+    //         userTargetId: userId,
+    //         objectTargetId: savedIdea.id,
+    //         contentIdea: savedIdea.title,
+    //     })
+
+    //     return 1
+    // }
+
     static createMediaIdea = async ({ files, userId, body }) => {
         if (!files || !body.title || !body.categoryId)
-            throw new BadRequest(
-                'Title, image, video and category are required',
-            )
+            throw new BadRequest('Title, image/video and category are required')
+
         let urls = []
         let urlsString = ''
-        if (files && files.length > 0) {
-            const uploadPromises = files.map((file) =>
-                UploadService.uploadFromBuffer({
-                    file,
-                    folderName: 'idea/media',
-                    filename: `${userId}_${Date.now()}`,
-                }),
-            )
+        let urlThumbString = ''
 
-            const images = await Promise.all(uploadPromises)
-            urls = images.map((image) => image.url)
+
+        if (files && files.length > 0) {
+            const uploadPromises = files.map(async (file) => {
+                if (file.mimetype.startsWith('image/')) {
+                    const image = await UploadService.uploadFromBuffer({
+                        file,
+                        folderName: 'idea/media',
+                        filename: `${userId}_${Date.now()}`,
+                    })
+                    return image.url
+                }
+                if (file.mimetype.startsWith('video/')) {
+                    const video = await UploadService.uploadFromBuffer({
+                        file,
+                        folderName: 'idea/media',
+                        filename: `${userId}_${Date.now()}`,
+                    })
+                    urlThumbString = video.thumbnailUrl
+                    return video.url
+                }
+            })
+
+            const uploadResults = await Promise.all(uploadPromises)
+            urls = uploadResults.filter((result) => result)
             urlsString = urls.join(',')
         }
-        body.linkImage = urlsString
+
+        body.thumbnailUrl = urlThumbString
+        body.linkMedia= urlsString
         body.userId = userId
         body.isDrafted = false
         body.isPublished = false
 
         const savedIdea = await createIdea(body)
 
+        // Lưu lịch sử cho action tạo idea
         await HistoryService.createHistory({
             type: 'CI01',
             userId,
@@ -117,7 +172,7 @@ class IdeaService {
             await createIdea(body)
         }
 
-        if (body.type === 'image') {
+        if (body.type === 'media') {
             if (!files) {
                 throw new BadRequest(
                     'Title, image, video and category are required',
@@ -139,7 +194,7 @@ class IdeaService {
                 urls = images.map((image) => image.url)
                 urlsString = urls.join(',')
             }
-            body.linkImage = urlsString
+            body.linkMedia = urlsString
             body.userId = userId
             body.isDrafted = true
             body.isPublished = false
@@ -673,7 +728,7 @@ class IdeaService {
         isDrafted = false,
     }) => {
         let fieldSort = OPTION_SHOW_IDEA[option]
-        const { ideas, totalIdea } = await findAllPublishIdeasByUsedId  ({
+        const { ideas, totalIdea } = await findAllPublishIdeasByUsedId({
             limit,
             page,
             fieldSort,

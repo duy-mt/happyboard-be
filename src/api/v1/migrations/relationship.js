@@ -262,6 +262,161 @@ module.exports = {
             onUpdate: 'CASCADE',
             onDelete: 'CASCADE',
         })
+
+        // fk_ideas_group
+        await queryInterface.addConstraint('ideas', {
+            fields: ['groupId'],
+            type: 'foreign key',
+            name: 'fk_ideas_group',
+            references: {
+                table: 'groups',
+                field: 'id',
+            },
+            onUpdate: 'CASCADE',
+            onDelete: 'SET NULL',
+        })
+
+        // fk_user_has_groups_user
+        await queryInterface.addConstraint('user_has_groups', {
+            fields: ['userId'],
+            type: 'foreign key',
+            name: 'fk_user_has_groups_user',
+            references: {
+                table: 'users',
+                field: 'id',
+            },
+            onUpdate: 'CASCADE',
+            onDelete: 'CASCADE',
+        })
+
+        // fk_user_has_groups_group
+        await queryInterface.addConstraint('user_has_groups', {
+            fields: ['groupId'],
+            type: 'foreign key',
+            name: 'fk_user_has_groups_group',
+            references: {
+                table: 'groups',
+                field: 'id',
+            },
+            onUpdate: 'CASCADE',
+            onDelete: 'CASCADE',
+        })
+
+        await queryInterface.addConstraint('poll_options', {
+            fields: ['pollId'],
+            type: 'foreign key',
+            name: 'fk_poll_options_poll',
+            references: {
+                table: 'polls',
+                field: 'id',
+            },
+            onUpdate: 'CASCADE',
+            onDelete: 'CASCADE',
+        })
+
+        // fk_poll_responses_poll
+        await queryInterface.addConstraint('poll_responses', {
+            fields: ['pollId'],
+            type: 'foreign key',
+            name: 'fk_poll_responses_poll',
+            references: {
+                table: 'polls',
+                field: 'id',
+            },
+            onUpdate: 'CASCADE',
+            onDelete: 'CASCADE',
+        })
+
+        // fk_poll_responses_option
+        await queryInterface.addConstraint('poll_responses', {
+            fields: ['pollOptionId'],
+            type: 'foreign key',
+            name: 'fk_poll_responses_option',
+            references: {
+                table: 'poll_options',
+                field: 'id',
+            },
+            onUpdate: 'CASCADE',
+            onDelete: 'CASCADE',
+        })
+
+        // fk_poll_responses_user
+        await queryInterface.addConstraint('poll_responses', {
+            fields: ['userId'],
+            type: 'foreign key',
+            name: 'fk_poll_responses_user',
+            references: {
+                table: 'users',
+                field: 'id',
+            },
+            onUpdate: 'CASCADE',
+            onDelete: 'CASCADE',
+        })
+
+        // fk_polls_user
+        await queryInterface.addConstraint('polls', {
+            fields: ['userId'],
+            type: 'foreign key',
+            name: 'fk_polls_user',
+            references: {
+                table: 'users',
+                field: 'id',
+            },
+            onUpdate: 'CASCADE',
+            onDelete: 'CASCADE',
+        })
+
+        // fk_polls_category
+        await queryInterface.addConstraint('polls', {
+            fields: ['categoryId'],
+            type: 'foreign key',
+            name: 'fk_polls_category',
+            references: {
+                table: 'categories',
+                field: 'id',
+            },
+            onUpdate: 'CASCADE',
+            onDelete: 'SET NULL',
+        })
+
+        // fk_comments_poll
+        await queryInterface.addConstraint('comments', {
+            fields: ['pollId'],
+            type: 'foreign key',
+            name: 'fk_comments_poll',
+            references: {
+                table: 'polls',
+                field: 'id',
+            },
+            onUpdate: 'CASCADE',
+            onDelete: 'CASCADE',
+        })
+
+        // fk_votes_poll
+        await queryInterface.addConstraint('votes', {
+            fields: ['pollId'],
+            type: 'foreign key',
+            name: 'fk_votes_poll',
+            references: {
+                table: 'polls',
+                field: 'id',
+            },
+            onUpdate: 'CASCADE',
+            onDelete: 'CASCADE',
+        })
+
+        // fk_polls_group
+        await queryInterface.addConstraint('polls', {
+            fields: ['groupId'],
+            type: 'foreign key',
+            name: 'fk_polls_group',
+            references: {
+                table: 'groups',
+                field: 'id',
+            },
+            onUpdate: 'CASCADE',
+            onDelete: 'SET NULL',
+        })
     },
 
     async down(queryInterface, Sequelize) {
@@ -269,8 +424,11 @@ module.exports = {
         await queryInterface.removeConstraint('tokens', 'fk_tokens_user')
         await queryInterface.removeConstraint('ideas', 'fk_ideas_user')
         await queryInterface.removeConstraint('ideas', 'fk_ideas_category')
+        await queryInterface.removeConstraint('polls', 'fk_polls_user')
+        await queryInterface.removeConstraint('polls', 'fk_polls_category')
         await queryInterface.removeConstraint('comments', 'fk_comments_user')
         await queryInterface.removeConstraint('comments', 'fk_comments_idea')
+        await queryInterface.removeConstraint('comments', 'fk_comments_poll')
         await queryInterface.removeConstraint('comments', 'fk_comments_parent')
         await queryInterface.removeConstraint('reactions', 'fk_reactions_user')
         await queryInterface.removeConstraint(
@@ -279,6 +437,7 @@ module.exports = {
         )
         await queryInterface.removeConstraint('votes', 'fk_votes_user')
         await queryInterface.removeConstraint('votes', 'fk_votes_idea')
+        await queryInterface.removeConstraint('votes', 'fk_votes_poll')
         await queryInterface.removeConstraint(
             'user_has_roles',
             'fk_user_has_roles_user',
@@ -318,6 +477,32 @@ module.exports = {
         await queryInterface.removeConstraint(
             'histories',
             'fk_histories_user_field_userTargetId',
+        )
+        await queryInterface.removeConstraint('ideas', 'fk_ideas_group')
+        await queryInterface.removeConstraint('polls', 'fk_polls_group')
+        await queryInterface.removeConstraint(
+            'user_has_groups',
+            'fk_user_has_groups_user',
+        )
+        await queryInterface.removeConstraint(
+            'user_has_groups',
+            'fk_user_has_groups_group',
+        )
+        await queryInterface.removeConstraint(
+            'poll_options',
+            'fk_poll_options_poll',
+        )
+        await queryInterface.removeConstraint(
+            'poll_responses',
+            'fk_poll_responses_poll',
+        )
+        await queryInterface.removeConstraint(
+            'poll_responses',
+            'fk_poll_responses_option',
+        )
+        await queryInterface.removeConstraint(
+            'poll_responses',
+            'fk_poll_responses_user',
         )
     },
 }

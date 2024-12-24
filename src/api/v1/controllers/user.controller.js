@@ -54,12 +54,11 @@ class UserController {
         }).send(res)
     }
 
-    removePermissions = async (req, res, next) => {
+    removePermissionsOfUser = async (req, res, next) => {
         new OK({
-            message: 'Remove permission successfully',
-            data: await UserService.removePermission({
+            message: 'Remove permission of user successfully',
+            data: await UserService.removePermissionsOfUser({
                 userId: req.params.userId,
-                adminId: req.body.userId,
                 permissions: req.body.permissions,
             }),
         }).send(res)
@@ -135,10 +134,10 @@ class UserController {
         }).send(res)
     }
 
-    updateRole = async (req, res, next) => {
+    addRoleForUser = async (req, res, next) => {
         new OK({
-            message: 'Update role successfully',
-            data: await UserService.updateRole({
+            message: 'Add role for user successfully',
+            data: await UserService.addRoleForUser({
                 userId: req.params.userId,
                 roleId: req.body.roleId,
                 adminId: req.body.userId,

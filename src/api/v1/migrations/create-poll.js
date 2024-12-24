@@ -2,20 +2,12 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
     async up(queryInterface, Sequelize) {
-        await queryInterface.createTable('ideas', {
+        await queryInterface.createTable('polls', {
             id: {
                 allowNull: false,
                 autoIncrement: true,
                 primaryKey: true,
                 type: Sequelize.INTEGER,
-            },
-            title: {
-                type: Sequelize.STRING,
-                allowNull: false,
-            },
-            content: {
-                type: Sequelize.TEXT,
-                allowNull: true,
             },
             userId: {
                 type: Sequelize.INTEGER,
@@ -25,6 +17,10 @@ module.exports = {
                 type: Sequelize.INTEGER,
                 allowNull: false,
             },
+            groupId: {
+                type: Sequelize.INTEGER,
+                allowNull: true,
+            },
             voteCount: {
                 type: Sequelize.INTEGER,
                 defaultValue: 0,
@@ -33,17 +29,37 @@ module.exports = {
                 type: Sequelize.INTEGER,
                 defaultValue: 0,
             },
-            commentCount: {
-                type: Sequelize.INTEGER,
-                defaultValue: 0,
-            },
             isPublished: {
                 type: Sequelize.BOOLEAN,
                 defaultValue: false,
             },
-            isDrafted: {
+            commentCount: {
+                type: Sequelize.INTEGER,
+                defaultValue: 0,
+            },
+            question: {
+                type: Sequelize.STRING(255),
+                allowNull: false,
+            },
+            description: {
+                type: Sequelize.TEXT,
+                allowNull: true,
+            },
+            startDate: {
+                type: Sequelize.DATE,
+                allowNull: true,
+            },
+            remindTime: {
+                type: Sequelize.DATE,
+                allowNull: true,
+            },
+            endDate: {
+                type: Sequelize.DATE,
+                allowNull: true,
+            }, 
+            isActive: {
                 type: Sequelize.BOOLEAN,
-                defaultValue: false,
+                defaultValue: true,
             },
             createdAt: {
                 allowNull: false,
@@ -57,29 +73,9 @@ module.exports = {
                 allowNull: true,
                 type: Sequelize.DATE,
             },
-            type: {
-                type: Sequelize.ENUM('text', 'link', 'media'),
-                defaultValue: 'text',
-            },
-            linkUrl: {
-                allowNull: true,
-                type: Sequelize.TEXT
-            },
-            linkMedia: {
-                allowNull: true,
-                type: Sequelize.TEXT
-            },
-            thumbnailUrl: {
-                allowNull: true,
-                type: Sequelize.TEXT
-            },
-            groupId: {
-                type: Sequelize.INTEGER,
-                allowNull: true,
-            },
         })
     },
     async down(queryInterface, Sequelize) {
-        await queryInterface.dropTable('ideas')
+        await queryInterface.dropTable('polls')
     },
 }

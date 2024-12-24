@@ -2,7 +2,7 @@ const { processReturnedData } = require('../../utils')
 const { User_has_roles } = require('../index')
 
 // CREATE
-const createRole = async ({ userId, roleId = 3 }) => {
+const createRole = async ({ userId, roleId }) => {
     let role = await User_has_roles.create({
         userId,
         roleId,

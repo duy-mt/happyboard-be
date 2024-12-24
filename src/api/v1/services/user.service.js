@@ -37,8 +37,9 @@ const {
 } = require('../models/repo/user_has_permissions.repo')
 const {
     findRoleIdByUserId,
-    updateRole,
     findRoleIdsByUserId,
+    createRole,
+    updateRole
 } = require('../models/repo/user_has_roles.repo')
 const { htmlBlockUser } = require('../template')
 const { removeField } = require('../utils')
@@ -149,7 +150,7 @@ class UserService {
             throw new BadRequest('Missing status to change or status wrong')
         // Check user isAdmin? if admin -> throw err
         // ...
-        let updatedRole = await this.updateRole({
+        let updatedRole = await updateRole({
             userId,
             roleId: STATUS_USER[status].roleId,
             adminId,
@@ -327,21 +328,11 @@ class UserService {
         return 1
     }
 
-    static removePermission = async ({ userId, adminId, permissions = [] }) => {
+    static removePermissionsOfUser = async ({ userId, permissions = [] }) => {
         // 1. Check array permission
         if (permissions.length === 0)
             throw new BadRequest("Can't add empty permisisons for user")
-        // 2. Check permission of admin
-        let permissionIdsOfAdmin = await findPermissionIdsByRoleId(adminId)
-        for (let i = 0; i < permissions.length; i++) {
-            if (!permissionIdsOfAdmin.includes(permissions[i])) {
-                throw new BadRequest(
-                    `You can't remove permission beyond your own capabilities`,
-                )
-            }
-        }
-        // Don't remove permission of role
-        // let permissionIdsOfUser = await findPermissionsByUserId(userId)
+        
         await deletePermissionOfUser({
             userId,
             permissions,
@@ -349,7 +340,7 @@ class UserService {
         return 1
     }
 
-    static updateRole = async ({ userId, roleId, adminId }) => {
+    static addRoleForUser = async ({ userId, roleId, adminId }) => {
         console.log(`userId::${userId} -- type: ${typeof userId}`)
         console.log(`roleId::${roleId} -- type: ${typeof roleId}`)
         console.log(`adminId::${adminId} -- type: ${typeof adminId}`)
@@ -360,6 +351,9 @@ class UserService {
         let role = await findRoleById(roleId)
         if (!role) throw new BadRequest('Not found role')
 
+        let roleIdsbyUserId = await findRoleIdsByUserId(userId)
+        if (!roleIdsbyUserId) throw new BadRequest('Not found role of user')
+
         let admin = await findUserByUserId(adminId)
         if (!admin) throw new BadRequest('Not found admin')
         if (admin.email !== 'admin@example.com') {
@@ -368,17 +362,12 @@ class UserService {
             )
         }
 
-        // let adminRoleId = await findRoleIdByUserId(adminId)
-
-        // let priorityTarget = roleId
-        // let priorityAdmin = adminRoleId
-
-        // if (priorityAdmin > priorityTarget)
-        //     throw new BadRequest(
-        //         "You can't assign a role higher than your own.",
-        //     )
-
-        let rs = await updateRole({
+        if (roleIdsbyUserId.includes(roleId)) {
+            throw new BadRequest(
+                'The user has already been granted permission for that role.',
+            )
+        }
+        await createRole({
             userId,
             roleId,
         })

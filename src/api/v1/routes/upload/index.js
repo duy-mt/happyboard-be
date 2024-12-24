@@ -15,6 +15,11 @@ router.post(
     uploadDisk.single('file'),
     asyncHandler(uploadController.uploadFileThumb),
 )
+router.post(
+    '/idea/content',
+    uploadDisk.single('file'),
+    asyncHandler(uploadController.uploadImageInContent),
+)
 router.post('/avatar/url', asyncHandler(uploadController.uploadURLThumb))
 
 module.exports = router

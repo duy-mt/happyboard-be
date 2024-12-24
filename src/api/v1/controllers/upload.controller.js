@@ -21,6 +21,22 @@ class UploadController {
         }).send(res)
     }
 
+    uploadImageInContent = async (req, res, next) => {
+        const { file } = req
+        const userId = req.headers['x-client-id']
+        if (!file) {
+            throw new BadRequest('File missing')
+        }
+        new OK({
+            message: 'Upload Thumbnail successfully',
+            data: await UploadService.uploadImageFromLocal({
+                path: file.path,
+                folderName: 'idea/content',
+                filename: userId,
+            }),
+        }).send(res)
+    }
+
     uploadURLThumb = async (req, res, next) => {
         const { userId, url: urlImage } = req.body
         new OK({

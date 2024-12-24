@@ -2,28 +2,24 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
     async up(queryInterface, Sequelize) {
-        await queryInterface.createTable('votes', {
+        await queryInterface.createTable('abouts', {
             id: {
                 allowNull: false,
                 autoIncrement: true,
                 primaryKey: true,
                 type: Sequelize.INTEGER,
             },
-            userId: {
-                type: Sequelize.INTEGER,
+            title: {
+                type: Sequelize.STRING(50),
                 allowNull: false,
             },
-            ideaId: {
-                type: Sequelize.INTEGER,
-                allowNull: false,
+            content: {
+                type: Sequelize.TEXT,
+                defaultValue: '',
             },
-            pollId: {
-                type: Sequelize.INTEGER,
-                allowNull: false,
-            },
-            status: {
-                type: Sequelize.INTEGER,
-                allowNull: false,
+            imageUrl: {
+                type: Sequelize.TEXT,
+                defaultValue: '',
             },
             createdAt: {
                 allowNull: false,
@@ -40,6 +36,6 @@ module.exports = {
         })
     },
     async down(queryInterface, Sequelize) {
-        await queryInterface.dropTable('votes')
+        await queryInterface.dropTable('abouts')
     },
 }

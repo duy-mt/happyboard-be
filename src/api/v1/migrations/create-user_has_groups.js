@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
     async up(queryInterface, Sequelize) {
-        await queryInterface.createTable('votes', {
+        await queryInterface.createTable('user_has_groups', {
             id: {
                 allowNull: false,
                 autoIncrement: true,
@@ -13,15 +13,7 @@ module.exports = {
                 type: Sequelize.INTEGER,
                 allowNull: false,
             },
-            ideaId: {
-                type: Sequelize.INTEGER,
-                allowNull: false,
-            },
-            pollId: {
-                type: Sequelize.INTEGER,
-                allowNull: false,
-            },
-            status: {
+            groupId: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
             },
@@ -37,9 +29,9 @@ module.exports = {
                 allowNull: true,
                 type: Sequelize.DATE,
             },
-        })
+        });
     },
     async down(queryInterface, Sequelize) {
-        await queryInterface.dropTable('votes')
+        await queryInterface.dropTable('user_has_groups');
     },
-}
+};

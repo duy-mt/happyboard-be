@@ -21,6 +21,10 @@ module.exports = {
                 type: Sequelize.INTEGER,
                 allowNull: false,
             },
+            pollId: {
+                type: Sequelize.INTEGER,
+                allowNull: false,
+            },
             parentId: {
                 type: Sequelize.INTEGER,
                 defaultValue: null,

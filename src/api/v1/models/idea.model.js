@@ -40,9 +40,10 @@ module.exports = (sequelize, DataTypes) => {
             voteCount: DataTypes.INTEGER,
             commentCount: DataTypes.INTEGER,
             viewCount: DataTypes.INTEGER,
-            type: ENUM('text', 'link', 'image'),
+            type: ENUM('text', 'link', 'media'),
             linkUrl: DataTypes.TEXT,
-            linkImage: DataTypes.TEXT
+            linkMedia: DataTypes.TEXT,
+            thumbnailUrl: DataTypes.TEXT,
         },
         {
             sequelize,
