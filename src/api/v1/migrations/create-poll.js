@@ -9,57 +9,21 @@ module.exports = {
                 primaryKey: true,
                 type: Sequelize.INTEGER,
             },
-            userId: {
+            ideaId: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
             },
-            categoryId: {
-                type: Sequelize.INTEGER,
-                allowNull: false,
-            },
-            groupId: {
-                type: Sequelize.INTEGER,
-                allowNull: true,
-            },
-            voteCount: {
-                type: Sequelize.INTEGER,
-                defaultValue: 0,
-            },
-            viewCount: {
-                type: Sequelize.INTEGER,
-                defaultValue: 0,
-            },
-            isPublished: {
-                type: Sequelize.BOOLEAN,
-                defaultValue: false,
-            },
-            commentCount: {
-                type: Sequelize.INTEGER,
-                defaultValue: 0,
-            },
-            question: {
-                type: Sequelize.STRING(255),
-                allowNull: false,
-            },
-            description: {
-                type: Sequelize.TEXT,
-                allowNull: true,
-            },
-            startDate: {
-                type: Sequelize.DATE,
-                allowNull: true,
-            },
-            remindTime: {
-                type: Sequelize.DATE,
-                allowNull: true,
-            },
-            endDate: {
-                type: Sequelize.DATE,
-                allowNull: true,
-            }, 
             isActive: {
                 type: Sequelize.BOOLEAN,
                 defaultValue: true,
+            },
+            expireHour: {
+                type: Sequelize.INTEGER,
+                allowNull: false,
+            },
+            remindBeforeExpireTime: {
+                type: Sequelize.INTEGER,
+                allowNull: false,
             },
             createdAt: {
                 allowNull: false,

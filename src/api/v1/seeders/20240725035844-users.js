@@ -14,7 +14,7 @@ module.exports = {
                     phone: '0378481575',
                     status: 'active',
                     isOnline: false,
-                    jobPosition: 'Intent MyFPT',
+                    jobPosition: 'Intern',
                     introduce:
                         'A dedicated and eager software development intern with a passion for learning and building effective backend systems. Driven by curiosity and a commitment to excellence, they focus on honing their skills and contributing to impactful projects.',
                     createdAt: new Date(),
@@ -24,12 +24,12 @@ module.exports = {
                     email: 'bathangvu@gmail.com',
                     password:
                         '$2a$10$GyqMakjEG34Jjn76BKQk8eFVwiW1aECKdq4TfVcTZMl6Ph6J0mJEq',
-                    username: 'Thang Vu Ba',
+                    username: 'Nguyen Van Ds',
                     avatar: '',
                     phone: '0378481575',
                     status: 'active',
                     isOnline: false,
-                    jobPosition: 'Intent MyFPT',
+                    jobPosition: 'Intern',
                     introduce:
                         'A dedicated and eager software development intern with a passion for learning and building effective backend systems. Driven by curiosity and a commitment to excellence, they focus on honing their skills and contributing to impactful projects.',
                     createdAt: new Date(),
@@ -39,12 +39,12 @@ module.exports = {
                     email: 'phanngockhai888@gmail.com',
                     password:
                         '$2a$10$GyqMakjEG34Jjn76BKQk8eFVwiW1aECKdq4TfVcTZMl6Ph6J0mJEq',
-                    username: 'Khai Phan Ngoc',
+                    username: 'Nguyen Van B',
                     avatar: '',
                     phone: '0378481575',
                     status: 'active',
                     isOnline: false,
-                    jobPosition: 'Intent MyFPT',
+                    jobPosition: 'Intern',
                     introduce:
                         'A dedicated and eager software development intern with a passion for learning and building effective backend systems. Driven by curiosity and a commitment to excellence, they focus on honing their skills and contributing to impactful projects.',
                     createdAt: new Date(),
@@ -59,7 +59,7 @@ module.exports = {
                     phone: '0378481575',
                     status: 'active',
                     isOnline: false,
-                    jobPosition: 'Intent MyFPT',
+                    jobPosition: 'Intern',
                     introduce:
                         'A dedicated and eager software development intern with a passion for learning and building effective backend systems. Driven by curiosity and a commitment to excellence, they focus on honing their skills and contributing to impactful projects.',
                     createdAt: new Date(),
@@ -69,12 +69,12 @@ module.exports = {
                     email: 'laduchung25032005@gmail.com',
                     password:
                         '$2a$10$GyqMakjEG34Jjn76BKQk8eFVwiW1aECKdq4TfVcTZMl6Ph6J0mJEq',
-                    username: 'Hung La Duc',
+                    username: 'Nguyen Van A',
                     avatar: '',
                     phone: '0378481575',
                     status: 'active',
                     isOnline: false,
-                    jobPosition: 'Intent MyFPT',
+                    jobPosition: 'Intern',
                     introduce:
                         'A dedicated and eager software development intern with a passion for learning and building effective backend systems. Driven by curiosity and a commitment to excellence, they focus on honing their skills and contributing to impactful projects.',
                     createdAt: new Date(),

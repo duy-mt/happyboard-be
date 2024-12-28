@@ -13,6 +13,13 @@ const migrate = async () => {
     await IdeaService.publishIdea({ ideaId: 6, adminId: 1 })
     await IdeaService.publishIdea({ ideaId: 7, adminId: 1 })
     await IdeaService.publishIdea({ ideaId: 8, adminId: 1 })
+    await IdeaService.publishIdea({ ideaId: 9, adminId: 1 })
+    await IdeaService.publishIdea({ ideaId: 10, adminId: 1 })
+    await IdeaService.publishIdea({ ideaId: 11, adminId: 1 })
+    await IdeaService.publishIdea({ ideaId: 12, adminId: 1 })
+    await IdeaService.publishIdea({ ideaId: 13, adminId: 1 })
+    await IdeaService.publishIdea({ ideaId: 14, adminId: 1 })
+    await IdeaService.publishIdea({ ideaId: 15, adminId: 1 })
 }
 
 migrate()

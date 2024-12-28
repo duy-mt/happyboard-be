@@ -33,6 +33,9 @@ const MessageQueue = require('./rabbitmq.service')
 const CommentService = require('./comment.service')
 const HistoryService = require('./history.service')
 const UploadService = require('./upload.service')
+const PollService = require('./poll.service')
+const PollOptionService = require('./poll_option.service')
+const { sequelize, Sequelize } = require('../models')
 
 class IdeaService {
     // CREATE IDEA
@@ -63,6 +66,64 @@ class IdeaService {
             objectTargetId: savedIdea.id,
             contentIdea: savedIdea.title,
         })
+
+        return 1
+    }
+
+    static createPollIdea = async ({
+        title,
+        content,
+        categoryId,
+        userId,
+        isPublished = false,
+        isDrafted = false,
+        expireHour,
+        remindBeforeExpireTime,
+        pollOptions = [],
+    }) => {
+        if (!content || !title || !categoryId || pollOptions.length == 0)
+            throw new BadRequest(
+                'Title, content, poll option and category are required',
+            )
+
+        const transaction = await sequelize.transaction()
+
+        const savedIdea = await createIdea(
+            {
+                title,
+                content,
+                categoryId,
+                userId,
+                isPublished,
+                isDrafted,
+            },
+            { transaction },
+        )
+
+        const savePollId = await PollService.createPoll(
+            {
+                ideaId: savedIdea.id,
+                expireHour,
+                remindBeforeExpireTime,
+            },
+            { transaction },
+        )
+
+        await PollOptionService.createPollOptionForPoll(
+            { pollId: savePollId.id, options: pollOptions },
+            { transaction },
+        )
+
+        await HistoryService.createHistory(
+            {
+                type: 'CI01',
+                userId,
+                userTargetId: userId,
+                objectTargetId: savedIdea.id,
+                contentIdea: savedIdea.title,
+            },
+            { transaction },
+        )
 
         return 1
     }
@@ -113,7 +174,6 @@ class IdeaService {
         let urlsString = ''
         let urlThumbString = ''
 
-
         if (files && files.length > 0) {
             const uploadPromises = files.map(async (file) => {
                 if (file.mimetype.startsWith('image/')) {
@@ -141,7 +201,7 @@ class IdeaService {
         }
 
         body.thumbnailUrl = urlThumbString
-        body.linkMedia= urlsString
+        body.linkMedia = urlsString
         body.userId = userId
         body.isDrafted = false
         body.isPublished = false

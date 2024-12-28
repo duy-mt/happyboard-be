@@ -201,11 +201,7 @@ const findAllIdeas = async ({
                     model: Category,
                     attributes: ['id', 'title', 'icon'],
                     where: {
-                        title: {
-                            [Op.in]: categories
-                                .split(',')
-                                .map((cat) => cat.trim()),
-                        },
+                        id: 1,
                     },
                 },
             ],
@@ -823,5 +819,5 @@ module.exports = {
     findAllOwnIdeas,
     findAllUpvotedIdeasByUsedId,
     findAllDownvotedIdeasByUsedId,
-    findAllPublishIdeasByUsedId
+    findAllPublishIdeasByUsedId,
 }

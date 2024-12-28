@@ -17,10 +17,6 @@ module.exports = {
                 type: Sequelize.INTEGER,
                 allowNull: false,
             },
-            pollId: {
-                type: Sequelize.INTEGER,
-                allowNull: false,
-            },
             status: {
                 type: Sequelize.INTEGER,
                 allowNull: false,

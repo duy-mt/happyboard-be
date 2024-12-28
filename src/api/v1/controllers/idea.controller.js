@@ -23,7 +23,7 @@ class IdeaController {
                 id: req.params.ideaId,
                 userId: req.body.userId,
                 isPublished: true,
-                isDrafted: false
+                isDrafted: false,
             }),
         }).send(res)
     }
@@ -217,10 +217,18 @@ class IdeaController {
         new Created({
             message: 'Created media content idea successfully!',
             data: await IdeaService.createMediaIdea({
-                files, 
-                userId, 
-                body: req.body
+                files,
+                userId,
+                body: req.body,
             }),
+        }).send(res)
+    }
+
+    
+    createPollIdea = async (req, res, next) => {
+        new Created({
+            message: 'Created poll idea successfully!',
+            data: await IdeaService.createPollIdea(req.body),
         }).send(res)
     }
 
@@ -230,9 +238,9 @@ class IdeaController {
         new Created({
             message: 'Drafted idea successfully!',
             data: await IdeaService.draftIdea({
-                files, 
-                userId, 
-                body: req.body
+                files,
+                userId,
+                body: req.body,
             }),
         }).send(res)
     }
@@ -262,7 +270,7 @@ class IdeaController {
             message: 'Cancel vote successfully',
             data: await IdeaService.cancelVote({
                 ideaId: req.params.ideaId,
-                userId: req.body.userId
+                userId: req.body.userId,
             }),
         }).send(res)
     }
@@ -289,8 +297,8 @@ class IdeaController {
             message: 'Delete comment successfully',
             data: await CommentService.deleteComment({
                 id: req.params.commentId,
-                userId: req.body.userId
-            })
+                userId: req.body.userId,
+            }),
         }).send(res)
     }
 

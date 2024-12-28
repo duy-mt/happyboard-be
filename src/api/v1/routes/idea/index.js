@@ -49,6 +49,14 @@ router.post(
     uploadMemory.array('files', 10),
     asyncHandler(ideaController.createMediaIdea),
 )
+
+router.post(
+    '/poll',
+    authorize(['IDE04']),
+    uploadMemory.array('files', 10),
+    asyncHandler(ideaController.createPollIdea),
+)
+
 router.post(
     '/draft',
     uploadMemory.array('files', 10),
