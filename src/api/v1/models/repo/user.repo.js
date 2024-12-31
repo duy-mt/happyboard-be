@@ -1,8 +1,28 @@
 'use strict'
-
 const { processReturnedData, removeField } = require('../../utils')
-const { User } = require('../index')
+const { User, User_has_groups, sequelize } = require('../index')
+const { Op } = require('sequelize')
 
+const optUser = {
+    attributes: ['id', 'username', 'avatar'],
+}
+
+const findAllUsersForGroup = async ({ groupId }) => {
+    const { count: total, rows: users } = await User.findAndCountAll({
+        where: {
+            id: {
+                [Op.notIn]: sequelize.literal(`(
+                    SELECT DISTINCT "userId" 
+                    FROM "user_has_groups" 
+                    WHERE "groupId" = ${groupId}
+                )`),
+            },
+        },
+        ...optUser,
+    })
+
+    return { total, users }
+}
 // CREATE
 const createUser = async ({ email, password, username, avatar = '' }) => {
     try {
@@ -145,4 +165,5 @@ module.exports = {
     findUserByUserId,
     updateUserByUserId,
     findUsersByUserIds,
+    findAllUsersForGroup,
 }

@@ -24,6 +24,11 @@ module.exports = (sequelize, DataTypes) => {
                 foreignKey: 'userId',
             })
 
+            this.belongsTo(models.Group, {
+                foreignKey: 'groupId',
+                as: 'groups'
+            })
+
             this.belongsTo(models.Category, {
                 foreignKey: 'categoryId',
             })
@@ -34,6 +39,7 @@ module.exports = (sequelize, DataTypes) => {
             title: DataTypes.STRING,
             content: DataTypes.TEXT,
             userId: DataTypes.INTEGER,
+            groupId: DataTypes.INTEGER,
             categoryId: DataTypes.INTEGER,
             isPublished: DataTypes.BOOLEAN,
             isDrafted: DataTypes.BOOLEAN,

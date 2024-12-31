@@ -45,11 +45,16 @@ class IdeaService {
         content,
         categoryId,
         userId,
+        groupId = 1,
         isPublished = false,
         isDrafted = false,
     }) => {
         if (!content || !title || !categoryId)
             throw new BadRequest('Title, content and category are required')
+
+        if (groupId !== 1 && !isDrafted){
+            isPublished = true
+        }
 
         const savedIdea = await createIdea({
             title,
@@ -58,6 +63,7 @@ class IdeaService {
             userId,
             isPublished,
             isDrafted,
+            groupId
         })
         await HistoryService.createHistory({
             type: 'CI01',
@@ -75,6 +81,7 @@ class IdeaService {
         content,
         categoryId,
         userId,
+        groupId = 1,
         isPublished = false,
         isDrafted = false,
         expireHour,
@@ -86,6 +93,10 @@ class IdeaService {
                 'Title, content, poll option and category are required',
             )
 
+        if (groupId !== 1 && !isDrafted){
+            isPublished = true
+        }
+
         const transaction = await sequelize.transaction()
 
         const savedIdea = await createIdea(
@@ -94,6 +105,7 @@ class IdeaService {
                 content,
                 categoryId,
                 userId,
+                groupId,
                 isPublished,
                 isDrafted,
             },
@@ -170,6 +182,7 @@ class IdeaService {
         if (!files || !body.title || !body.categoryId)
             throw new BadRequest('Title, image/video and category are required')
 
+
         let urls = []
         let urlsString = ''
         let urlThumbString = ''
@@ -203,8 +216,10 @@ class IdeaService {
         body.thumbnailUrl = urlThumbString
         body.linkMedia = urlsString
         body.userId = userId
+        if (body.groupId !==1&& !body.isDrafted) {
+            body.isPublished = true
+        }
         body.isDrafted = false
-        body.isPublished = false
 
         const savedIdea = await createIdea(body)
 
@@ -357,6 +372,7 @@ class IdeaService {
         categories = null,
         isPublished = null,
         isDrafted = false,
+        groupId = 1
     }) => {
         let fieldSort = OPTION_SHOW_IDEA[option]
         let { ideas, totalIdea } = await findAllIdeas({
@@ -366,6 +382,7 @@ class IdeaService {
             categories,
             isPublished,
             isDrafted,
+            groupId
         })
 
         for (let i = 0; i < ideas.length; i++) {
@@ -394,6 +411,7 @@ class IdeaService {
         option = Object.keys(OPTION_SHOW_IDEA)[0],
         categories = null,
         duration,
+        groupId = 1
     }) => {
         return await this.getAllIdeas({
             limit,
@@ -403,6 +421,7 @@ class IdeaService {
             isPublished: true,
             categories,
             duration,
+            groupId
         })
     }
 

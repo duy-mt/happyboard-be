@@ -1,6 +1,6 @@
 'use strict'
 const { Op, literal, where } = require('sequelize')
-const { Idea, Comment, User, Category, Vote, sequelize } = require('../index')
+const { Idea, Comment, User, Category, Vote, Group, sequelize } = require('../index')
 const { upVote, downVote, deleteVote, findVote } = require('./vote.repo')
 const { processReturnedData } = require('../../utils')
 
@@ -89,6 +89,7 @@ const createIdea = async ({
     type = 'text',
     categoryId,
     userId,
+    groupId = 1,
     thumbnailUrl = null,
     linkMedia = null,
     linkUrl = null,
@@ -101,6 +102,7 @@ const createIdea = async ({
         type,
         categoryId,
         userId,
+        groupId,
         thumbnailUrl,
         linkMedia,
         linkUrl,
@@ -158,6 +160,7 @@ const findAllIdeas = async ({
     categories = null,
     isPublished = true,
     isDrafted = false,
+    groupId = 1,
 }) => {
     let queryFindIdeas
     if (!categories) {
@@ -177,6 +180,14 @@ const findAllIdeas = async ({
                 {
                     model: Category,
                     attributes: ['id', 'title', 'icon'],
+                },
+                {
+                    model: Group,
+                    attributes: ['id', 'name'],
+                    as: 'groups',
+                    where: {
+                        id: groupId,
+                    },
                 },
             ],
             attributes: {
@@ -201,7 +212,15 @@ const findAllIdeas = async ({
                     model: Category,
                     attributes: ['id', 'title', 'icon'],
                     where: {
-                        id: 1,
+                        id: categories,
+                    },
+                },
+                {
+                    model: Group,
+                    attributes: ['id', 'name'],
+                    as: 'groups',
+                    where: {
+                        id: groupId,
                     },
                 },
             ],

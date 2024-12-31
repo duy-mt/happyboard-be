@@ -29,6 +29,7 @@ const {
     updateUserByUserId,
     findUserByUserId,
     findUsersByUserIds,
+    findAllUsersForGroup,
 } = require('../models/repo/user.repo')
 const {
     findPermissionsByUserId,
@@ -39,14 +40,38 @@ const {
     findRoleIdByUserId,
     findRoleIdsByUserId,
     createRole,
-    updateRole
+    updateRole,
 } = require('../models/repo/user_has_roles.repo')
+const {
+    addMemberToGroup,
+    leaveGroup,
+} = require('../models/repo/user_has_groups.repo')
 const { htmlBlockUser } = require('../template')
 const { removeField } = require('../utils')
 const MailerService = require('./mailer.service')
 const RedisService = require('./redis.service')
 
 class UserService {
+    
+    static addMemberToGroup = async ({ memberId, groupId }) => {
+        await addMemberToGroup({ memberId, groupId })
+        return 1
+    }
+
+    static leaveGroup = async ({ userId, groupId }) => {
+        await leaveGroup({ userId, groupId })
+        return 1
+    }
+
+    static getAllUsersForGroup = async ({ groupId }) => {
+        const { users, total } = await findAllUsersForGroup({ groupId })
+
+        return {
+            total,
+            users,
+        }
+    }
+
     static getAllUsers = async ({
         page = 1,
         limit = 10,
@@ -332,7 +357,7 @@ class UserService {
         // 1. Check array permission
         if (permissions.length === 0)
             throw new BadRequest("Can't add empty permisisons for user")
-        
+
         await deletePermissionOfUser({
             userId,
             permissions,

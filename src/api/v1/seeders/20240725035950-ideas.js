@@ -13,6 +13,7 @@ module.exports = {
                         <img src="https://res.cloudinary.com/daokqrkdk/image/upload/v1735077289/download_kq7sp9.jpg" alt="Quà Tết 2024" />
                     `,
                     userId: 2,
+                    groupId: 2,
                     categoryId: 1,
                     voteCount: 0,
                     commentCount: 0,
@@ -34,6 +35,7 @@ module.exports = {
                         <img src="https://res.cloudinary.com/daokqrkdk/image/upload/v1735077404/download_pj8b7f.jpg" alt="Nâng cấp cơ sở vật chất văn phòng" />
                     `,
                     userId: 3,
+                    groupId: 2,
                     categoryId: 2,
                     voteCount: 0,
                     commentCount: 0,
@@ -55,6 +57,7 @@ module.exports = {
                         <video src="https://youtu.be/0B0L-Icia4M?si=XEK1DrLCF5NRl9pA" controls></video>
                     `,
                     userId: 3,
+                    groupId: 2,
                     categoryId: 3,
                     voteCount: 0,
                     commentCount: 0,
@@ -76,6 +79,7 @@ module.exports = {
                         <video src="https://youtu.be/B4kNiCWTl7M?si=vEvLQCO7U_FaGq3N" controls></video>
                     `,
                     userId: 4,
+                    groupId: 2,
                     categoryId: 4,
                     voteCount: 0,
                     commentCount: 0,
@@ -97,6 +101,7 @@ module.exports = {
                         <img src="https://res.cloudinary.com/daokqrkdk/image/upload/v1735077659/download_haltbi.jpg" alt="AI Learning" />
                     `,
                     userId: 5,
+                    groupId: 2,
                     categoryId: 5,
                     voteCount: 0,
                     commentCount: 0,
@@ -120,6 +125,7 @@ module.exports = {
                         <img src="https://res.cloudinary.com/daokqrkdk/image/upload/v1735077209/download_luzjvs.jpg" alt="Quà Tết cho bạn bè" />
                     `,
                     userId: 2,
+                    groupId: 1,
                     categoryId: 1,
                     voteCount: 0,
                     commentCount: 0,
@@ -141,6 +147,7 @@ module.exports = {
                         <img src="https://res.cloudinary.com/daokqrkdk/image/upload/v1735077389/download_u6gyk4.jpg" alt="Không gian làm việc tại nhà" />
                     `,
                     userId: 2,
+                    groupId: 1,
                     categoryId: 2,
                     voteCount: 0,
                     commentCount: 0,
@@ -162,6 +169,7 @@ module.exports = {
                         <video src="https://youtu.be/uIrknRT8bB8?si=N1WSOo5OjLExbUMV" controls></video>
                     `,
                     userId: 3,
+                    groupId: 1,
                     categoryId: 3,
                     voteCount: 0,
                     commentCount: 0,
@@ -183,6 +191,7 @@ module.exports = {
                         <img src="https://res.cloudinary.com/daokqrkdk/image/upload/v1735077569/download_pqaczv.jpg" alt="Tập thể dục cho người mới bắt đầu" />
                     `,
                     userId: 4,
+                    groupId: 1,
                     categoryId: 4,
                     voteCount: 0,
                     commentCount: 0,
@@ -204,6 +213,7 @@ module.exports = {
                         <img src="https://res.cloudinary.com/daokqrkdk/image/upload/v1735077656/download_y6ewo3.jpg" alt="Công nghệ Blockchain" />
                     `,
                     userId: 5,
+                    groupId: 1,
                     categoryId: 5,
                     voteCount: 0,
                     commentCount: 0,
@@ -225,6 +235,7 @@ module.exports = {
                         <img src="https://res.cloudinary.com/daokqrkdk/image/upload/v1735077552/download_e0uv0t.jpg" alt="Hoạt động thể thao mùa hè" />
                     `,
                     userId: 5,
+                    groupId: 1,
                     categoryId: 4,
                     voteCount: 0,
                     commentCount: 0,
@@ -246,6 +257,7 @@ module.exports = {
                         <img src="https://res.cloudinary.com/daokqrkdk/image/upload/v1735077652/download_jodrr4.jpg" alt="Giữ động lực học tập" />
                     `,
                     userId: 4,
+                    groupId: 1,
                     categoryId: 5,
                     voteCount: 0,
                     commentCount: 0,
@@ -267,6 +279,7 @@ module.exports = {
                         <img src="https://res.cloudinary.com/daokqrkdk/image/upload/v1735077546/download_o5wky4.jpg" alt="Chăm sóc sức khỏe mùa lạnh" />
                     `,
                     userId: 4,
+                    groupId: 1,
                     categoryId: 4,
                     voteCount: 0,
                     commentCount: 0,
@@ -288,6 +301,7 @@ module.exports = {
                         <img src="https://res.cloudinary.com/daokqrkdk/image/upload/v1735077398/download_rfbjc6.jpg" alt="Làm việc hiệu quả từ xa" />
                     `,
                     userId: 2,
+                    groupId: 1,
                     categoryId: 2,
                     voteCount: 0,
                     commentCount: 0,
@@ -309,6 +323,7 @@ module.exports = {
                         <img src="https://res.cloudinary.com/daokqrkdk/image/upload/v1735077652/download_jodrr4.jpg" alt="Trải nghiệm thực tế ảo" />
                     `,
                     userId: 3,
+                    groupId: 1,
                     categoryId: 5,
                     voteCount: 0,
                     commentCount: 0,

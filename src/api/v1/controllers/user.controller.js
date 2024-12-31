@@ -4,10 +4,38 @@ const { OK, Created } = require('../core/success.response')
 const UserService = require('../services/user.service')
 
 class UserController {
+    addMemberToGroup = async (req, res, next) => {
+        new OK({
+            message: 'Add member successfully',
+            data: await UserService.addMemberToGroup({
+                memberId: req.body?.memberId,
+                groupId: req.body?.groupId,
+            }),
+        }).send(res)
+    }
+
+    leaveGroup = async (req, res, next) => {
+        const userId = req.headers['x-client-id']
+        new OK({
+            message: 'Leave group successfully',
+            data: await UserService.leaveGroup({
+                userId: userId,
+                groupId: req.params.groupId,
+            }),
+        }).send(res)
+    }
+
     getAllUsers = async (req, res, next) => {
         new OK({
             message: 'Get all users successfully',
             data: await UserService.getAllUsers(req.query),
+        }).send(res)
+    }
+
+    getAllUsersForGroup = async (req, res, next) => {
+        new OK({
+            message: 'Get all user for add member successfully',
+            data: await UserService.getAllUsersForGroup(req.query),
         }).send(res)
     }
 
@@ -92,9 +120,9 @@ class UserController {
         new OK({
             message: 'Update permission successfully',
             data: await UserService.updatePermission({
-                permissionId: req.params.permissionId, 
+                permissionId: req.params.permissionId,
                 name: req.body.name,
-                description: req.body.description
+                description: req.body.description,
             }),
         }).send(res)
     }
@@ -113,13 +141,13 @@ class UserController {
         new OK({
             message: 'Update role not for an user successfully',
             data: await UserService.updateRoleNotForAnUser({
-                roleId: req.params.roleId, 
+                roleId: req.params.roleId,
                 name: req.body.name,
-                description: req.body.description
+                description: req.body.description,
             }),
         }).send(res)
     }
-    
+
     getAllRolesNotForAnUser = async (req, res, next) => {
         new OK({
             message: 'Get all roles not for an user successfully',
@@ -172,7 +200,6 @@ class UserController {
             }),
         }).send(res)
     }
-
 }
 
 module.exports = new UserController()

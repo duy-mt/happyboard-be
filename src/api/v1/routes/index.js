@@ -30,6 +30,8 @@ router.use('/api/v1/profile', require('./profile'))
 router.use('/api/v1/ideas', require('./idea'))
 router.use('/api/v1/comments', require('./comment'))
 router.use('/api/v1/categories', require('./category'))
+router.use('/api/v1/groups', require('./group'))
 router.use('/api/v1', require('./access'))
+
 
 module.exports = router

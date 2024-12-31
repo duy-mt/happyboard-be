@@ -164,6 +164,7 @@ class IdeaController {
                     userId: req.body.userId,
                     option: req.query?.option,
                     categories: req.query?.categories,
+                    groupId: req.query?.group ? req.query?.group : 1
                 }),
             }).send(res)
         } else {
@@ -228,7 +229,7 @@ class IdeaController {
     createPollIdea = async (req, res, next) => {
         new Created({
             message: 'Created poll idea successfully!',
-            data: await IdeaService.createPollIdea(req.body),
+            data: await IdeaService.createPollIdea(preq.body),
         }).send(res)
     }
 

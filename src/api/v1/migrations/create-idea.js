@@ -21,6 +21,10 @@ module.exports = {
                 type: Sequelize.INTEGER,
                 allowNull: false,
             },
+            groupId: {
+                type: Sequelize.INTEGER,
+                allowNull: false,
+            },
             categoryId: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
@@ -72,10 +76,6 @@ module.exports = {
             thumbnailUrl: {
                 allowNull: true,
                 type: Sequelize.TEXT
-            },
-            groupId: {
-                type: Sequelize.INTEGER,
-                allowNull: true,
             },
         })
     },

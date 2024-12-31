@@ -16,7 +16,16 @@ router.put(
 
 router.use(asyncHandler(authentication))
 ////////////////////////////////////////
+
+
 router.get('', authorize(['USR01']), asyncHandler(userController.getAllUsers))
+
+router.get('/forGroup', asyncHandler(userController.getAllUsersForGroup))
+
+router.post('/group', asyncHandler(userController.addMemberToGroup))
+
+router.delete('/leaveGroup/:groupId', asyncHandler(userController.leaveGroup))
+
 router.get(
     '/latest-online',
     authorize(['USR01']),
