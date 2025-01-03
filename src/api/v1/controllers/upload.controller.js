@@ -37,6 +37,38 @@ class UploadController {
         }).send(res)
     }
 
+    uploadAvatarGroup = async (req, res, next) => {
+        const { file } = req
+        const userId = req.headers['x-client-id']
+        if (!file) {
+            throw new BadRequest('File missing')
+        }
+        new OK({
+            message: 'Upload avatar group successfully',
+            data: await UploadService.uploadImageFromLocal({
+                path: file.path,
+                folderName: 'group/avatar',
+                filename: userId,
+            }),
+        }).send(res)
+    }
+
+    uploadBackgroundGroup = async (req, res, next) => {
+        const { file } = req
+        const userId = req.headers['x-client-id']
+        if (!file) {
+            throw new BadRequest('File missing')
+        }
+        new OK({
+            message: 'Upload background group successfully',
+            data: await UploadService.uploadImageFromLocal({
+                path: file.path,
+                folderName: 'group/background',
+                filename: userId,
+            }),
+        }).send(res)
+    }
+
     uploadURLThumb = async (req, res, next) => {
         const { userId, url: urlImage } = req.body
         new OK({

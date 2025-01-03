@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
         static associate(models) {
             this.belongsTo(models.Poll, {
                 foreignKey: 'pollId',
+                as: 'poll'
             })
         }
     }
@@ -19,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
         {
             pollId: DataTypes.INTEGER,
             optionText: DataTypes.STRING,
-            votesCount: DataTypes.INTEGER,
+            votes: DataTypes.INTEGER
         },
         {
             sequelize,

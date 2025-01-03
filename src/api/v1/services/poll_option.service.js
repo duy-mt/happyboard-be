@@ -5,12 +5,12 @@ class PollOptionService {
     static createPollOptionForPoll = async ({
         pollId,
         options = [],
-        votesCount = 0
+        votes = 0,
     }) => {
         return await createPollOptionForPoll({
             pollId,
             options,
-            votesCount
+            votes,
         })
     }
 }

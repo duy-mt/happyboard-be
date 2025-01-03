@@ -1,6 +1,17 @@
 'use strict'
 const { Op, literal, where } = require('sequelize')
-const { Idea, Comment, User, Category, Vote, Group, sequelize } = require('../index')
+const {
+    Idea,
+    Comment,
+    User,
+    Category,
+    Vote,
+    Group,
+    Poll,
+    Poll_response,
+    Poll_option,
+    sequelize
+} = require('../index')
 const { upVote, downVote, deleteVote, findVote } = require('./vote.repo')
 const { processReturnedData } = require('../../utils')
 
@@ -33,6 +44,23 @@ const optIdea = {
             model: Vote,
             as: 'votes',
             attributes: ['id', 'status'],
+        },
+        {
+            model: Poll,
+            as: 'poll',
+            attributes: ['id'],
+            include: [
+                {
+                    model: Poll_option,
+                    as: 'options',
+                    attributes: ['id', 'pollId', 'optionText', 'votes'],
+                },
+                {
+                    model: Poll_response,
+                    as: 'responses',
+                    attributes: ['pollId', 'userId', 'pollOptionId'],
+                },
+            ],
         },
     ],
     attributes: {

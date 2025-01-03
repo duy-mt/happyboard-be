@@ -4,6 +4,33 @@ const { OK, Created } = require('../core/success.response')
 const GroupService = require('../services/group.service')
 
 class GroupController {
+
+    updateBackgroundGroup = async (req, res, next) => {
+        const { file } = req
+        const userId = req.headers['x-client-id']
+        new OK({
+            message: 'Update background group successfully!',
+            data: await GroupService.updateBackgroundGroup({
+                file,
+                userId,
+                groupId: req.params.groupId,
+            }),
+        }).send(res)
+    }
+
+    updateAvatarGroup = async (req, res, next) => {
+        const { file } = req
+        const userId = req.headers['x-client-id']
+        new OK({
+            message: 'Update avatar group successfully!',
+            data: await GroupService.updateAvatarGroup({
+                file,
+                userId,
+                groupId: req.params.groupId,
+            }),
+        }).send(res)
+    }
+
     createGroup = async (req, res, next) => {
         const { files } = req
         const userId = req.headers['x-client-id']

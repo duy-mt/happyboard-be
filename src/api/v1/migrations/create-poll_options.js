@@ -17,7 +17,7 @@ module.exports = {
                 type: Sequelize.STRING(255),
                 allowNull: false,
             },
-            votesCount: {
+            votes: {
                 type: Sequelize.INTEGER,
                 defaultValue: 0,
             },

@@ -1,12 +1,13 @@
 'use strict'
 
-const { Poll_option } = require('../index')
+const { where } = require('sequelize')
+const { Poll_option, sequelize } = require('../index')
 
-const createPollOption = async ({ pollId, optionText, votesCount = 0 }) => {
+const createPollOption = async ({ pollId, optionText, votes = 0 }) => {
     return await Poll_option.create({
         pollId,
         optionText,
-        votesCount,
+        votes,
     })
 }
 
@@ -25,7 +26,36 @@ const createPollOptionForPoll = async ({ pollId, options, votesCount = 0 }) => {
     return rows
 }
 
+const upVoteForPoll = async ({ pollOptionId }) => {
+    return await Poll_option.update(
+        {
+            votes: sequelize.literal('votes + 1'),
+        },
+        {
+            where: {
+                id: pollOptionId,
+            },
+        },
+    )
+        .then(([affectedRows]) => {
+            console.log(`Số bản ghi bị ảnh hưởng: ${affectedRows}`)
+        })
+        .catch((error) => {
+            console.error('Có lỗi xảy ra:', error)
+        })
+}
+
+const findOptionById = async ({ pollOptionId }) => {
+    return await Poll_option.findOne({
+        where: {
+            id: pollOptionId,
+        },
+    })
+}
+
 module.exports = {
     createPollOption,
     createPollOptionForPoll,
+    upVoteForPoll,
+    findOptionById
 }

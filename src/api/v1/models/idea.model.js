@@ -32,6 +32,11 @@ module.exports = (sequelize, DataTypes) => {
             this.belongsTo(models.Category, {
                 foreignKey: 'categoryId',
             })
+
+            this.hasOne(models.Poll, {
+                foreignKey: 'ideaId',
+                as: 'poll'
+            })
         }
     }
     Idea.init(

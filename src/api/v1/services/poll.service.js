@@ -1,13 +1,43 @@
 'use strict'
 
-const { createPoll } = require('../models/repo/poll.repo')
+const { createPoll, findOptionByPollId } = require('../models/repo/poll.repo')
+const {
+    upVoteForPoll,
+    findOptionById,
+} = require('../models/repo/poll_option.repo')
+const {
+    createPollResponse,
+    findConfirmVotedPoll,
+} = require('../models/repo/poll_response.repo')
+const { sequelize } = require('../models')
+
 class PollService {
-    static createPoll = async ({ ideaId, expireHour, remindBeforeExpireTime }) => {
+    static getOptionByPollId = async ({ pollId }) => {
+        const poll = await findOptionByPollId({ pollId })
+        return poll
+    }
+
+    static createPoll = async ({
+        ideaId,
+        expireHour,
+        remindBeforeExpireTime,
+    }) => {
         return await createPoll({
             ideaId,
             expireHour,
             remindBeforeExpireTime,
         })
+    }
+
+    static createVoteForPoll = async ({ userId, pollId, pollOptionId }) => {
+        const transaction = await sequelize.transaction()
+
+        await upVoteForPoll({ pollOptionId }, { transaction })
+        await createPollResponse(
+            { userId, pollId, pollOptionId },
+            { transaction },
+        )
+        return 1
     }
 
     static deletePoll = async ({ ideaId, userId }) => {

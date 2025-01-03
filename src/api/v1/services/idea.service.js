@@ -24,6 +24,7 @@ const {
     findAllDownvotedIdeasByUsedId,
     findAllPublishIdeasByUsedId,
 } = require('../models/repo/idea.repo')
+const { findConfirmVotedPoll } = require('../models/repo/poll_response.repo')
 const { sortComment, removeField } = require('../utils')
 const VoteService = require('./vote.service')
 const RedisService = require('./redis.service')
@@ -344,6 +345,7 @@ class IdeaService {
 
     static getIdea = async ({ id, userId, isPublished, isDrafted }) => {
         const idea = await findIdea({ id, isPublished, isDrafted })
+        
         if (!idea) throw new BadRequest('Idea is not exist')
 
         const handledComment = sortComment(idea.comments)

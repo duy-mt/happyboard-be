@@ -11,6 +11,18 @@ const router = express.Router()
 
 router.use(asyncHandler(authentication))
 
+router.put(
+    '/:groupId/avatar',
+    uploadMemory.single('file'),
+    asyncHandler(groupController.updateAvatarGroup),
+)
+
+router.put(
+    '/:groupId/background',
+    uploadMemory.single('file'),
+    asyncHandler(groupController.updateBackgroundGroup),
+)
+
 router.get('/byUser', asyncHandler(groupController.getAllGroupsByUserId))
 router.get('', asyncHandler(groupController.getAllGroups))
 router.post(

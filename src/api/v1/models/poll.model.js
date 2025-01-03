@@ -15,7 +15,12 @@ module.exports = (sequelize, DataTypes) => {
             })
 
             this.hasMany(models.Poll_option, {
-                foreignKey: "pollId"
+                foreignKey: 'pollId',
+                as: 'options',
+            })
+            this.hasMany(models.Poll_response, {
+                foreignKey: 'pollId',
+                as: 'responses',
             })
         }
     }

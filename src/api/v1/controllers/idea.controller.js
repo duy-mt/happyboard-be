@@ -229,7 +229,7 @@ class IdeaController {
     createPollIdea = async (req, res, next) => {
         new Created({
             message: 'Created poll idea successfully!',
-            data: await IdeaService.createPollIdea(preq.body),
+            data: await IdeaService.createPollIdea(req.body),
         }).send(res)
     }
 

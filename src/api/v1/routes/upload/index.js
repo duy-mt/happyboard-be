@@ -20,6 +20,19 @@ router.post(
     uploadDisk.single('file'),
     asyncHandler(uploadController.uploadImageInContent),
 )
+
+router.post(
+    '/group/avatar',
+    uploadDisk.single('file'),
+    asyncHandler(uploadController.uploadAvatarGroup),
+)
+
+router.post(
+    '/group/background',
+    uploadDisk.single('file'),
+    asyncHandler(uploadController.uploadBackgroundGroup),
+)
+
 router.post('/avatar/url', asyncHandler(uploadController.uploadURLThumb))
 
 module.exports = router

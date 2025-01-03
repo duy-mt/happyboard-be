@@ -17,6 +17,54 @@ const { sequelize, Sequelize } = require('../models')
 const UploadService = require('./upload.service')
 
 class GroupService {
+    static updateBackgroundGroup = async ({ file, userId, groupId }) => {
+        let payload = {}
+        if (file) {
+            let background = null
+
+            if (file.mimetype.startsWith('image/')) {
+                const image = await UploadService.uploadFromBuffer({
+                    file,
+                    folderName: 'group/background',
+                    filename: `${userId}_${Date.now()}`,
+                })
+                background = image.url
+            }
+
+            payload = {
+                background,
+            }
+        }
+
+        await updateGroup({ groupId, payload })
+
+        return 1
+    }
+
+    static updateAvatarGroup = async ({ file, userId, groupId }) => {
+        let payload = {}
+        if (file) {
+            let avatar = null
+
+            if (file.mimetype.startsWith('image/')) {
+                const image = await UploadService.uploadFromBuffer({
+                    file,
+                    folderName: 'group/avatar',
+                    filename: `${userId}_${Date.now()}`,
+                })
+                avatar = image.url
+            }
+
+            payload = {
+                avatar,
+            }
+        }
+
+        await updateGroup({ groupId, payload })
+
+        return 1
+    }
+
     static createGroup = async ({ files, userId, body }) => {
         if (!body.name || !body.description)
             throw new BadRequest('Name group and description are required')
