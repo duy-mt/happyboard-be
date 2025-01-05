@@ -12,16 +12,22 @@ class AccessController {
             maxAge: 10 * 24 * 60 * 60 * 1000,
             secure: true,
             sameSite: 'None',
+            domain: '.happyidea.io.vn',
+            path: '/',
         })
             .cookie('refresh-token', data.tokens.refreshToken, {
                 maxAge: 10 * 24 * 60 * 60 * 1000,
                 secure: true,
                 sameSite: 'None',
+                domain: '.happyidea.io.vn',
+                path: '/',
             })
             .cookie('userId', data.user.id, {
                 maxAge: 10 * 24 * 60 * 60 * 1000,
                 secure: true,
                 sameSite: 'None',
+                domain: '.happyidea.io.vn',
+                path: '/',
             })
 
         new OK({
@@ -37,16 +43,22 @@ class AccessController {
             maxAge: 10 * 24 * 60 * 60 * 1000,
             secure: true,
             sameSite: 'None',
+            domain: '.happyidea.io.vn',       
+            path: '/',  
         })
             .cookie('refresh-token', data.tokens.refreshToken, {
                 maxAge: 10 * 24 * 60 * 60 * 1000,
                 secure: true,
                 sameSite: 'None',
+                domain: '.happyidea.io.vn',       
+                path: '/',  
             })
             .cookie('userId', data.user.id, {
                 maxAge: 10 * 24 * 60 * 60 * 1000,
                 secure: true,
                 sameSite: 'None',
+                domain: '.happyidea.io.vn',       
+                path: '/',  
             })
 
         new Created({
@@ -73,6 +85,8 @@ class AccessController {
             maxAge: 10 * 24 * 60 * 60 * 1000,
             secure: true,
             sameSite: 'None',
+            domain: '.happyidea.io.vn',       
+            path: '/',  
         })
 
         new OK({
@@ -91,20 +105,24 @@ class AccessController {
             maxAge: 10 * 24 * 60 * 60 * 1000,
             secure: true,
             sameSite: 'None',
+            domain: '.happyidea.io.vn',       
+            path: '/',  
         })
             .cookie('refresh-token', data.tokens.refreshToken, {
                 maxAge: 10 * 24 * 60 * 60 * 1000,
                 secure: true,
                 sameSite: 'None',
+                domain: '.happyidea.io.vn',       
+                path: '/',  
             })
             .cookie('userId', data.user.id, {
                 maxAge: 10 * 24 * 60 * 60 * 1000,
                 secure: true,
                 sameSite: 'None',
+                domain: '.happyidea.io.vn',       
+                path: '/',  
             })
-            .redirect(
-                process.env.DOMAIN_CLIENT,
-            )
+            .redirect(process.env.DOMAIN_CLIENT)
         new Created({
             message: 'Register with google successfully',
             data,

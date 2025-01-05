@@ -22,7 +22,7 @@ jobs:
                   echo "PORT=${{secrets.PORT}}" >> .env
                   echo "SECRET_KEY=${{secrets.SECRET_KEY}}" >> .env
 
-                  echo `PROD_POSTGRES_HOST=54.169.184.180` >> .env
+                  echo "PROD_POSTGRES_HOST=${{ secrets.PROD_POSTGRES_HOST }} >> .env
                   echo "PROD_POSTGRES_USER=${{secrets.PROD_POSTGRES_USER}}" >> .env
                   echo "PROD_POSTGRES_PW=${{secrets.PROD_POSTGRES_PW}}" >> .env
                   echo "PROD_POSTGRES_DB=${{secrets.PROD_POSTGRES_DB}}" >> .env
