@@ -61,15 +61,17 @@ jobs:
             - name: Publish image to docker hub
               run: docker push duymt3/happyboard-be:latest
 
-    # deploy:
-    #     needs: build
-    #     runs-on: cicd-be
-    #     steps:
-    #         - name: Pull image from docker hub
-    #           run: docker pull duymt3/happyboard-be:latest
-    #         - name: Delete old container
-    #           run: docker rm -f happyboard-be-container
-    #         - name: Delete old image
-    #           run: docker rmi duymt3/happyboard-be:latest
-    #         - name: Run docker container
-    #           run: docker run -d -p 8000:8000 --name happyboard-be-container duymt3/happyboard-be:latest
+    deploy:
+        needs: build
+        runs-on: self-hosted
+        steps:
+            - name: Pull image from docker hub
+              run: docker pull duymt3/happyboard-be:latest
+            - name: Stop old container
+              run: docker stop happyboard-be-container
+            - name: Remove old container
+              run: docker rm happyboard-be-container
+            - name: Remove old image
+              run: docker rmi duymt3/happyboard-be:latest
+            - name: Run docker container
+              run: docker run -d -p 8000:8000 --name happyboard-be-container duymt3/happyboard-be:latest

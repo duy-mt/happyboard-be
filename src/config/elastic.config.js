@@ -5,14 +5,7 @@ const dev = {
 
 // CLOUD
 const prod = {
-    cloud: {
-        id:
-            process.env.PROD_ES_CLOUDID
-    },
-    auth: {
-        username: process.env.PROD_ES_USER,
-        password: process.env.PROD_ES_PW,
-    },
+    node: process.env.PROD_ES_NODE || 'http://localhost:9200',
 }
 
 const config = {
