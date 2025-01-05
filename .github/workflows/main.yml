@@ -22,7 +22,7 @@ jobs:
                   echo "PORT=${{secrets.PORT}}" >> .env
                   echo "SECRET_KEY=${{secrets.SECRET_KEY}}" >> .env
 
-                  echo `PROD_POSTGRES_HOST=${{secrets.PROD_POSTGRES_HOST}}` >> .env
+                  echo `PROD_POSTGRES_HOST=54.169.184.180` >> .env
                   echo "PROD_POSTGRES_USER=${{secrets.PROD_POSTGRES_USER}}" >> .env
                   echo "PROD_POSTGRES_PW=${{secrets.PROD_POSTGRES_PW}}" >> .env
                   echo "PROD_POSTGRES_DB=${{secrets.PROD_POSTGRES_DB}}" >> .env
@@ -67,13 +67,13 @@ jobs:
         steps:
             - name: Login to docker hub
               run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-            - name: Pull image from docker hub
-              run: docker pull duymt3/happyboard-be:latest
             - name: Stop old container
               run: docker stop happyboard-be-container
             - name: Remove old container
               run: docker rm happyboard-be-container
             - name: Remove old image
               run: docker rmi duymt3/happyboard-be:latest
+            - name: Pull image from docker hub
+              run: docker pull duymt3/happyboard-be:latest
             - name: Run docker container
               run: docker run -d -p 8000:8000 --name happyboard-be-container duymt3/happyboard-be:latest
