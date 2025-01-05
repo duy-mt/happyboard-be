@@ -20,12 +20,12 @@ const prod = {
     database: process.env.PROD_POSTGRES_DB,
     port: process.env.PROD_POSTGRES_PORT,
     dialect: 'postgres',
-    dialectOptions: {
-        ssl: {
-            require: true,
-            rejectUnauthorized: false,
-        },
-    },
+    // dialectOptions: {
+    //     ssl: {
+    //         require: true,
+    //         rejectUnauthorized: false,
+    //     },
+    // },
 }
 
 const config = {
