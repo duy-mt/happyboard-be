@@ -864,7 +864,7 @@ class IdeaService {
         userId,
         option = Object.keys(OPTION_SHOW_IDEA)[0],
         categories = null,
-        isPublished = null,
+        isPublished = true,
         isDrafted = false,
     }) => {
         let fieldSort = OPTION_SHOW_IDEA[option]
@@ -903,7 +903,7 @@ class IdeaService {
         userId,
         option = Object.keys(OPTION_SHOW_IDEA)[0],
         categories = null,
-        isPublished = null,
+        isPublished = true,
         isDrafted = false,
     }) => {
         let fieldSort = OPTION_SHOW_IDEA[option]

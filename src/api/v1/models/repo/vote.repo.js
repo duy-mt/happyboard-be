@@ -1,5 +1,6 @@
 'use strict'
 
+const { where } = require('sequelize')
 const { Vote } = require('../index')
 
 const upVote = async ({ userId, ideaId }) => {
@@ -83,9 +84,20 @@ const findVote = async ({ ideaId, userId }) => {
     return v
 }
 
+const findVotesByUserId = async ({ userId, status }) => {
+    return await Vote.findAll({
+        where: {
+            userId: userId,
+            status: status,
+        },
+        raw: true
+    })
+}
+
 module.exports = {
     upVote,
     downVote,
     deleteVote,
     findVote,
+    findVotesByUserId,
 }

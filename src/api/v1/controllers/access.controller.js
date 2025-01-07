@@ -2,6 +2,7 @@
 
 const { OK, Created } = require('../core/success.response')
 const AccessService = require('../services/access.service')
+require('dotenv').config()
 
 class AccessController {
     login = async (req, res, next) => {
@@ -12,21 +13,21 @@ class AccessController {
             maxAge: 10 * 24 * 60 * 60 * 1000,
             secure: true,
             sameSite: 'None',
-            domain: '.happyidea.io.vn',
+            domain: process.env.DOMAIN_SET_COOKIE,
             path: '/',
         })
             .cookie('refresh-token', data.tokens.refreshToken, {
                 maxAge: 10 * 24 * 60 * 60 * 1000,
                 secure: true,
                 sameSite: 'None',
-                domain: '.happyidea.io.vn',
+                domain: process.env.DOMAIN_SET_COOKIE,
                 path: '/',
             })
             .cookie('userId', data.user.id, {
                 maxAge: 10 * 24 * 60 * 60 * 1000,
                 secure: true,
                 sameSite: 'None',
-                domain: '.happyidea.io.vn',
+                domain: process.env.DOMAIN_SET_COOKIE,
                 path: '/',
             })
 
@@ -43,21 +44,21 @@ class AccessController {
             maxAge: 10 * 24 * 60 * 60 * 1000,
             secure: true,
             sameSite: 'None',
-            domain: '.happyidea.io.vn',       
+            domain: process.env.DOMAIN_SET_COOKIE,       
             path: '/',  
         })
             .cookie('refresh-token', data.tokens.refreshToken, {
                 maxAge: 10 * 24 * 60 * 60 * 1000,
                 secure: true,
                 sameSite: 'None',
-                domain: '.happyidea.io.vn',       
+                domain: process.env.DOMAIN_SET_COOKIE,       
                 path: '/',  
             })
             .cookie('userId', data.user.id, {
                 maxAge: 10 * 24 * 60 * 60 * 1000,
                 secure: true,
                 sameSite: 'None',
-                domain: '.happyidea.io.vn',       
+                domain: process.env.DOMAIN_SET_COOKIE,       
                 path: '/',  
             })
 
@@ -85,7 +86,7 @@ class AccessController {
             maxAge: 10 * 24 * 60 * 60 * 1000,
             secure: true,
             sameSite: 'None',
-            domain: '.happyidea.io.vn',       
+            domain: process.env.DOMAIN_SET_COOKIE,       
             path: '/',  
         })
 
@@ -105,21 +106,21 @@ class AccessController {
             maxAge: 10 * 24 * 60 * 60 * 1000,
             secure: true,
             sameSite: 'None',
-            domain: '.happyidea.io.vn',       
+            domain: process.env.DOMAIN_SET_COOKIE,       
             path: '/',  
         })
             .cookie('refresh-token', data.tokens.refreshToken, {
                 maxAge: 10 * 24 * 60 * 60 * 1000,
                 secure: true,
                 sameSite: 'None',
-                domain: '.happyidea.io.vn',       
+                domain: process.env.DOMAIN_SET_COOKIE,       
                 path: '/',  
             })
             .cookie('userId', data.user.id, {
                 maxAge: 10 * 24 * 60 * 60 * 1000,
                 secure: true,
                 sameSite: 'None',
-                domain: '.happyidea.io.vn',       
+                domain: process.env.DOMAIN_SET_COOKIE,       
                 path: '/',  
             })
             .redirect(process.env.DOMAIN_CLIENT)

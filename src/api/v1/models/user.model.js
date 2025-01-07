@@ -16,6 +16,10 @@ module.exports = (sequelize, DataTypes) => {
                 otherKey: 'groupId',
                 as: 'groups',
             });
+            this.hasMany(models.Vote, {
+                foreignKey: "userId",
+                as: 'votes'
+            })
 
         }
     }

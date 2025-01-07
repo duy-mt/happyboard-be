@@ -10,9 +10,16 @@ const {
     Poll,
     Poll_response,
     Poll_option,
-    sequelize
+    sequelize,
 } = require('../index')
-const { upVote, downVote, deleteVote, findVote } = require('./vote.repo')
+const {
+    upVote,
+    downVote,
+    deleteVote,
+    findVote,
+    findVotesByUserId,
+    s,
+} = require('./vote.repo')
 const { processReturnedData } = require('../../utils')
 
 // DEFIND OPTIONS
@@ -290,12 +297,19 @@ const findAllUpvotedIdeasByUsedId = async ({
     isPublished = true,
     isDrafted = false,
 }) => {
+    const votes = await findVotesByUserId({ userId, status: 1 })
+    const ideaIds = votes?.map((vote) => vote.ideaId)
+
     let queryFindIdeas
     if (!categories) {
         queryFindIdeas = {
             offset: 0,
             limit: 5,
-            where: {},
+            where: {
+                id: {
+                    [Op.in]: ideaIds,
+                },
+            },
             order: [
                 ['updatedAt', 'DESC'],
                 ['id', 'DESC'],
@@ -313,9 +327,6 @@ const findAllUpvotedIdeasByUsedId = async ({
                     model: Vote,
                     as: 'votes',
                     attributes: ['id', 'status'],
-                    where: {
-                        status: 1,
-                    },
                 },
             ],
             attributes: {
@@ -326,7 +337,11 @@ const findAllUpvotedIdeasByUsedId = async ({
         queryFindIdeas = {
             offset: 0,
             limit: 5,
-            where: {},
+            where: {
+                id: {
+                    [Op.in]: ideaIds,
+                },
+            },
             order: [
                 ['updatedAt', 'DESC'],
                 ['id', 'DESC'],
@@ -339,21 +354,18 @@ const findAllUpvotedIdeasByUsedId = async ({
                 {
                     model: Category,
                     attributes: ['id', 'title', 'icon'],
-                    where: {
-                        title: {
-                            [Op.in]: categories
-                                .split(',')
-                                .map((cat) => cat.trim()),
-                        },
-                    },
+                    // where: {
+                    //     title: {
+                    //         [Op.in]: categories
+                    //             .split(',')
+                    //             .map((cat) => cat.trim()),
+                    //     },
+                    // },
                 },
                 {
                     model: Vote,
                     as: 'votes',
                     attributes: ['id', 'status'],
-                    where: {
-                        status: 1,
-                    },
                 },
             ],
             attributes: {
@@ -365,7 +377,6 @@ const findAllUpvotedIdeasByUsedId = async ({
     queryFindIdeas.offset = offset
     queryFindIdeas.limit = limit
     queryFindIdeas.order[0][0] = fieldSort
-    queryFindIdeas.where.userId = userId
     if (isPublished != null) {
         queryFindIdeas.where.isPublished = isPublished
     } else {
@@ -395,12 +406,18 @@ const findAllDownvotedIdeasByUsedId = async ({
     isPublished = true,
     isDrafted = false,
 }) => {
+    const votes = await findVotesByUserId({ userId, status: -1 })
+    const ideaIds = votes?.map((vote) => vote.ideaId)
     let queryFindIdeas
     if (!categories) {
         queryFindIdeas = {
             offset: 0,
             limit: 5,
-            where: {},
+            where: {
+                id: {
+                    [Op.in]: ideaIds,
+                },
+            },
             order: [
                 ['updatedAt', 'DESC'],
                 ['id', 'DESC'],
@@ -418,9 +435,6 @@ const findAllDownvotedIdeasByUsedId = async ({
                     model: Vote,
                     as: 'votes',
                     attributes: ['id', 'status'],
-                    where: {
-                        status: -1,
-                    },
                 },
             ],
             attributes: {
@@ -431,7 +445,11 @@ const findAllDownvotedIdeasByUsedId = async ({
         queryFindIdeas = {
             offset: 0,
             limit: 5,
-            where: {},
+            where: {
+                id: {
+                    [Op.in]: ideaIds,
+                },
+            },
             order: [
                 ['updatedAt', 'DESC'],
                 ['id', 'DESC'],
@@ -456,9 +474,6 @@ const findAllDownvotedIdeasByUsedId = async ({
                     model: Vote,
                     as: 'votes',
                     attributes: ['id', 'status'],
-                    where: {
-                        status: -1,
-                    },
                 },
             ],
             attributes: {
@@ -470,7 +485,6 @@ const findAllDownvotedIdeasByUsedId = async ({
     queryFindIdeas.offset = offset
     queryFindIdeas.limit = limit
     queryFindIdeas.order[0][0] = fieldSort
-    queryFindIdeas.where.userId = userId
     if (isPublished != null) {
         queryFindIdeas.where.isPublished = isPublished
     } else {
