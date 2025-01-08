@@ -33,7 +33,7 @@ const getAllNotificationsByUserId = async ({ userId, offset, limit }) => {
         limit,
         ...queryConfig,
         where: {
-            to: userId || '3',
+            to: userId || '4',
         },
     })
 }
