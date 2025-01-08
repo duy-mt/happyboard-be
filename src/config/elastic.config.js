@@ -5,7 +5,7 @@ const dev = {
 
 // CLOUD
 const prod = {
-    node: process.env.PROD_ES_NODE || 'http://localhost:9200',
+    node: `http://${process.env.PROD_ES_NODE}:9200` || 'http://localhost:9200',
 }
 
 const config = {
