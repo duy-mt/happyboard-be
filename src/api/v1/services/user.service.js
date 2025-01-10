@@ -29,7 +29,7 @@ const {
     updateUserByUserId,
     findUserByUserId,
     findUsersByUserIds,
-    findAllUsersForGroup,
+    findAllUserNotInGroupToAddMember,
 } = require('../models/repo/user.repo')
 const {
     findPermissionsByUserId,
@@ -52,7 +52,6 @@ const MailerService = require('./mailer.service')
 const RedisService = require('./redis.service')
 
 class UserService {
-    
     static addMemberToGroup = async ({ memberId, groupId }) => {
         await addMemberToGroup({ memberId, groupId })
         return 1
@@ -63,8 +62,10 @@ class UserService {
         return 1
     }
 
-    static getAllUsersForGroup = async ({ groupId }) => {
-        const { users, total } = await findAllUsersForGroup({ groupId })
+    static getAllUsersForAddMemberToGroup = async ({ groupId, userId }) => {
+        const { users, total } = await findAllUserNotInGroupToAddMember({
+            groupId, userId
+        })
 
         return {
             total,

@@ -21,6 +21,7 @@ const {
     s,
 } = require('./vote.repo')
 const { processReturnedData } = require('../../utils')
+const { update } = require('lodash')
 
 // DEFIND OPTIONS
 const optIdea = {
@@ -55,7 +56,7 @@ const optIdea = {
         {
             model: Poll,
             as: 'poll',
-            attributes: ['id'],
+            attributes: ['id', 'isActive', 'endDate'],
             include: [
                 {
                     model: Poll_option,
@@ -730,9 +731,11 @@ const increaseVoteCount = async ({ ideaId, userId }) => {
 const decrementVoteCount = async ({ ideaId, userId }) => {
     const vote = await findVote({ ideaId, userId })
     const idea = await Idea.findByPk(ideaId)
-    if (vote?.status == -1)
+    let updated = vote?.status == -1
+    if (updated)
         return {
             voteCount: idea.voteCount,
+            updated: !updated,
         }
     const t = await sequelize.transaction()
 
@@ -746,6 +749,7 @@ const decrementVoteCount = async ({ ideaId, userId }) => {
     await t.commit()
     return {
         voteCount: idea.voteCount,
+        updated: !updated,
     }
 }
 

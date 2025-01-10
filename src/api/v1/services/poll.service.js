@@ -17,15 +17,10 @@ class PollService {
         return poll
     }
 
-    static createPoll = async ({
-        ideaId,
-        expireHour,
-        remindBeforeExpireTime,
-    }) => {
+    static createPoll = async ({ ideaId, endDate }) => {
         return await createPoll({
             ideaId,
-            expireHour,
-            remindBeforeExpireTime,
+            endDate,
         })
     }
 

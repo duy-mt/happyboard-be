@@ -20,7 +20,7 @@ router.use(asyncHandler(authentication))
 
 router.get('', authorize(['USR01']), asyncHandler(userController.getAllUsers))
 
-router.get('/forGroup', asyncHandler(userController.getAllUsersForGroup))
+router.get('/forGroup', asyncHandler(userController.getAllUsersForAddMemberToGroup))
 
 router.post('/group', asyncHandler(userController.addMemberToGroup))
 

@@ -6,9 +6,9 @@ const { processReturnedData } = require('../../utils')
 const findOptionByPollId = async ({ pollId }) => {
     const poll = await Poll.findOne({
         where: {
-            id: pollId
+            id: pollId,
         },
-        attributes: ['id', 'ideaId', 'isActive', 'expireHour', "remindBeforeExpireTime"],
+        attributes: ['id', 'ideaId', 'isActive', 'endDate'],
         include: [
             {
                 model: Poll_option,
@@ -18,21 +18,14 @@ const findOptionByPollId = async ({ pollId }) => {
         ],
     })
 
-    
     return poll && processReturnedData(poll)
 }
 
-const createPoll = async ({
-    isActive = true,
-    ideaId,
-    expireHour,
-    remindBeforeExpireTime,
-}) => {
+const createPoll = async ({ isActive = true, ideaId, endDate }) => {
     return await Poll.create({
         isActive,
         ideaId,
-        expireHour,
-        remindBeforeExpireTime,
+        endDate,
     })
 }
 

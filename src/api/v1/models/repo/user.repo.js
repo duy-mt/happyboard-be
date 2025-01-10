@@ -1,21 +1,47 @@
 'use strict'
 const { processReturnedData, removeField } = require('../../utils')
-const { User, User_has_groups, sequelize } = require('../index')
+const { User, User_has_groups, Group, sequelize } = require('../index')
 const { Op } = require('sequelize')
+const { findUserInGroup } = require('../repo/user_has_groups.repo')
 
 const optUser = {
     attributes: ['id', 'username', 'avatar'],
 }
 
-const findAllUsersForGroup = async ({ groupId }) => {
+const findAllReceiversNotificationInGroup = async ({ groupId, userId }) => {
+    const { count: total, rows: users } = await User.findAndCountAll({
+        include: [
+            {
+                model: Group,
+                as: 'groups',
+                where: {
+                    id: groupId,
+                },
+                through: {
+                    attributes: [],
+                },
+            },
+        ],
+        where: {
+            id: {
+                [Op.ne]: userId,
+            },
+        },
+        ...optUser,
+    })
+
+    return { total, users }
+}
+
+const findAllUserNotInGroupToAddMember = async ({ groupId }) => {
+    const user_has_groups = await findUserInGroup({ groupId })
+    const userIds = user_has_groups.map(
+        (user_has_group) => user_has_group.userId,
+    )
     const { count: total, rows: users } = await User.findAndCountAll({
         where: {
             id: {
-                [Op.notIn]: sequelize.literal(`(
-                    SELECT DISTINCT "userId" 
-                    FROM "user_has_groups" 
-                    WHERE "groupId" = ${groupId}
-                )`),
+                [Op.notIn]: userIds,
             },
         },
         ...optUser,
@@ -165,5 +191,6 @@ module.exports = {
     findUserByUserId,
     updateUserByUserId,
     findUsersByUserIds,
-    findAllUsersForGroup,
+    findAllReceiversNotificationInGroup,
+    findAllUserNotInGroupToAddMember,
 }

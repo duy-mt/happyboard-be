@@ -32,10 +32,14 @@ class UserController {
         }).send(res)
     }
 
-    getAllUsersForGroup = async (req, res, next) => {
+    getAllUsersForAddMemberToGroup = async (req, res, next) => {
+        const userId = req.headers['x-client-id']
         new OK({
             message: 'Get all user for add member successfully',
-            data: await UserService.getAllUsersForGroup(req.query),
+            data: await UserService.getAllUsersForAddMemberToGroup({
+                groupId: req.query.groupId,
+                userId,
+            }),
         }).send(res)
     }
 

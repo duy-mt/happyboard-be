@@ -68,6 +68,92 @@ class MessageQueue {
             console.error(`Error in receiveMQ: ${error.message}`)
         }
     }
+
+    static sendNotificationToQueue = async ({
+        sender,
+        receivers,
+        endDate,
+        target,
+        action,
+        metadata,
+    }) => {
+        try {
+            const { channel } = await getRabbitMQInstance()
+
+            const ttlExchange = 'poll_notification_ttl'
+
+            // Tính TTL (ms)
+            const now = new Date()
+            const notifyTime = new Date(endDate) - 60 * 60 * 1000 // Trước 1 giờ
+            const ttl = notifyTime - now
+
+            if (ttl <= 0) {
+                console.error('TTL <= 0, sending notification immediately.')
+                await this.processNotifications({
+                    sender,
+                    receivers,
+                    target,
+                    action,
+                    metadata,
+                })
+                return
+            }
+
+            // Tạo message
+            const message = { sender, receivers, target, action, metadata }
+
+            // Gửi message tới TTL Exchange
+            channel.publish(
+                ttlExchange,
+                '',
+                Buffer.from(JSON.stringify(message)),
+                {
+                    expiration: ttl.toString(), // TTL cho message
+                    persistent: true,
+                },
+            )
+
+            console.log(`Message sent to TTL exchange with TTL: ${ttl} ms.`)
+        } catch (error) {
+            console.error('Error in sendNotificationToQueue:', error.message)
+        }
+    }
+
+    static processNotifications = async ({
+        sender,
+        receivers,
+        target,
+        action,
+        metadata,
+    }) => {
+        try {
+            if (!receivers || receivers.length === 0) {
+                console.log('No receivers provided.')
+                return
+            }
+
+            // Tạo message data
+            const messageData = {
+                sender,
+                receivers,
+                target,
+                action,
+                metadata,
+            }
+
+            // Gửi message lên RabbitMQ với exchange "poll_notification"
+            await MessageQueue.send({
+                nameExchange: 'poll_notification',
+                message: messageData,
+            })
+
+            console.log(
+                'Notification message sent to poll_notification exchange successfully.',
+            )
+        } catch (err) {
+            console.error('Error in processNotifications:', err)
+        }
+    }
 }
 
 module.exports = MessageQueue

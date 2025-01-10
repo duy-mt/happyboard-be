@@ -11,16 +11,18 @@ module.exports = (sequelize, DataTypes) => {
          */
         static associate(models) {
             this.belongsToMany(models.Group, {
-                through: models.User_has_groups,
+                through: {
+                    model: models.User_has_groups,
+                    as: 'user_has_groups',
+                },
                 foreignKey: 'userId',
                 otherKey: 'groupId',
                 as: 'groups',
-            });
-            this.hasMany(models.Vote, {
-                foreignKey: "userId",
-                as: 'votes'
             })
-
+            this.hasMany(models.Vote, {
+                foreignKey: 'userId',
+                as: 'votes',
+            })
         }
     }
     User.init(

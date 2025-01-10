@@ -17,13 +17,9 @@ module.exports = {
                 type: Sequelize.BOOLEAN,
                 defaultValue: true,
             },
-            expireHour: {
-                type: Sequelize.INTEGER,
+            endDate: {
                 allowNull: false,
-            },
-            remindBeforeExpireTime: {
-                type: Sequelize.INTEGER,
-                allowNull: false,
+                type: Sequelize.DATE,
             },
             createdAt: {
                 allowNull: false,

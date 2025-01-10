@@ -25,6 +25,9 @@ const {
     findAllPublishIdeasByUsedId,
 } = require('../models/repo/idea.repo')
 const { findConfirmVotedPoll } = require('../models/repo/poll_response.repo')
+const {
+    findAllReceiversNotificationInGroup,
+} = require('../models/repo/user.repo')
 const { sortComment, removeField } = require('../utils')
 const VoteService = require('./vote.service')
 const RedisService = require('./redis.service')
@@ -37,6 +40,7 @@ const UploadService = require('./upload.service')
 const PollService = require('./poll.service')
 const PollOptionService = require('./poll_option.service')
 const { sequelize, Sequelize } = require('../models')
+const { map } = require('lodash')
 
 class IdeaService {
     // CREATE IDEA
@@ -53,7 +57,7 @@ class IdeaService {
         if (!content || !title || !categoryId)
             throw new BadRequest('Title, content and category are required')
 
-        if (groupId !== 1 && !isDrafted){
+        if (groupId !== 1 && !isDrafted) {
             isPublished = true
         }
 
@@ -64,7 +68,7 @@ class IdeaService {
             userId,
             isPublished,
             isDrafted,
-            groupId
+            groupId,
         })
         await HistoryService.createHistory({
             type: 'CI01',
@@ -85,8 +89,7 @@ class IdeaService {
         groupId = 1,
         isPublished = false,
         isDrafted = false,
-        expireHour,
-        remindBeforeExpireTime,
+        endDate,
         pollOptions = [],
     }) => {
         if (!content || !title || !categoryId || pollOptions.length == 0)
@@ -94,7 +97,7 @@ class IdeaService {
                 'Title, content, poll option and category are required',
             )
 
-        if (groupId !== 1 && !isDrafted){
+        if (groupId !== 1 && !isDrafted) {
             isPublished = true
         }
 
@@ -116,8 +119,7 @@ class IdeaService {
         const savePollId = await PollService.createPoll(
             {
                 ideaId: savedIdea.id,
-                expireHour,
-                remindBeforeExpireTime,
+                endDate,
             },
             { transaction },
         )
@@ -137,6 +139,29 @@ class IdeaService {
             },
             { transaction },
         )
+
+        const receivers = await findAllReceiversNotificationInGroup({
+            groupId,
+            userId,
+        })
+
+        const receiverIds = receivers?.users?.map((receiver) => receiver.id)
+
+        // Gửi thông báo thông qua RabbitMQ với TTL
+        if (receiverIds && receiverIds.length > 0) {
+            const notifyData = {
+                sender: userId,
+                receivers: receiverIds,
+                endDate: savePollId.endDate,
+                target: 'poll',
+                action: 'expire',
+                metadata: {
+                    targetId: savedIdea.id,
+                },
+            }
+
+            await MessageQueue.sendNotificationToQueue(notifyData)
+        }
 
         return 1
     }
@@ -183,7 +208,6 @@ class IdeaService {
         if (!files || !body.title || !body.categoryId)
             throw new BadRequest('Title, image/video and category are required')
 
-
         let urls = []
         let urlsString = ''
         let urlThumbString = ''
@@ -217,7 +241,7 @@ class IdeaService {
         body.thumbnailUrl = urlThumbString
         body.linkMedia = urlsString
         body.userId = userId
-        if (body.groupId !==1&& !body.isDrafted) {
+        if (body.groupId !== 1 && !body.isDrafted) {
             body.isPublished = true
         }
         body.isDrafted = false
@@ -345,7 +369,7 @@ class IdeaService {
 
     static getIdea = async ({ id, userId, isPublished, isDrafted }) => {
         const idea = await findIdea({ id, isPublished, isDrafted })
-        
+
         if (!idea) throw new BadRequest('Idea is not exist')
 
         const handledComment = sortComment(idea.comments)
@@ -374,7 +398,7 @@ class IdeaService {
         categories = null,
         isPublished = null,
         isDrafted = false,
-        groupId = 1
+        groupId = 1,
     }) => {
         let fieldSort = OPTION_SHOW_IDEA[option]
         let { ideas, totalIdea } = await findAllIdeas({
@@ -384,7 +408,7 @@ class IdeaService {
             categories,
             isPublished,
             isDrafted,
-            groupId
+            groupId,
         })
 
         for (let i = 0; i < ideas.length; i++) {
@@ -413,7 +437,7 @@ class IdeaService {
         option = Object.keys(OPTION_SHOW_IDEA)[0],
         categories = null,
         duration,
-        groupId = 1
+        groupId = 1,
     }) => {
         return await this.getAllIdeas({
             limit,
@@ -423,7 +447,7 @@ class IdeaService {
             isPublished: true,
             categories,
             duration,
-            groupId
+            groupId,
         })
     }
 
@@ -563,7 +587,7 @@ class IdeaService {
                         targetId: ideaId,
                     },
                 }
-                if (idea.userId != receiver) {
+                if (userId != receiver) {
                     await MessageQueue.send({
                         nameExchange: 'post_notification',
                         message: data,
@@ -602,11 +626,41 @@ class IdeaService {
                 objectTargetId: ideaId,
                 contentIdea: idea.title,
             })
-
-            return await decrementVoteCount({
+            let { voteCount, updated } = await decrementVoteCount({
                 ideaId,
                 userId,
             })
+
+            // 2. Send notification
+            if (updated) {
+                const receiver = idea.User.id
+                const data = {
+                    sender: userId,
+                    receiver: receiver.toString(),
+                    target: 'idea',
+                    action: 'up',
+                    metadata: {
+                        targetId: ideaId,
+                    },
+                }
+                if (userId != receiver) {
+                    await MessageQueue.send({
+                        nameExchange: 'post_notification',
+                        message: data,
+                    })
+
+                    await HistoryService.createHistory({
+                        type: 'VI01',
+                        userId,
+                        userTargetId: receiver,
+                        objectTargetId: ideaId,
+                        contentIdea: idea.title,
+                    })
+                }
+            }
+            return {
+                voteCount,
+            }
         } else {
             return {
                 voteCount: idea.voteCount,
@@ -655,6 +709,7 @@ class IdeaService {
             createdAt: idea.createdAt,
             updatedAt: idea.updatedAt,
         }
+
         await ElasticSearch.createDocument({
             // Using dynamic index getting from db
             index: 'ideas',

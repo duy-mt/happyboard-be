@@ -28,8 +28,7 @@ module.exports = (sequelize, DataTypes) => {
         {
             ideaId: DataTypes.INTEGER,
             isActive: DataTypes.BOOLEAN,
-            expireHour: DataTypes.INTEGER,
-            remindBeforeExpireTime: DataTypes.INTEGER,
+            endDate: DataTypes.DATE,
         },
         {
             sequelize,

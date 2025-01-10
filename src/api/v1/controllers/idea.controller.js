@@ -164,7 +164,7 @@ class IdeaController {
                     userId: req.body.userId,
                     option: req.query?.option,
                     categories: req.query?.categories,
-                    groupId: req.query?.group ? req.query?.group : 1
+                    groupId: req.query?.group ? req.query?.group : 1,
                 }),
             }).send(res)
         } else {
@@ -225,7 +225,6 @@ class IdeaController {
         }).send(res)
     }
 
-    
     createPollIdea = async (req, res, next) => {
         new Created({
             message: 'Created poll idea successfully!',
@@ -247,11 +246,12 @@ class IdeaController {
     }
 
     upVoteCount = async (req, res, next) => {
+        const userId = req.headers['x-client-id']
         new OK({
             message: 'Up voteCount successfully',
             data: await IdeaService.upVoteCount({
                 ideaId: req.params.ideaId,
-                userId: req.body.userId,
+                userId: userId,
             }),
         }).send(res)
     }

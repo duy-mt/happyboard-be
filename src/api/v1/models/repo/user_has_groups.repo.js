@@ -59,6 +59,14 @@ const leaveGroup = async ({ userId, groupId }) => {
     })
 }
 
+const findUserInGroup = async ({ groupId }) => {
+    return await User_has_groups.findAll({
+        where: {
+            groupId: groupId,
+        },
+    })
+}
+
 // const findGroupIdByUserId = async (userId) => {
 //     const role = await User_has_groups.findOne({
 //         where: {
@@ -88,6 +96,7 @@ module.exports = {
     findGroupsByUserId,
     addMemberToGroup,
     leaveGroup,
+    findUserInGroup
     // findGroupIdsByUserId,
     // findGroupIdByUserId,
     // updateGroup,
