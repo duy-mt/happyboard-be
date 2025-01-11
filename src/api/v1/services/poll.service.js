@@ -9,6 +9,8 @@ const {
     createPollResponse,
     findConfirmVotedPoll,
 } = require('../models/repo/poll_response.repo')
+const { findIdeabyPollId } = require('../models/repo/idea.repo')
+const HistoryService = require('./history.service')
 const { sequelize } = require('../models')
 
 class PollService {
@@ -32,6 +34,16 @@ class PollService {
             { userId, pollId, pollOptionId },
             { transaction },
         )
+
+        const savedIdea = await findIdeabyPollId({pollId})
+
+        await HistoryService.createHistory({
+            type: 'CP01',
+            userId,
+            userTargetId: userId,
+            objectTargetId: savedIdea.id,
+            contentIdea: savedIdea.title,
+        })
         return 1
     }
 

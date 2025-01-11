@@ -49,22 +49,44 @@ const {
 const { htmlBlockUser } = require('../template')
 const { removeField } = require('../utils')
 const MailerService = require('./mailer.service')
+const HistoryService = require('./history.service')
+const GroupService = require('./group.service')
 const RedisService = require('./redis.service')
 
 class UserService {
-    static addMemberToGroup = async ({ memberId, groupId }) => {
+    static addMemberToGroup = async ({ memberId, groupId, userId }) => {
         await addMemberToGroup({ memberId, groupId })
+
+        const group = await GroupService.getGroupById(groupId)
+
+        await HistoryService.createHistory({
+            type: 'CG02',
+            userId,
+            userTargetId: userId,
+            objectTargetId: groupId,
+            contentIdea: group.name,
+        })
         return 1
     }
 
     static leaveGroup = async ({ userId, groupId }) => {
         await leaveGroup({ userId, groupId })
+        const group = await GroupService.getGroupById(groupId)
+
+        await HistoryService.createHistory({
+            type: 'CG03',
+            userId,
+            userTargetId: userId,
+            objectTargetId: groupId,
+            contentIdea: group.name,
+        })
         return 1
     }
 
     static getAllUsersForAddMemberToGroup = async ({ groupId, userId }) => {
         const { users, total } = await findAllUserNotInGroupToAddMember({
-            groupId, userId
+            groupId,
+            userId,
         })
 
         return {

@@ -15,6 +15,7 @@ const {
 } = require('../models/repo/user_has_groups.repo')
 const { sequelize, Sequelize } = require('../models')
 const UploadService = require('./upload.service')
+const HistoryService = require('./history.service')
 
 class GroupService {
     static updateBackgroundGroup = async ({ file, userId, groupId }) => {
@@ -108,6 +109,14 @@ class GroupService {
             { userId: userId, groupId: group.id },
             { transaction },
         )
+
+        await HistoryService.createHistory({
+            type: 'CG01',
+            userId,
+            userTargetId: userId,
+            objectTargetId: group.id,
+            contentIdea: group.name,
+        })
 
         return 1
     }

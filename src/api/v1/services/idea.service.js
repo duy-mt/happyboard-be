@@ -29,6 +29,7 @@ const {
     findAllReceiversNotificationInGroup,
 } = require('../models/repo/user.repo')
 const { sortComment, removeField } = require('../utils')
+const { findUserByUserId } = require('../models/repo/user.repo')
 const VoteService = require('./vote.service')
 const RedisService = require('./redis.service')
 const { OPTION_SHOW_IDEA } = require('../constants')
@@ -70,8 +71,9 @@ class IdeaService {
             isDrafted,
             groupId,
         })
+
         await HistoryService.createHistory({
-            type: 'CI01',
+            type: 'CP01',
             userId,
             userTargetId: userId,
             objectTargetId: savedIdea.id,
@@ -149,8 +151,10 @@ class IdeaService {
 
         // Gửi thông báo thông qua RabbitMQ với TTL
         if (receiverIds && receiverIds.length > 0) {
+            const user = await findUserByUserId(userId)
             const notifyData = {
                 sender: userId,
+                senderName: user?.username,
                 receivers: receiverIds,
                 endDate: savePollId.endDate,
                 target: 'poll',
@@ -241,7 +245,9 @@ class IdeaService {
         body.thumbnailUrl = urlThumbString
         body.linkMedia = urlsString
         body.userId = userId
-        if (body.groupId !== 1 && !body.isDrafted) {
+        if (!body.groupId && body.groupId !== 1) {
+            body.isPublished = false
+        } else {
             body.isPublished = true
         }
         body.isDrafted = false
@@ -575,11 +581,14 @@ class IdeaService {
                 userId,
             })
 
+            const user = await findUserByUserId(userId)
+
             // 2. Send notification
             if (updated) {
                 const receiver = idea.User.id
                 const data = {
                     sender: userId,
+                    senderName: user?.userName,
                     receiver: receiver.toString(),
                     target: 'idea',
                     action: 'up',
@@ -631,11 +640,14 @@ class IdeaService {
                 userId,
             })
 
+            const user = await findUserByUserId(userId)
+
             // 2. Send notification
             if (updated) {
                 const receiver = idea.User.id
                 const data = {
                     sender: userId,
+                    senderName: user?.username,
                     receiver: receiver.toString(),
                     target: 'idea',
                     action: 'up',

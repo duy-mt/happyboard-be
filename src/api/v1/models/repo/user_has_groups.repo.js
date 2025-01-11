@@ -33,20 +33,6 @@ const findGroupsByUserId = async (userId) => {
 }
 
 const addMemberToGroup = async ({ memberId, groupId }) => {
-    // return await User_has_groups.findOrCreate({
-    //     where: {
-    //         userId: {
-    //             [Op.eq]: memberId,
-    //         },
-    //         groupId: {
-    //             [Op.eq]: groupId,
-    //         },
-    //     },
-    //     default: {
-    //         userId: memberId,
-    //         groupId: groupId,
-    //     }
-    // })
     return await User_has_groups.create({ userId: memberId, groupId })
 }
 
@@ -96,7 +82,7 @@ module.exports = {
     findGroupsByUserId,
     addMemberToGroup,
     leaveGroup,
-    findUserInGroup
+    findUserInGroup,
     // findGroupIdsByUserId,
     // findGroupIdByUserId,
     // updateGroup,

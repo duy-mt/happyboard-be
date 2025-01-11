@@ -71,6 +71,7 @@ class MessageQueue {
 
     static sendNotificationToQueue = async ({
         sender,
+        senderName,
         receivers,
         endDate,
         target,
@@ -91,6 +92,7 @@ class MessageQueue {
                 console.error('TTL <= 0, sending notification immediately.')
                 await this.processNotifications({
                     sender,
+                    senderName,
                     receivers,
                     target,
                     action,
@@ -100,7 +102,14 @@ class MessageQueue {
             }
 
             // Tạo message
-            const message = { sender, receivers, target, action, metadata }
+            const message = {
+                sender,
+                senderName,
+                receivers,
+                target,
+                action,
+                metadata,
+            }
 
             // Gửi message tới TTL Exchange
             channel.publish(
@@ -121,6 +130,7 @@ class MessageQueue {
 
     static processNotifications = async ({
         sender,
+        senderName,
         receivers,
         target,
         action,
@@ -135,6 +145,7 @@ class MessageQueue {
             // Tạo message data
             const messageData = {
                 sender,
+                senderName,
                 receivers,
                 target,
                 action,

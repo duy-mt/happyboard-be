@@ -8,7 +8,7 @@ const {
     deleteCommentByIdeaId,
     deleteComment,
     editComment,
-    getMyComments
+    getMyComments,
 } = require('../models/repo/comment.repo')
 const { findUserIdByIdeaId, findIdea } = require('../models/repo/idea.repo')
 const {
@@ -17,6 +17,7 @@ const {
     checkReaction,
     deleteReaction,
 } = require('../models/repo/reaction.repo')
+const { findUserByUserId } = require('../models/repo/user.repo')
 const { processReturnedData, sortComment } = require('../utils')
 const HistoryService = require('./history.service')
 const MessageQueue = require('./rabbitmq.service')
@@ -47,9 +48,12 @@ class CommentService {
 
         const receiver = await findUserIdByIdeaId({ id: ideaId })
 
+        const user = await findUserByUserId(userId)
+
         if (parseInt(userId) !== receiver) {
             const data = {
                 sender: userId,
+                senderName: user?.username,
                 receiver: receiver.toString(),
                 target: 'idea',
                 action: 'comment',
@@ -278,7 +282,7 @@ class CommentService {
 
     static getMyComments = async ({ limit = 10, page = 1, userId }) => {
         return await getMyComments({
-            limit, 
+            limit,
             page,
             userId,
         })

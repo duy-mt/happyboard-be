@@ -60,6 +60,10 @@ const HISTORY_LOGS = {
     DC01: 'Delete Comment Log',
     RC01: 'Reply Comment Log',
     RC02: 'Reaction Comment Log',
+    CG01: 'Create Group Log',
+    CG02: 'Leave Group Log',
+    CG03: 'Add member to Group Log',
+    CP01: 'Create Vote for Poll Log',
 }
 
 const WHILELIST_DOMAIN = [

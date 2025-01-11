@@ -5,11 +5,13 @@ const UserService = require('../services/user.service')
 
 class UserController {
     addMemberToGroup = async (req, res, next) => {
+        const userId = req.headers['x-client-id']
         new OK({
             message: 'Add member successfully',
             data: await UserService.addMemberToGroup({
                 memberId: req.body?.memberId,
                 groupId: req.body?.groupId,
+                userId: userId
             }),
         }).send(res)
     }

@@ -18,7 +18,6 @@ const {
     deleteVote,
     findVote,
     findVotesByUserId,
-    s,
 } = require('./vote.repo')
 const { processReturnedData } = require('../../utils')
 const { update } = require('lodash')
@@ -117,6 +116,23 @@ let optIdeaNoComment = {
     attributes: {
         exclude: ['isDrafted', 'isPublished', 'categoryId', 'userId'],
     },
+}
+
+const findIdeabyPollId = async ({ pollId }) => {
+    return await Idea.findOne({
+        attributes: ['id', 'title'],
+        include: [
+            {
+                model: Poll,
+                as: 'poll',
+                attributes: ['id'],
+                where: {
+                    id: pollId,
+                },
+            },
+        ],
+        raw: true
+    })
 }
 
 const createIdea = async ({
@@ -864,6 +880,7 @@ const deleteIdea = async (id) => {
 }
 
 module.exports = {
+    findIdeabyPollId,
     createIdea,
     findAllIdeas,
     findAllIdeasByUsedId,
