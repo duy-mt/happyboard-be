@@ -235,10 +235,12 @@ class CommentService {
         })
 
         const receiver = cmt.userId
+        const user = await findUserByUserId(userId)
 
         if (parseInt(userId) !== receiver) {
             const data = {
                 sender: userId,
+                senderName: user.username,
                 receiver: receiver.toString(),
                 target: 'comment',
                 action: 'reaction',

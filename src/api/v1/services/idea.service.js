@@ -73,7 +73,7 @@ class IdeaService {
         })
 
         await HistoryService.createHistory({
-            type: 'CP01',
+            type: 'CI01',
             userId,
             userTargetId: userId,
             objectTargetId: savedIdea.id,
@@ -588,7 +588,7 @@ class IdeaService {
                 const receiver = idea.User.id
                 const data = {
                     sender: userId,
-                    senderName: user?.userName,
+                    senderName: user?.username,
                     receiver: receiver.toString(),
                     target: 'idea',
                     action: 'up',
@@ -650,7 +650,7 @@ class IdeaService {
                     senderName: user?.username,
                     receiver: receiver.toString(),
                     target: 'idea',
-                    action: 'up',
+                    action: 'down',
                     metadata: {
                         targetId: ideaId,
                     },
@@ -745,7 +745,7 @@ class IdeaService {
         return updatedIdea ? 1 : 0
     }
 
-    static unPublishIdea = async ({ ideaId }) => {
+    static unPublishIdea = async ({ ideaId, adminId }) => {
         const idea = await findPublisedIdea({ id: ideaId })
         if (!idea) throw new BadRequest('Not found idea')
         const updatedIdea = await updateIdea({
@@ -758,6 +758,20 @@ class IdeaService {
         await ElasticSearch.deleteDocument({
             index: 'ideas',
             id: ideaId,
+        })
+
+        const data = {
+            sender: adminId,
+            receiver: idea.userId.toString(),
+            target: 'idea',
+            action: 'hide',
+            metadata: {
+                targetId: ideaId,
+            },
+        }
+        await MessageQueue.send({
+            nameExchange: 'post_notification',
+            message: data,
         })
         return updatedIdea ? 1 : 0
     }

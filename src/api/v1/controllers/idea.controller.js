@@ -328,7 +328,7 @@ class IdeaController {
             message: 'Unpublish successfully',
             data: await IdeaService.unPublishIdea({
                 ideaId: req.params.ideaId,
-                userId: req.body.userId,
+                adminId: req.body.userId,
             }),
         }).send(res)
     }
