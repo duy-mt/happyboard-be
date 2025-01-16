@@ -90,4 +90,9 @@ router.put(
     '/role/:roleId/permissions',
     asyncHandler(userController.addPermissionsForRole),
 )
+
+router.put(
+    '/role/:roleId/permissions/del',
+    asyncHandler(userController.removePermissionsOfRole),
+)
 module.exports = router

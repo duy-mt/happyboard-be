@@ -22,6 +22,7 @@ const {
     findPermissionIdsByRoleIds,
     findPermissionIdsByRoleId,
     createPermissionsForRole,
+    deletePermissionOfRole,
 } = require('../models/repo/role_has_permissions.repo')
 const { removeTokenByUserId } = require('../models/repo/token.repo')
 const {
@@ -388,6 +389,48 @@ class UserService {
         return 1
     }
 
+    static removePermissionsOfRole = async ({
+        roleId,
+        adminId,
+        permissions = [],
+    }) => {
+        // 1. Check array permission
+        if (permissions.length === 0)
+            throw new BadRequest("Can't delete empty permisisons for role")
+
+        // 2. Check permission of admin
+        let permissionIdsOfAdmin = await findPermissionsByUserId(adminId)
+        let RolesOfAdmin = await findRoleIdsByUserId(adminId)
+        let permissionsIdOfRoles =
+            await findPermissionIdsByRoleIds(RolesOfAdmin)
+        if (permissionIdsOfAdmin.length !== 0) {
+            for (let i = 0; i < permissions.length; i++) {
+                if (
+                    !permissionIdsOfAdmin.includes(parseInt(permissions[i])) ||
+                    !permissionsIdOfRoles.includes(parseInt(permissions[i]))
+                ) {
+                    throw new BadRequest(
+                        `You can't delete permission beyond your own capabilities`,
+                    )
+                }
+            }
+        } else {
+            for (let i = 0; i < permissions.length; i++) {
+                if (!permissionsIdOfRoles.includes(parseInt(permissions[i]))) {
+                    throw new BadRequest(
+                        `You can't add permission beyond your own capabilities`,
+                    )
+                }
+            }
+        }
+
+        await deletePermissionOfRole({
+            roleId,
+            permissions,
+        })
+        return 1
+    }
+
     static addRoleForUser = async ({ userId, roleId, adminId }) => {
         console.log(`userId::${userId} -- type: ${typeof userId}`)
         console.log(`roleId::${roleId} -- type: ${typeof roleId}`)
@@ -475,14 +518,24 @@ class UserService {
         let RolesOfAdmin = await findRoleIdsByUserId(adminId)
         let permissionsIdOfRoles =
             await findPermissionIdsByRoleIds(RolesOfAdmin)
-        for (let i = 0; i < permissions.length; i++) {
-            if (
-                !permissionIdsOfAdmin.includes(permissions[i]) &&
-                !permissionsIdOfRoles.includes(permissions[i])
-            ) {
-                throw new BadRequest(
-                    `You can't add permission beyond your own capabilities`,
-                )
+        if (permissionIdsOfAdmin.length !== 0) {
+            for (let i = 0; i < permissions.length; i++) {
+                if (
+                    !permissionIdsOfAdmin.includes(parseInt(permissions[i])) ||
+                    !permissionsIdOfRoles.includes(parseInt(permissions[i]))
+                ) {
+                    throw new BadRequest(
+                        `You can't add permission beyond your own capabilities`,
+                    )
+                }
+            }
+        } else {
+            for (let i = 0; i < permissions.length; i++) {
+                if (!permissionsIdOfRoles.includes(parseInt(permissions[i]))) {
+                    throw new BadRequest(
+                        `You can't add permission beyond your own capabilities`,
+                    )
+                }
             }
         }
 

@@ -11,7 +11,7 @@ class UserController {
             data: await UserService.addMemberToGroup({
                 memberId: req.body?.memberId,
                 groupId: req.body?.groupId,
-                userId: userId
+                userId: userId,
             }),
         }).send(res)
     }
@@ -93,6 +93,18 @@ class UserController {
             message: 'Remove permission of user successfully',
             data: await UserService.removePermissionsOfUser({
                 userId: req.params.userId,
+                permissions: req.body.permissions,
+            }),
+        }).send(res)
+    }
+
+    removePermissionsOfRole = async (req, res, next) => {
+        const userId = req.headers['x-client-id']
+        new OK({
+            message: 'Remove permission of role successfully',
+            data: await UserService.removePermissionsOfRole({
+                roleId: req.params.roleId,
+                adminId: userId,
                 permissions: req.body.permissions,
             }),
         }).send(res)

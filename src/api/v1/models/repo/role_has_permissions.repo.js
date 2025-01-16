@@ -2,6 +2,7 @@
 
 const { processReturnedData } = require('../../utils')
 const { Role_has_permissions } = require('../index')
+const { Op } = require('sequelize')
 
 const findPermissionIdsByRoleIds = async (roleIds = []) => {
     const permissions = new Set()
@@ -43,8 +44,26 @@ const createPermissionsForRole = async ({ roleId, permissions }) => {
     return rows
 }
 
+const deletePermissionOfRole = async ({ roleId, permissions }) => {
+    if (!Array.isArray(permissions)) {
+        throw new Error('Permissions must be an array')
+    }
+
+    const result = await Role_has_permissions.destroy({
+        where: {
+            roleId,
+            permissionId: {
+                [Op.in]: permissions,
+            },
+        },
+    })
+
+    return result
+}
+
 module.exports = {
     findPermissionIdsByRoleIds,
     findPermissionIdsByRoleId,
-    createPermissionsForRole
+    createPermissionsForRole,
+    deletePermissionOfRole,
 }
