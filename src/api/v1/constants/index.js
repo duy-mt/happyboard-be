@@ -67,8 +67,8 @@ const HISTORY_LOGS = {
 }
 
 const WHILELIST_DOMAIN = [
-    process.env.DOMAIN_CLIENT || 'https://happyidea.io.vn',
-    process.env.DOMAIN_ADMIN || 'https://cms.happyidea.io.vn',
+    process.env.DOMAIN_CLIENT || 'https://happyboard.io.vn',
+    process.env.DOMAIN_ADMIN || 'https://cms.happyboard.io.vn',
     undefined, //POSTMAN
 ]
 

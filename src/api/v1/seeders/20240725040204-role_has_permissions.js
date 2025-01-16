@@ -102,6 +102,66 @@ module.exports = {
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },
+                {
+                    roleId: 1,
+                    permissionId: 19,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+                {
+                    roleId: 1,
+                    permissionId: 20,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+                {
+                    roleId: 1,
+                    permissionId: 21,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+                {
+                    roleId: 1,
+                    permissionId: 22,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+                {
+                    roleId: 1,
+                    permissionId: 23,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+                {
+                    roleId: 1,
+                    permissionId: 24,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+                {
+                    roleId: 1,
+                    permissionId: 25,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+                {
+                    roleId: 1,
+                    permissionId: 26,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+                {
+                    roleId: 1,
+                    permissionId: 27,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+                {
+                    roleId: 1,
+                    permissionId: 28,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
 
                 // Admin permissions
                 {
@@ -188,7 +248,66 @@ module.exports = {
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },
-
+                {
+                    roleId: 2,
+                    permissionId: 19,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+                {
+                    roleId: 2,
+                    permissionId: 20,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+                {
+                    roleId: 2,
+                    permissionId: 21,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+                {
+                    roleId: 2,
+                    permissionId: 22,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+                {
+                    roleId: 2,
+                    permissionId: 23,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+                {
+                    roleId: 2,
+                    permissionId: 24,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+                {
+                    roleId: 2,
+                    permissionId: 25,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+                {
+                    roleId: 2,
+                    permissionId: 26,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+                {
+                    roleId: 2,
+                    permissionId: 27,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+                {
+                    roleId: 2,
+                    permissionId: 28,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
                 // User permissions
                 {
                     roleId: 3,
@@ -244,6 +363,18 @@ module.exports = {
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },
+                {
+                    roleId: 3,
+                    permissionId: 27,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+                {
+                    roleId: 3,
+                    permissionId: 28,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
 
                 // Pending-User permissions
                 {
@@ -291,6 +422,18 @@ module.exports = {
                 {
                     roleId: 4,
                     permissionId: 17,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+                {
+                    roleId: 4,
+                    permissionId: 27,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+                {
+                    roleId: 4,
+                    permissionId: 28,
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },
